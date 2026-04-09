@@ -1,0 +1,204 @@
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { LayoutDashboard, Search, ArrowLeftRight, Bell, User, Plus, LogOut, Menu, X } from 'lucide-react'
+import { useState } from 'react'
+import { useAuth } from '../context/AuthContext.jsx'
+import { useNotifications } from '../context/NotificationContext.jsx'
+import { notificationsApi } from '../api/endpoints.js'
+import { QUERY_KEYS } from '../store/queryClient.js'
+import { Avatar, Toast } from './shared.jsx'
+
+const NAV_LINKS = [
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/browse', icon: Search, label: 'Browse' },
+  { to: '/exchanges', icon: ArrowLeftRight, label: 'Exchanges' },
+  { to: '/notifications', icon: Bell, label: 'Notifications' },
+]
+
+export const AppLayout = ({ children }) => {
+  const { user, logout } = useAuth()
+  const { toasts, dismissToast } = useNotifications()
+  const navigate = useNavigate()
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  const { data: notifData } = useQuery({
+    queryKey: QUERY_KEYS.NOTIFICATIONS({ page: 1, limit: 1 }),
+    queryFn: () => notificationsApi.list({ limit: 1 }).then(r => r.data),
+    enabled: !!user,
+    refetchInterval: 30_000,
+  })
+
+  const unread = notifData?.pagination?.total ?? 0
+
+  return (
+    <div className="min-h-screen bg-bartr-bg flex">
+      {/* ── Sidebar (desktop) ── */}
+      <aside className="hidden md:flex flex-col w-60 shrink-0 bg-white border-r border-gray-100 fixed inset-y-0 left-0 z-30">
+        {/* Logo */}
+        <div className="h-16 flex items-center px-6 border-b border-gray-50">
+          <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 font-sora font-bold text-lg">
+            <span className="w-7 h-7 bg-yellow-300 rounded-lg flex items-center justify-center text-bartr-dark font-black text-sm">B</span>
+            Bartr
+          </button>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-4 space-y-1">
+          {NAV_LINKS.map(({ to, icon: Icon, label }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium font-dm transition-all ${isActive ? 'bg-bartr-dark text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`
+              }
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+              {label === 'Notifications' && unread > 0 && (
+                <span className="ml-auto bg-yellow-300 text-bartr-dark text-xs font-bold px-1.5 py-0.5 rounded-full font-sora">
+                  {unread > 99 ? '99+' : unread}
+                </span>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+
+        {/* Post skill CTA */}
+        <div className="px-3 pb-3">
+          <button
+            onClick={() => navigate('/skills/new')}
+            className="w-full flex items-center justify-center gap-2 bg-yellow-300 text-bartr-dark font-sora font-semibold text-sm py-2.5 rounded-xl hover:bg-yellow-400 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Post a Skill
+          </button>
+        </div>
+
+        {/* User footer */}
+        <div className="border-t border-gray-50 p-3">
+          <button
+            onClick={() => navigate(`/profile/${user?.username}`)}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors text-left"
+          >
+            <Avatar src={user?.avatar_url} name={user?.full_name} size="sm" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 font-sora truncate">{user?.full_name}</p>
+              <p className="text-xs text-gray-400 font-dm truncate">@{user?.username}</p>
+            </div>
+          </button>
+          <button
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors text-sm font-dm mt-1"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign out
+          </button>
+        </div>
+      </aside>
+
+      {/* ── Mobile header ── */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100 h-14 flex items-center px-4 justify-between">
+        <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 font-sora font-bold text-base">
+          <span className="w-6 h-6 bg-yellow-300 rounded-lg flex items-center justify-center text-bartr-dark font-black text-xs">B</span>
+          Bartr
+        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => navigate('/skills/new')} className="w-8 h-8 bg-yellow-300 rounded-full flex items-center justify-center">
+            <Plus className="w-4 h-4 text-bartr-dark" />
+          </button>
+          <button onClick={() => setMobileOpen(o => !o)} className="p-1">
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 z-30 bg-white pt-14">
+          <nav className="p-4 space-y-1">
+            {NAV_LINKS.map(({ to, icon: Icon, label }) => (
+              <NavLink
+                key={to}
+                to={to}
+                onClick={() => setMobileOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm ${isActive ? 'bg-bartr-dark text-white' : 'text-gray-700 hover:bg-gray-50'}`
+                }
+              >
+                <Icon className="w-4 h-4" />
+                {label}
+              </NavLink>
+            ))}
+            <button
+              onClick={() => { navigate(`/profile/${user?.username}`); setMobileOpen(false) }}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm text-gray-700 hover:bg-gray-50"
+            >
+              <User className="w-4 h-4" />
+              My Profile
+            </button>
+            <button
+              onClick={logout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm text-red-500"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign out
+            </button>
+          </nav>
+        </div>
+      )}
+
+      {/* ── Main content ── */}
+      <main className="flex-1 md:ml-60 pt-14 md:pt-0 min-h-screen">
+        <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
+          {children}
+        </div>
+      </main>
+
+      {/* ── Toast stack ── */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+        {toasts.map(t => (
+          <Toast key={t.id} toast={t} onDismiss={dismissToast} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Protected Route ────────────────────────────────────────────────────────────
+import { Navigate } from 'react-router-dom'
+import { Spinner } from './shared.jsx'
+
+export const ProtectedRoute = ({ children }) => {
+  const { user, isLoading } = useAuth()
+  if (isLoading) return (
+    <div className="min-h-screen flex items-center justify-center bg-bartr-bg">
+      <Spinner size="lg" />
+    </div>
+  )
+  if (!user) return <Navigate to="/login" replace />
+  if (!user.onboarding_done) return <Navigate to="/onboarding" replace />
+  return children
+}
+
+export const OnboardingRoute = ({ children }) => {
+  const { user, isLoading } = useAuth()
+  if (isLoading) return (
+    <div className="min-h-screen flex items-center justify-center bg-bartr-bg">
+      <Spinner size="lg" />
+    </div>
+  )
+  if (!user) return <Navigate to="/login" replace />
+  if (user.onboarding_done) return <Navigate to="/dashboard" replace />
+  return children
+}
+
+export const GuestRoute = ({ children }) => {
+  const { user, isLoading } = useAuth()
+  if (isLoading) return (
+    <div className="min-h-screen flex items-center justify-center bg-bartr-bg">
+      <Spinner size="lg" />
+    </div>
+  )
+  if (user) return <Navigate to={user.onboarding_done ? '/dashboard' : '/onboarding'} replace />
+  return children
+}
