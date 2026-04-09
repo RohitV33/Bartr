@@ -1,18 +1,153 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { MapPin, GraduationCap, Star, ArrowLeftRight } from 'lucide-react'
+import { GraduationCap, ArrowLeftRight, Star, ChevronRight, Sparkles, Edit3 } from 'lucide-react'
 import { usersApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
-import {
-  Avatar, Card, Stars, ProficiencyBadge, Spinner, EmptyState, Button, Badge,
-} from '../../components/shared.jsx'
+import { Avatar, Card, Stars, ProficiencyBadge, Spinner, EmptyState, Button, Badge } from '../../components/shared.jsx'
 import { timeAgo } from '../../utils/helpers.js'
+import { useEffect, useRef, useState } from 'react'
+
+/* ─── Custom Cursor ─────────────────────────────────────────────────────────── */
+function CustomCursor() {
+  const dot = useRef(null)
+  const ring = useRef(null)
+  const pos = useRef({ x: 0, y: 0 })
+  const rp = useRef({ x: 0, y: 0 })
+  const [h, setH] = useState(false)
+  useEffect(() => {
+    const mv = (e) => { pos.current = { x: e.clientX, y: e.clientY }; if (dot.current) { dot.current.style.left=`${e.clientX}px`; dot.current.style.top=`${e.clientY}px` } }
+    const ov = (e) => setH(!!e.target.closest('button,a,[role=button]'))
+    window.addEventListener('mousemove', mv); window.addEventListener('mouseover', ov)
+    let raf; const a = () => { rp.current.x+=(pos.current.x-rp.current.x)*.1; rp.current.y+=(pos.current.y-rp.current.y)*.1; if(ring.current){ring.current.style.left=`${rp.current.x}px`;ring.current.style.top=`${rp.current.y}px`}; raf=requestAnimationFrame(a) }; raf=requestAnimationFrame(a)
+    return () => { window.removeEventListener('mousemove',mv); window.removeEventListener('mouseover',ov); cancelAnimationFrame(raf) }
+  }, [])
+  return (
+    <>
+      <div ref={dot} style={{position:'fixed',width:8,height:8,borderRadius:'50%',background:'#f59e0b',pointerEvents:'none',zIndex:9999,transform:'translate(-50%,-50%)',mixBlendMode:'multiply'}} />
+      <div ref={ring} style={{position:'fixed',width:h?48:32,height:h?48:32,borderRadius:'50%',border:`2px solid ${h?'#f59e0b':'rgba(245,158,11,0.4)'}`,pointerEvents:'none',zIndex:9998,transform:'translate(-50%,-50%)',transition:'width .3s ease,height .3s ease,border-color .3s ease'}} />
+    </>
+  )
+}
+
+/* ─── Reveal ─────────────────────────────────────────────────────────────────── */
+function Reveal({ children, delay = 0, className = '' }) {
+  const [v, setV] = useState(false)
+  const ref = useRef()
+  useEffect(() => {
+    const io = new IntersectionObserver(([e]) => { if(e.isIntersecting){setV(true);io.disconnect()} }, { threshold:0.05 })
+    if (ref.current) io.observe(ref.current); return () => io.disconnect()
+  }, [])
+  return <div ref={ref} className={className} style={{transitionDelay:`${delay}ms`,opacity:v?1:0,transform:v?'translateY(0)':'translateY(24px)',transition:'opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)'}}>{children}</div>
+}
+
+/* ─── Cinematic Profile Hero ─────────────────────────────────────────────────── */
+function ProfileHero({ user, isMe, scrollY, onEdit, onExchange }) {
+  const scale = Math.max(1 - scrollY * 0.0003, 0.93)
+  const opacity = Math.max(1 - scrollY * 0.004, 0)
+  const bgOffsets = [
+    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1400&q=80",
+    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1400&q=80",
+    "https://images.unsplash.com/photo-1528901166007-3784c7dd3653?w=1400&q=80",
+  ]
+  // pick deterministic bg from username
+  const bg = bgOffsets[(user?.username?.charCodeAt(0) || 0) % bgOffsets.length]
+
+  return (
+    <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-[2rem] mb-8">
+      {/* BG */}
+      <div className="absolute inset-0">
+        <img src={bg} alt="" className="w-full h-full object-cover" style={{transform:`translateY(${scrollY*.18}px)`,transition:'none'}} />
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-950/70 via-gray-950/60 to-gray-950/95" />
+        <div className="absolute inset-0" style={{backgroundImage:'radial-gradient(rgba(245,158,11,0.08) 1px,transparent 1px)',backgroundSize:'28px 28px'}} />
+      </div>
+
+      {/* Glow */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-80 h-40 opacity-30" style={{background:'radial-gradient(ellipse,#f59e0b,transparent 70%)'}} />
+
+      <div className="relative px-8 pt-10 pb-10 flex flex-col items-center text-center">
+        {/* Avatar ring */}
+        <div className="relative mb-5">
+          <div className="absolute inset-0 rounded-full animate-ping opacity-20" style={{background:'rgba(245,158,11,0.5)',animationDuration:'3s'}} />
+          <div className="ring-4 ring-amber-400/40 ring-offset-2 ring-offset-transparent rounded-full shadow-2xl">
+            <Avatar src={user?.avatar_url} name={user?.full_name} size="xl" />
+          </div>
+          {user?.is_verified && (
+            <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-white shadow-md">
+              <span className="text-white text-xs">✓</span>
+            </div>
+          )}
+        </div>
+
+        <h1 className="text-3xl font-black text-white mb-1" style={{fontFamily:"'Sora',sans-serif"}}>{user?.full_name}</h1>
+        <p className="text-amber-400/80 text-sm font-medium mb-3" style={{fontFamily:"'DM Sans',sans-serif"}}>@{user?.username}</p>
+
+        {user?.university && (
+          <div className="flex items-center gap-1.5 text-gray-300 text-sm mb-3" style={{fontFamily:"'DM Sans',sans-serif"}}>
+            <GraduationCap className="w-3.5 h-3.5 text-gray-400" />
+            {user.university}{user.department ? ` · ${user.department}` : ''}{user.year_of_study ? ` · Year ${user.year_of_study}` : ''}
+          </div>
+        )}
+
+        {user?.bio && <p className="text-gray-300 text-sm max-w-sm leading-relaxed mb-5" style={{fontFamily:"'DM Sans',sans-serif"}}>{user.bio}</p>}
+
+        {/* Reputation */}
+        <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 mb-6">
+          <Stars rating={user?.reputation_score} />
+          <span className="text-white font-black text-sm" style={{fontFamily:"'Sora',sans-serif"}}>{user?.reputation_score?.toFixed(1)}</span>
+          <span className="text-gray-400 text-xs">({user?._count?.reviews_received || 0} reviews)</span>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          {isMe ? (
+            <button onClick={onEdit} className="flex items-center gap-2 bg-white text-gray-900 px-6 py-2.5 rounded-full text-sm font-bold hover:bg-amber-400 transition-all duration-200 shadow-lg" style={{fontFamily:"'Sora',sans-serif"}}>
+              <Edit3 className="w-4 h-4" /> Edit Profile
+            </button>
+          ) : (
+            <button onClick={onExchange} className="flex items-center gap-2 bg-amber-400 text-gray-900 px-6 py-2.5 rounded-full text-sm font-bold hover:bg-amber-300 transition-all duration-200 shadow-lg shadow-amber-400/30" style={{fontFamily:"'Sora',sans-serif"}}>
+              <ArrowLeftRight className="w-4 h-4" /> Exchange Skills
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─── Skill Item ─────────────────────────────────────────────────────────────── */
+function SkillItem({ skill, onClick }) {
+  const [h, setH] = useState(false)
+  return (
+    <button onClick={onClick} className="w-full text-left">
+      <div
+        onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
+        className="bg-white border border-gray-100 rounded-2xl p-4 flex items-center gap-3 transition-all duration-200"
+        style={{ boxShadow: h ? '0 8px 24px rgba(0,0,0,0.1)' : '0 1px 4px rgba(0,0,0,0.04)', transform: h ? 'translateX(4px)' : 'none' }}
+      >
+        <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-xl shrink-0">{skill.category?.icon}</div>
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-gray-900 text-sm" style={{fontFamily:"'Sora',sans-serif"}}>{skill.title}</p>
+          <p className="text-xs text-gray-500 line-clamp-1" style={{fontFamily:"'DM Sans',sans-serif"}}>{skill.description}</p>
+        </div>
+        <ProficiencyBadge level={skill.proficiency_level} />
+        <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" style={{opacity: h?1:0, transform: h?'translateX(2px)':'none', transition:'all .2s'}} />
+      </div>
+    </button>
+  )
+}
 
 export default function ProfilePage() {
   const { username } = useParams()
   const navigate = useNavigate()
   const { user: me } = useAuth()
+  const [scrollY, setScrollY] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.USER_PROFILE(username),
@@ -28,86 +163,61 @@ export default function ProfilePage() {
   const requests = user.skills?.filter(s => !s.is_offering) || []
 
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Header */}
-      <Card className="p-6 mb-6">
-        <div className="flex items-start gap-5">
-          <Avatar src={user.avatar_url} name={user.full_name} size="xl" />
-          <div className="flex-1">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h1 className="font-sora font-bold text-2xl text-gray-900">{user.full_name}</h1>
-                <p className="text-gray-500 font-dm text-sm">@{user.username}</p>
-              </div>
-              {isMe ? (
-                <Button variant="secondary" size="sm" onClick={() => navigate('/profile/edit')}>Edit profile</Button>
-              ) : (
-                <Button variant="primary" size="sm" onClick={() => navigate('/browse')}>
-                  <ArrowLeftRight className="w-3.5 h-3.5" /> Exchange
-                </Button>
-              )}
-            </div>
+    <div className="max-w-3xl mx-auto" style={{cursor:'none'}}>
+      <CustomCursor />
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap'); *{cursor:none!important}`}</style>
 
-            <div className="flex flex-wrap gap-4 mt-3 text-sm font-dm text-gray-500">
-              {user.university && (
-                <span className="flex items-center gap-1.5"><GraduationCap className="w-3.5 h-3.5" />{user.university}{user.department ? ` · ${user.department}` : ''}</span>
-              )}
-              {user.year_of_study && <span>Year {user.year_of_study}</span>}
-            </div>
-
-            {user.bio && <p className="text-gray-600 font-dm text-sm mt-3 leading-relaxed">{user.bio}</p>}
-
-            <div className="flex items-center gap-4 mt-4">
-              <div className="flex items-center gap-1.5">
-                <Stars rating={user.reputation_score} />
-                <span className="text-sm font-bold text-gray-900">{user.reputation_score?.toFixed(1)}</span>
-                <span className="text-xs text-gray-400 font-dm">({user._count?.reviews_received || 0} reviews)</span>
-              </div>
-              {user.is_verified && (
-                <Badge className="bg-emerald-100 text-emerald-700">✓ Verified</Badge>
-              )}
-            </div>
-          </div>
-        </div>
-      </Card>
+      <ProfileHero
+        user={user} isMe={isMe} scrollY={scrollY}
+        onEdit={() => navigate('/profile/edit')}
+        onExchange={() => navigate('/browse')}
+      />
 
       <div className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-6">
-          {/* Skills offering */}
+        <div className="md:col-span-2 space-y-8">
+
+          {/* Skills Offered */}
           {offerings.length > 0 && (
             <div>
-              <h2 className="font-sora font-bold text-gray-900 mb-3 flex items-center gap-2">✨ Skills Offered <span className="text-sm font-normal text-gray-400">({offerings.length})</span></h2>
-              <div className="space-y-2">
-                {offerings.map(skill => (
-                  <button key={skill.id} onClick={() => navigate(`/skills/${skill.id}`)} className="w-full text-left">
-                    <Card className="p-4 hover:shadow-sm transition-shadow flex items-center gap-3">
-                      <span className="text-xl">{skill.category?.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-sora font-semibold text-gray-900 text-sm">{skill.title}</p>
-                        <p className="text-xs text-gray-500 font-dm line-clamp-1">{skill.description}</p>
-                      </div>
-                      <ProficiencyBadge level={skill.proficiency_level} />
-                    </Card>
-                  </button>
+              <Reveal>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-200 to-transparent" />
+                  <h2 className="text-sm font-black text-gray-500 uppercase tracking-widest" style={{fontFamily:"'Sora',sans-serif"}}>✨ Offering ({offerings.length})</h2>
+                  <div className="h-px flex-1 bg-gradient-to-l from-transparent via-amber-200 to-transparent" />
+                </div>
+              </Reveal>
+              <div className="space-y-2.5">
+                {offerings.map((skill, i) => (
+                  <Reveal key={skill.id} delay={i * 60}>
+                    <SkillItem skill={skill} onClick={() => navigate(`/skills/${skill.id}`)} />
+                  </Reveal>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Skills wanting */}
+          {/* Skills Wanted */}
           {requests.length > 0 && (
             <div>
-              <h2 className="font-sora font-bold text-gray-900 mb-3 flex items-center gap-2">🎯 Looking to Learn <span className="text-sm font-normal text-gray-400">({requests.length})</span></h2>
-              <div className="space-y-2">
-                {requests.map(skill => (
-                  <Card key={skill.id} className="p-4 flex items-center gap-3">
-                    <span className="text-xl">{skill.category?.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-sora font-semibold text-gray-900 text-sm">{skill.title}</p>
-                      <p className="text-xs text-gray-500 font-dm line-clamp-1">{skill.description}</p>
+              <Reveal>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-blue-200 to-transparent" />
+                  <h2 className="text-sm font-black text-gray-500 uppercase tracking-widest" style={{fontFamily:"'Sora',sans-serif"}}>🎯 Wanting ({requests.length})</h2>
+                  <div className="h-px flex-1 bg-gradient-to-l from-transparent via-blue-200 to-transparent" />
+                </div>
+              </Reveal>
+              <div className="space-y-2.5">
+                {requests.map((skill, i) => (
+                  <Reveal key={skill.id} delay={i * 60}>
+                    <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-4 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-xl shrink-0">{skill.category?.icon}</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-gray-900 text-sm" style={{fontFamily:"'Sora',sans-serif"}}>{skill.title}</p>
+                        <p className="text-xs text-gray-500 line-clamp-1" style={{fontFamily:"'DM Sans',sans-serif"}}>{skill.description}</p>
+                      </div>
+                      <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full" style={{fontFamily:"'Sora',sans-serif"}}>Wants</span>
                     </div>
-                    <Badge className="bg-blue-100 text-blue-700">Wants</Badge>
-                  </Card>
+                  </Reveal>
                 ))}
               </div>
             </div>
@@ -116,45 +226,62 @@ export default function ProfilePage() {
           {/* Reviews */}
           {user.reviews_received?.length > 0 && (
             <div>
-              <h2 className="font-sora font-bold text-gray-900 mb-3">Reviews</h2>
+              <Reveal>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-rose-200 to-transparent" />
+                  <h2 className="text-sm font-black text-gray-500 uppercase tracking-widest" style={{fontFamily:"'Sora',sans-serif"}}>⭐ Reviews</h2>
+                  <div className="h-px flex-1 bg-gradient-to-l from-transparent via-rose-200 to-transparent" />
+                </div>
+              </Reveal>
               <div className="space-y-3">
-                {user.reviews_received.map(r => (
-                  <Card key={r.id} className="p-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Avatar src={r.reviewer.avatar_url} name={r.reviewer.full_name} size="sm" />
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-gray-900 font-sora">{r.reviewer.full_name}</p>
-                        <Stars rating={r.rating} />
+                {user.reviews_received.map((r, i) => (
+                  <Reveal key={r.id} delay={i * 60}>
+                    <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                      <div className="flex items-center gap-3 mb-3">
+                        <Avatar src={r.reviewer.avatar_url} name={r.reviewer.full_name} size="sm" />
+                        <div className="flex-1">
+                          <p className="text-sm font-bold text-gray-900" style={{fontFamily:"'Sora',sans-serif"}}>{r.reviewer.full_name}</p>
+                          <Stars rating={r.rating} />
+                        </div>
+                        <span className="text-xs text-gray-400" style={{fontFamily:"'DM Sans',sans-serif"}}>{timeAgo(r.created_at)}</span>
                       </div>
-                      <span className="text-xs text-gray-400 font-dm">{timeAgo(r.created_at)}</span>
+                      {r.comment && (
+                        <p className="text-sm text-gray-600 italic border-l-2 border-amber-300 pl-3" style={{fontFamily:"'DM Sans',sans-serif"}}>"{r.comment}"</p>
+                      )}
                     </div>
-                    {r.comment && <p className="text-sm text-gray-600 font-dm italic">"{r.comment}"</p>}
-                  </Card>
+                  </Reveal>
                 ))}
               </div>
             </div>
           )}
         </div>
 
-        {/* Portfolio */}
+        {/* Portfolio sidebar */}
         <div>
           {user.portfolios?.length > 0 && (
             <div>
-              <h2 className="font-sora font-bold text-gray-900 mb-3">Portfolio</h2>
+              <Reveal>
+                <h2 className="text-sm font-black text-gray-500 uppercase tracking-widest mb-4" style={{fontFamily:"'Sora',sans-serif"}}>🖼️ Portfolio</h2>
+              </Reveal>
               <div className="space-y-3">
-                {user.portfolios.map(item => (
-                  <Card key={item.id} className="overflow-hidden">
-                    <img src={item.file_url} alt={item.title} className="w-full h-32 object-cover" />
-                    <div className="p-3">
-                      <p className="text-sm font-semibold text-gray-900 font-sora">{item.title}</p>
-                      {item.description && <p className="text-xs text-gray-500 font-dm mt-0.5 line-clamp-2">{item.description}</p>}
-                      {item.tags?.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {item.tags.map(tag => <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-dm">{tag}</span>)}
-                        </div>
-                      )}
+                {user.portfolios.map((item, i) => (
+                  <Reveal key={item.id} delay={i * 80}>
+                    <div className="overflow-hidden rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                      <div className="relative overflow-hidden">
+                        <img src={item.file_url} alt={item.title} className="w-full h-36 object-cover hover:scale-105 transition-transform duration-500" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+                      </div>
+                      <div className="p-3 bg-white">
+                        <p className="text-sm font-bold text-gray-900" style={{fontFamily:"'Sora',sans-serif"}}>{item.title}</p>
+                        {item.description && <p className="text-xs text-gray-500 mt-0.5 line-clamp-2" style={{fontFamily:"'DM Sans',sans-serif"}}>{item.description}</p>}
+                        {item.tags?.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {item.tags.map(tag => <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-medium">{tag}</span>)}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </Card>
+                  </Reveal>
                 ))}
               </div>
             </div>

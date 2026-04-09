@@ -3,9 +3,12 @@ import { ok, notFound, forbidden, paginated } from '../utils/response.js'
 
 export const getNotifications = async (req, res, next) => {
   try {
-    const { page = 1, limit = 20, type } = req.query
+    const { page = 1, limit = 20, type, is_read } = req.query
     const skip = (Number(page) - 1) * Number(limit)
     const where = { user_id: req.user.id, ...(type && { type }) }
+    if (is_read !== undefined) {
+      where.is_read = is_read === 'true'
+    }
     const [notifications, total] = await Promise.all([
       prisma.notification.findMany({ where, orderBy: { created_at: 'desc' }, skip, take: Number(limit) }),
       prisma.notification.count({ where }),

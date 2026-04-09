@@ -5,8 +5,10 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { skillsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
-import { Input, Textarea, Select, Button, PageHeader, Spinner } from '../../components/shared.jsx'
+import { Input, Textarea, Select, Spinner } from '../../components/shared.jsx'
 import { extractError } from '../../utils/helpers.js'
+import { useEffect, useRef, useState } from 'react'
+import { ChevronLeft, Sparkles, BookOpen } from 'lucide-react'
 
 const schema = z.object({
   title: z.string().min(3, 'At least 3 characters'),
@@ -16,8 +18,77 @@ const schema = z.object({
   is_offering: z.boolean(),
 })
 
+/* ─── Custom Cursor ─────────────────────────────────────────────────────────── */
+function CustomCursor() {
+  const dot = useRef(null); const ring = useRef(null)
+  const pos = useRef({x:0,y:0}); const rp = useRef({x:0,y:0}); const [h,setH]=useState(false)
+  useEffect(()=>{
+    const mv=(e)=>{pos.current={x:e.clientX,y:e.clientY};if(dot.current){dot.current.style.left=`${e.clientX}px`;dot.current.style.top=`${e.clientY}px`}}
+    const ov=(e)=>setH(!!e.target.closest('button,a,[role=button],input,textarea,select'))
+    window.addEventListener('mousemove',mv);window.addEventListener('mouseover',ov)
+    let raf;const a=()=>{rp.current.x+=(pos.current.x-rp.current.x)*.1;rp.current.y+=(pos.current.y-rp.current.y)*.1;if(ring.current){ring.current.style.left=`${rp.current.x}px`;ring.current.style.top=`${rp.current.y}px`};raf=requestAnimationFrame(a)};raf=requestAnimationFrame(a)
+    return()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseover',ov);cancelAnimationFrame(raf)}
+  },[])
+  return (
+    <>
+      <div ref={dot} style={{position:'fixed',width:8,height:8,borderRadius:'50%',background:'#f59e0b',pointerEvents:'none',zIndex:9999,transform:'translate(-50%,-50%)',mixBlendMode:'multiply'}} />
+      <div ref={ring} style={{position:'fixed',width:h?48:32,height:h?48:32,borderRadius:'50%',border:`2px solid ${h?'#f59e0b':'rgba(245,158,11,0.4)'}`,pointerEvents:'none',zIndex:9998,transform:'translate(-50%,-50%)',transition:'width .3s ease,height .3s ease,border-color .3s ease'}} />
+    </>
+  )
+}
+
+/* ─── Reveal ─────────────────────────────────────────────────────────────────── */
+function Reveal({ children, delay = 0 }) {
+  const [v, setV] = useState(false); const ref = useRef()
+  useEffect(()=>{
+    const io=new IntersectionObserver(([e])=>{if(e.isIntersecting){setV(true);io.disconnect()}},{threshold:.05})
+    if(ref.current) io.observe(ref.current); return()=>io.disconnect()
+  },[])
+  return <div ref={ref} style={{transitionDelay:`${delay}ms`,opacity:v?1:0,transform:v?'translateY(0)':'translateY(24px)',transition:'opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)'}}>{children}</div>
+}
+
+/* ─── Hero ───────────────────────────────────────────────────────────────────── */
+function PostHero({ isOffering, scrollY }) {
+  const scale = Math.max(1 - scrollY * 0.0004, 0.93)
+  const opacity = Math.max(1 - scrollY * 0.004, 0)
+  return (
+    <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-[2rem] mb-8">
+      <div className="absolute inset-0">
+        <img
+          src={isOffering ? "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80" : "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&q=80"}
+          alt="" className="w-full h-full object-cover transition-all duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-950/92 via-gray-900/78 to-gray-950/88" />
+        <div className="absolute inset-0 opacity-5" style={{backgroundImage:'radial-gradient(rgba(255,255,255,0.4) 1px,transparent 1px)',backgroundSize:'20px 20px'}} />
+      </div>
+      <div className="absolute top-0 right-0 w-72 h-72 opacity-15" style={{background:`radial-gradient(circle, ${isOffering?'#f59e0b':'#3b82f6'}, transparent 70%)`,transform:'translate(30%,-30%)'}} />
+
+      <div className="relative px-8 py-10">
+        <div className={`inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-full border mb-4 ${isOffering ? 'bg-amber-400/20 text-amber-300 border-amber-400/20' : 'bg-blue-400/20 text-blue-300 border-blue-400/20'}`}>
+          <Sparkles className="w-3 h-3" />
+          {isOffering ? 'Share Your Expertise' : 'Find a Teacher'}
+        </div>
+        <h1 className="text-3xl font-black text-white mb-2" style={{fontFamily:"'Sora',sans-serif"}}>
+          {isOffering ? 'Post a Skill ✨' : 'Request a Skill 🎯'}
+        </h1>
+        <p className="text-gray-300 text-sm" style={{fontFamily:"'DM Sans',sans-serif"}}>
+          {isOffering ? 'Share what you can teach and connect with eager learners.' : 'Describe what you want to learn and find the perfect teacher.'}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export default function NewSkillPage() {
   const navigate = useNavigate()
+  const [scrollY, setScrollY] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   const { register, handleSubmit, watch, setValue, formState: { errors }, setError } = useForm({
     resolver: zodResolver(schema),
     defaultValues: { is_offering: true, proficiency_level: 'INTERMEDIATE' },
@@ -41,90 +112,147 @@ export default function NewSkillPage() {
   if (catsLoading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
   return (
-    <div className="max-w-xl mx-auto">
-      <PageHeader
-        title="Post a Skill"
-        subtitle="Share what you can teach or what you're looking to learn"
-      />
+    <div className="max-w-xl mx-auto px-4 py-6" style={{cursor:'none'}}>
+      <CustomCursor />
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap'); *{cursor:none!important}`}</style>
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-8">
-        {/* Toggle: offering vs requesting */}
-        <div className="flex gap-2 p-1 bg-gray-100 rounded-xl mb-6">
-          {[true, false].map(val => (
-            <button
-              key={String(val)}
-              type="button"
-              onClick={() => setValue('is_offering', val)}
-              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold font-sora transition-all ${isOffering === val ? 'bg-white text-bartr-dark shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              {val ? '✨ I can teach this' : '🎯 I want to learn this'}
-            </button>
-          ))}
-        </div>
-
-        {errors.root && (
-          <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 mb-4">
-            <p className="text-sm text-red-600 font-dm">{errors.root.message}</p>
+      {/* Back */}
+      <Reveal>
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-700 mb-5 transition-colors group" style={{fontFamily:"'DM Sans',sans-serif"}}>
+          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+            <ChevronLeft className="w-3.5 h-3.5" />
           </div>
-        )}
+          Back
+        </button>
+      </Reveal>
 
-        <form onSubmit={handleSubmit(d => mutation.mutate(d))} className="space-y-5">
-          <Input
-            label="Skill title"
-            placeholder={isOffering ? 'e.g. React Development, Piano Lessons…' : 'e.g. UI/UX Design, Spanish…'}
-            error={errors.title?.message}
-            {...register('title')}
-          />
+      <PostHero isOffering={isOffering} scrollY={scrollY} />
 
-          <Textarea
-            label={isOffering ? 'What you can teach' : 'What you\'re looking for'}
-            placeholder={
-                isOffering
-                  ? `Describe your experience, what you'll teach, and how you'll run sessions…`
-                  : `Describe what you want to learn, your current level, and what outcome you're hoping for…`
-              }
-            rows={4}
-            error={errors.description?.message}
-            {...register('description')}
-          />
+      <Reveal delay={60}>
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
 
-          {/* Category grid */}
-          <div>
-            <label className="text-sm font-medium text-gray-700 font-sora block mb-2">Category</label>
-            <div className="grid grid-cols-4 gap-2">
-              {categories.map(cat => (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setValue('category_id', cat.id, { shouldValidate: true })}
-                  className={`flex flex-col items-center gap-1 p-3 rounded-xl border text-center transition-all ${selectedCategory === cat.id ? 'border-bartr-dark bg-bartr-dark text-white' : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'}`}
-                >
-                  <span className="text-xl">{cat.icon}</span>
-                  <span className="text-xs font-sora font-medium leading-tight">{cat.name}</span>
-                </button>
-              ))}
+          {/* Toggle */}
+          <div className="flex gap-1.5 p-1.5 bg-gray-100 rounded-2xl mb-6">
+            {[true, false].map(val => (
+              <button
+                key={String(val)}
+                type="button"
+                onClick={() => setValue('is_offering', val)}
+                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${isOffering === val ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+                style={{fontFamily:"'Sora',sans-serif"}}
+              >
+                {val ? '✨ I can teach this' : '🎯 I want to learn this'}
+              </button>
+            ))}
+          </div>
+
+          {errors.root && (
+            <div className="bg-red-50 border border-red-100 rounded-2xl px-4 py-3 mb-5">
+              <p className="text-sm text-red-600" style={{fontFamily:"'DM Sans',sans-serif"}}>{errors.root.message}</p>
             </div>
-            {errors.category_id && <p className="text-xs text-red-500 font-dm mt-1">{errors.category_id.message}</p>}
-          </div>
+          )}
 
-          <Select
-            label={isOffering ? 'Your proficiency level' : 'Your current level in this skill'}
-            error={errors.proficiency_level?.message}
-            {...register('proficiency_level')}
-          >
-            <option value="BEGINNER">Beginner</option>
-            <option value="INTERMEDIATE">Intermediate</option>
-            <option value="EXPERT">Expert</option>
-          </Select>
+          <form onSubmit={handleSubmit(d => mutation.mutate(d))} className="space-y-6">
 
-          <div className="flex gap-3 pt-2">
-            <Button type="button" variant="secondary" size="md" onClick={() => navigate(-1)} className="flex-1">Cancel</Button>
-            <Button type="submit" variant="primary" size="md" loading={mutation.isPending} className="flex-1">
-              {isOffering ? '✨ Post offering' : '🎯 Post request'}
-            </Button>
-          </div>
-        </form>
-      </div>
+            <div>
+              <label className="text-sm font-bold text-gray-700 block mb-1.5" style={{fontFamily:"'Sora',sans-serif"}}>Skill title</label>
+              <input
+                placeholder={isOffering ? 'e.g. React Development, Piano Lessons…' : 'e.g. UI/UX Design, Spanish…'}
+                className="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 text-sm focus:outline-none focus:ring-0 focus:border-amber-400 transition-all"
+                style={{fontFamily:"'DM Sans',sans-serif"}}
+                {...register('title')}
+              />
+              {errors.title && <p className="text-xs text-red-500 mt-1" style={{fontFamily:"'DM Sans',sans-serif"}}>{errors.title.message}</p>}
+            </div>
+
+            <div>
+              <label className="text-sm font-bold text-gray-700 block mb-1.5" style={{fontFamily:"'Sora',sans-serif"}}>
+                {isOffering ? 'What you can teach' : "What you're looking for"}
+              </label>
+              <textarea
+                rows={4}
+                placeholder={isOffering ? "Describe your experience, what you'll teach…" : "Describe what you want to learn, your current level…"}
+                className="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 text-sm focus:outline-none focus:ring-0 focus:border-amber-400 transition-all resize-none"
+                style={{fontFamily:"'DM Sans',sans-serif"}}
+                {...register('description')}
+              />
+              {errors.description && <p className="text-xs text-red-500 mt-1" style={{fontFamily:"'DM Sans',sans-serif"}}>{errors.description.message}</p>}
+            </div>
+
+            {/* Category grid */}
+            <div>
+              <label className="text-sm font-bold text-gray-700 block mb-3" style={{fontFamily:"'Sora',sans-serif"}}>Category</label>
+              <div className="grid grid-cols-4 gap-2">
+                {categories.map(cat => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setValue('category_id', cat.id, { shouldValidate: true })}
+                    className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 text-center transition-all duration-200 group ${
+                      selectedCategory === cat.id
+                        ? 'border-gray-900 bg-gray-900 text-white shadow-lg'
+                        : 'border-gray-200 hover:border-gray-400 bg-white text-gray-700 hover:shadow-sm'
+                    }`}
+                  >
+                    <span className="text-2xl">{cat.icon}</span>
+                    <span className="text-xs font-bold leading-tight" style={{fontFamily:"'Sora',sans-serif"}}>{cat.name}</span>
+                  </button>
+                ))}
+              </div>
+              {errors.category_id && <p className="text-xs text-red-500 mt-1.5" style={{fontFamily:"'DM Sans',sans-serif"}}>{errors.category_id.message}</p>}
+            </div>
+
+            {/* Proficiency */}
+            <div>
+              <label className="text-sm font-bold text-gray-700 block mb-3" style={{fontFamily:"'Sora',sans-serif"}}>Proficiency Level</label>
+              <div className="grid grid-cols-3 gap-2">
+                {['BEGINNER','INTERMEDIATE','EXPERT'].map(lvl => {
+                  const icons = { BEGINNER:'🌱', INTERMEDIATE:'⚡', EXPERT:'🔥' }
+                  const labels = { BEGINNER:'Beginner', INTERMEDIATE:'Intermediate', EXPERT:'Expert' }
+                  const current = watch('proficiency_level')
+                  return (
+                    <button
+                      key={lvl}
+                      type="button"
+                      onClick={() => setValue('proficiency_level', lvl)}
+                      className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 text-center transition-all duration-200 ${
+                        current === lvl ? 'border-amber-400 bg-amber-50 text-amber-700' : 'border-gray-200 hover:border-gray-400 text-gray-600'
+                      }`}
+                    >
+                      <span className="text-xl">{icons[lvl]}</span>
+                      <span className="text-xs font-bold" style={{fontFamily:"'Sora',sans-serif"}}>{labels[lvl]}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Submit */}
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:border-gray-400 hover:bg-gray-50 transition-all"
+                style={{fontFamily:"'Sora',sans-serif"}}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={mutation.isPending}
+                className="flex-1 py-3 rounded-2xl bg-gray-900 text-white text-sm font-bold disabled:opacity-60 hover:bg-gray-700 transition-all shadow-lg flex items-center justify-center gap-2"
+                style={{fontFamily:"'Sora',sans-serif"}}
+              >
+                {mutation.isPending
+                  ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Posting…</>
+                  : isOffering ? '✨ Post Offering' : '🎯 Post Request'
+                }
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </Reveal>
     </div>
   )
 }

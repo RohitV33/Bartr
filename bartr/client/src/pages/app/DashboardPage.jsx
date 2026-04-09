@@ -1,405 +1,290 @@
+import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useRef, useState } from 'react'
-import { ArrowRight, Plus, Zap, ChevronRight } from 'lucide-react'
+import { ArrowRight, Plus, Sparkles, TrendingUp, Star, Zap, BookOpen, Users, ChevronRight } from 'lucide-react'
 import { usersApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
-import { Avatar, Card, Stars, Spinner, EmptyState, Button } from '../../components/shared.jsx'
-import { timeAgo, exchangeStatusLabel as statusLabel, exchangeStatusColor as statusColor } from '../../utils/helpers.js'
+import { Avatar, SkillCard, Spinner } from '../../components/shared.jsx'
 
-/* ─── Animated counter ─── */
-function useCountUp(target, duration = 900) {
-  const [val, setVal] = useState(0)
+/* ─── Custom Cursor ─────────────────────────────────────────────────────────── */
+function CustomCursor() {
+  const dot = useRef(null)
+  const ring = useRef(null)
+  const pos = useRef({ x: 0, y: 0 })
+  const ringPos = useRef({ x: 0, y: 0 })
+  const [hovered, setHovered] = useState(false)
+
   useEffect(() => {
-    if (!target) return
-    let start = null
-    const step = (ts) => {
-      if (!start) start = ts
-      const p = Math.min((ts - start) / duration, 1)
-      setVal(p < 1 ? target * p : target)
-      if (p < 1) requestAnimationFrame(step)
+    const move = (e) => {
+      pos.current = { x: e.clientX, y: e.clientY }
+      if (dot.current) {
+        dot.current.style.left = `${e.clientX}px`
+        dot.current.style.top = `${e.clientY}px`
+      }
     }
-    requestAnimationFrame(step)
-  }, [target, duration])
-  return val
-}
-
-/* ─── Stat card with count-up ─── */
-function StatCard({ label, value, icon, delay = 0 }) {
-  const num = useCountUp(parseFloat(value) || 0)
-  const isFloat = String(value).includes('.')
-  const [visible, setVisible] = useState(false)
-  const ref = useRef()
-
-  useEffect(() => {
-    const io = new IntersectionObserver(([e]) => e.isIntersecting && setVisible(true), { threshold: 0.1 })
-    if (ref.current) io.observe(ref.current)
-    return () => io.disconnect()
+    const over = (e) => setHovered(!!e.target.closest('button,a,[role=button],input'))
+    window.addEventListener('mousemove', move)
+    window.addEventListener('mouseover', over)
+    let raf
+    const animate = () => {
+      ringPos.current.x += (pos.current.x - ringPos.current.x) * 0.1
+      ringPos.current.y += (pos.current.y - ringPos.current.y) * 0.1
+      if (ring.current) {
+        ring.current.style.left = `${ringPos.current.x}px`
+        ring.current.style.top = `${ringPos.current.y}px`
+      }
+      raf = requestAnimationFrame(animate)
+    }
+    raf = requestAnimationFrame(animate)
+    return () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseover', over); cancelAnimationFrame(raf) }
   }, [])
 
   return (
-    <div
-      ref={ref}
-      style={{
-        transitionDelay: `${delay}ms`,
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(18px)',
-        transition: 'opacity .45s ease, transform .45s ease',
-      }}
-      className="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col gap-2 hover:-translate-y-1 transition-transform duration-200 cursor-default"
-    >
-      <span className="text-xl">{icon}</span>
-      <p className="text-2xl font-bold text-gray-900 font-sora">
-        {isFloat ? num.toFixed(1) : Math.round(num)}
-      </p>
-      <p className="text-xs text-gray-400 font-dm uppercase tracking-wide">{label}</p>
+    <>
+      <div ref={dot} style={{ position:'fixed', width:8, height:8, borderRadius:'50%', background:'#f59e0b', pointerEvents:'none', zIndex:9999, transform:'translate(-50%,-50%)', mixBlendMode:'multiply' }} />
+      <div ref={ring} style={{ position:'fixed', width: hovered?48:32, height: hovered?48:32, borderRadius:'50%', border:`2px solid ${hovered?'#f59e0b':'rgba(245,158,11,0.4)'}`, pointerEvents:'none', zIndex:9998, transform:'translate(-50%,-50%)', transition:'width .3s ease,height .3s ease,border-color .3s ease' }} />
+    </>
+  )
+}
+
+/* ─── Reveal ─────────────────────────────────────────────────────────────────── */
+function Reveal({ children, delay = 0, className = '' }) {
+  const [v, setV] = useState(false)
+  const ref = useRef()
+  useEffect(() => {
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setV(true); io.disconnect() } }, { threshold: 0.05 })
+    if (ref.current) io.observe(ref.current)
+    return () => io.disconnect()
+  }, [])
+  return (
+    <div ref={ref} className={className} style={{ transitionDelay:`${delay}ms`, opacity:v?1:0, transform:v?'translateY(0)':'translateY(24px)', transition:'opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)' }}>
+      {children}
     </div>
   )
 }
 
-/* ─── Scroll-zoom parallax hero ─── */
-function HeroSection({ greeting, name, onPost }) {
-  const heroRef = useRef()
-  const orb1Ref = useRef()
-  const orb2Ref = useRef()
+/* ─── Hero Welcome Banner ───────────────────────────────────────────────────── */
+function WelcomeBanner({ user, scrollY }) {
+  const scale = Math.max(1 - scrollY * 0.0003, 0.94)
+  const opacity = Math.max(1 - scrollY * 0.003, 0)
+
+  return (
+    <div style={{ transform:`scale(${scale})`, opacity, transformOrigin:'top center' }}
+      className="relative overflow-hidden rounded-[2rem] mb-8">
+      {/* BG */}
+      <div className="absolute inset-0">
+        <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=1400&q=80" alt="" className="w-full h-full object-cover" style={{ transform:`translateY(${scrollY*0.15}px)`, transition:'none' }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-950/95 via-gray-900/80 to-amber-900/50" />
+        <div className="absolute inset-0" style={{ backgroundImage:'linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px)', backgroundSize:'50px 50px' }} />
+      </div>
+
+      {/* Glow orb */}
+      <div className="absolute top-0 right-0 w-80 h-80 rounded-full opacity-20" style={{ background:'radial-gradient(circle, #f59e0b 0%, transparent 70%)', transform:'translate(30%,-30%)' }} />
+
+      <div className="relative px-8 py-10 flex items-center justify-between gap-6">
+        <div>
+          <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 text-xs font-bold px-3 py-1.5 rounded-full border border-amber-400/20 mb-4">
+            <Sparkles className="w-3 h-3" /> Welcome back
+          </div>
+          <h1 className="text-3xl md:text-4xl font-black text-white mb-2" style={{ fontFamily:"'Sora',sans-serif" }}>
+            Hey, {user?.full_name?.split(' ')[0] || 'there'} 👋
+          </h1>
+          <p className="text-gray-300 text-sm max-w-sm" style={{ fontFamily:"'DM Sans',sans-serif" }}>
+            Ready to exchange some skills today? You have new opportunities waiting.
+          </p>
+        </div>
+        <div className="hidden md:block">
+          <div className="ring-4 ring-amber-400/30 rounded-full">
+            <Avatar src={user?.avatar_url} name={user?.full_name} size="xl" />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─── Stat Card ─────────────────────────────────────────────────────────────── */
+function StatCard({ icon: Icon, label, value, color, delay }) {
+  return (
+    <Reveal delay={delay}>
+      <div className={`relative overflow-hidden rounded-2xl p-5 border ${color} group hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}>
+        <div className="flex items-center justify-between mb-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/80 shadow-sm">
+            <Icon className="w-5 h-5 text-gray-700" />
+          </div>
+          <TrendingUp className="w-4 h-4 text-gray-400 group-hover:text-emerald-500 transition-colors" />
+        </div>
+        <p className="text-3xl font-black text-gray-900 mb-0.5" style={{ fontFamily:"'Sora',sans-serif" }}>{value}</p>
+        <p className="text-xs text-gray-500 font-medium" style={{ fontFamily:"'DM Sans',sans-serif" }}>{label}</p>
+      </div>
+    </Reveal>
+  )
+}
+
+/* ─── Section Header ─────────────────────────────────────────────────────────── */
+function SectionHeader({ title, action, actionLabel }) {
+  const navigate = useNavigate()
+  return (
+    <div className="flex items-center justify-between mb-4">
+      <h2 className="text-lg font-black text-gray-900" style={{ fontFamily:"'Sora',sans-serif" }}>{title}</h2>
+      {action && (
+        <button onClick={action} className="flex items-center gap-1 text-sm font-bold text-amber-600 hover:text-amber-700 transition-colors" style={{ fontFamily:"'Sora',sans-serif" }}>
+          {actionLabel} <ChevronRight className="w-4 h-4" />
+        </button>
+      )}
+    </div>
+  )
+}
+
+export default function DashboardPage() {
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const [scrollY, setScrollY] = useState(0)
 
-  /* scroll zoom effect */
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  /* mouse parallax */
-  const handleMouseMove = (e) => {
-    const r = heroRef.current.getBoundingClientRect()
-    const dx = ((e.clientX - r.left) / r.width - 0.5) * 24
-    const dy = ((e.clientY - r.top) / r.height - 0.5) * 24
-    if (orb1Ref.current) orb1Ref.current.style.transform = `translate(${dx}px, ${dy}px) scale(1.06)`
-    if (orb2Ref.current) orb2Ref.current.style.transform = `translate(${-dx * 0.5}px, ${-dy * 0.5}px) scale(1.02)`
-  }
-
-  const handleMouseLeave = () => {
-    if (orb1Ref.current) orb1Ref.current.style.transform = ''
-    if (orb2Ref.current) orb2Ref.current.style.transform = ''
-  }
-
-  const scaleVal = Math.max(1 - scrollY * 0.0004, 0.94)
-  const opacityVal = Math.max(1 - scrollY * 0.003, 0)
-
-  return (
-    <div
-      ref={heroRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{ transform: `scale(${scaleVal})`, opacity: opacityVal }}
-      className="relative overflow-hidden bg-gray-50 rounded-3xl p-8 mb-8 border border-gray-100 transition-[border-color] duration-200"
-    >
-      {/* decorative orbs */}
-      <div
-        ref={orb1Ref}
-        className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-blue-100 opacity-40"
-        style={{ transition: 'transform .1s ease-out' }}
-      />
-      <div
-        ref={orb2Ref}
-        className="absolute -bottom-12 left-1/3 w-40 h-40 rounded-full bg-emerald-100 opacity-30"
-        style={{ transition: 'transform .1s ease-out' }}
-      />
-      <div
-        className="absolute top-6 left-6 w-10 h-10 rounded-full bg-amber-100 opacity-50"
-        style={{ animation: 'floatA 6s ease-in-out infinite' }}
-      />
-
-      <div className="relative flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold font-sora text-gray-900 leading-tight">
-            {greeting}, {name} 👋
-          </h1>
-          <p className="text-sm text-gray-400 font-dm mt-1">Here's what's happening with your skill exchanges</p>
-        </div>
-        <button
-          onClick={onPost}
-          className="flex items-center gap-2 bg-gray-900 text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-gray-700 active:scale-95 transition-all duration-150 whitespace-nowrap flex-shrink-0"
-        >
-          <Plus className="w-4 h-4" /> Post a skill
-        </button>
-      </div>
-
-      <style>{`
-        @keyframes floatA { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-      `}</style>
-    </div>
-  )
-}
-
-/* ─── Scroll-reveal wrapper ─── */
-function Reveal({ children, delay = 0 }) {
-  const [v, setV] = useState(false)
-  const ref = useRef()
-  useEffect(() => {
-    const io = new IntersectionObserver(([e]) => e.isIntersecting && setV(true), { threshold: 0.08 })
-    if (ref.current) io.observe(ref.current)
-    return () => io.disconnect()
-  }, [])
-  return (
-    <div
-      ref={ref}
-      style={{
-        transitionDelay: `${delay}ms`,
-        opacity: v ? 1 : 0,
-        transform: v ? 'translateY(0)' : 'translateY(14px)',
-        transition: 'opacity .4s ease, transform .4s ease',
-      }}
-    >
-      {children}
-    </div>
-  )
-}
-
-/* ─── Exchange card ─── */
-function ExchangeCard({ ex, user, onClick }) {
-  const isOfferer = ex.offerer_id === user?.id
-  const partner = isOfferer ? ex.requester : ex.offerer
-  const mySkill = isOfferer ? ex.offered_skill : ex.requested_skill
-  const theirSkill = isOfferer ? ex.requested_skill : ex.offered_skill
-
-  return (
-    <div
-      onClick={onClick}
-      className="bg-white border border-gray-100 rounded-2xl p-4 cursor-pointer hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-sm transition-all duration-200"
-    >
-      <div className="flex items-center gap-3 mb-3">
-        <Avatar src={partner.avatar_url} name={partner.full_name} size="sm" />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900 font-sora truncate">{partner.full_name}</p>
-          <p className="text-xs text-gray-400 font-dm">{partner.university}</p>
-        </div>
-        <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full font-sora ${statusColor(ex.status)}`}>
-          {statusLabel(ex.status)}
-        </span>
-      </div>
-      <div className="flex items-center gap-2 text-xs font-dm">
-        <span className="bg-emerald-50 text-emerald-700 px-2 py-1 rounded-lg font-medium">{mySkill?.title}</span>
-        <ArrowRight className="w-3 h-3 text-gray-300 flex-shrink-0" />
-        <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg font-medium">{theirSkill?.title}</span>
-      </div>
-    </div>
-  )
-}
-
-/* ─── Match card ─── */
-function MatchCard({ m, onClick }) {
-  return (
-    <div
-      onClick={onClick}
-      className="bg-white border border-gray-100 rounded-2xl p-3.5 cursor-pointer hover:-translate-y-0.5 hover:border-gray-200 transition-all duration-200"
-    >
-      <div className="flex items-center gap-3">
-        <Avatar src={m.user.avatar_url} name={m.user.full_name} size="sm" />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900 font-sora truncate">{m.user.full_name}</p>
-          <p className="text-xs text-gray-400 font-dm truncate">{m.user.university}</p>
-        </div>
-        <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full font-sora">
-          {m.score}pt
-        </span>
-      </div>
-      <div className="flex items-center gap-1.5 mt-2 text-xs text-gray-400 font-dm">
-        <span className="truncate">{m.theirOffering?.title}</span>
-        <span className="text-gray-300 flex-shrink-0">↔</span>
-        <span className="truncate">{m.myOffering?.title}</span>
-      </div>
-    </div>
-  )
-}
-
-/* ─── Section header ─── */
-function SectionHead({ title, action }) {
-  return (
-    <div className="flex items-center justify-between mb-3">
-      <h2 className="text-sm font-semibold text-gray-900 font-sora">{title}</h2>
-      {action}
-    </div>
-  )
-}
-
-/* ─── Main page ─── */
-export default function DashboardPage() {
-  const { user } = useAuth()
-  const navigate = useNavigate()
-
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.DASHBOARD,
     queryFn: () => usersApi.getDashboard().then(r => r.data.data),
   })
 
-  const { data: matchData } = useQuery({
-    queryKey: QUERY_KEYS.MY_MATCHES,
-    queryFn: () => usersApi.getMatches().then(r => r.data.data.matches),
-  })
-
-  if (isLoading) {
-    return <div className="flex justify-center py-24"><Spinner size="lg" /></div>
-  }
-
-  const { stats, activeExchanges, recentReviews, mySkills } = data || {}
-  const matches = matchData?.slice(0, 3) || []
-  const hour = new Date().getHours()
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
-  const firstName = user?.full_name?.split(' ')[0]
-
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
-      {/* Hero with parallax + scroll-zoom */}
-      <HeroSection
-        greeting={greeting}
-        name={firstName}
-        onPost={() => navigate('/skills/new')}
-      />
+    <div style={{ cursor:'none', fontFamily:"'DM Sans',sans-serif" }}>
+      <CustomCursor />
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap'); *{cursor:none!important}`}</style>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-        <StatCard label="Active exchanges" value={stats?.activeExchanges || 0} icon="🤝" delay={0} />
-        <StatCard label="Skills posted"    value={stats?.totalSkills || 0}       icon="✨" delay={80} />
-        <StatCard label="Reputation"       value={stats?.reputation?.toFixed(1) || '0.0'} icon="⭐" delay={160} />
-        <StatCard label="Unread alerts"    value={stats?.unreadNotifications || 0} icon="🔔" delay={240} />
+      <WelcomeBanner user={user} scrollY={scrollY} />
+
+      {/* Stats row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <StatCard icon={Sparkles} label="Skills Offered" value={data?.stats?.skillsOffered ?? '—'} color="bg-amber-50 border-amber-100" delay={0} />
+        <StatCard icon={BookOpen} label="Skills Wanted" value={data?.stats?.skillsWanted ?? '—'} color="bg-blue-50 border-blue-100" delay={80} />
+        <StatCard icon={Zap} label="Exchanges" value={data?.stats?.exchanges ?? '—'} color="bg-emerald-50 border-emerald-100" delay={160} />
+        <StatCard icon={Star} label="Reputation" value={user?.reputation_score?.toFixed(1) ?? '—'} color="bg-rose-50 border-rose-100" delay={240} />
       </div>
 
-      {/* Main grid */}
-      <div className="grid lg:grid-cols-3 gap-6">
-
-        {/* Left: exchanges + reviews */}
-        <div className="lg:col-span-2 space-y-3">
-          <SectionHead
-            title="Active exchanges"
-            action={
+      {isLoading ? (
+        <div className="flex justify-center py-16"><Spinner size="lg" /></div>
+      ) : (
+        <div className="space-y-10">
+          {/* Quick Actions */}
+          <Reveal>
+            <div className="grid sm:grid-cols-2 gap-4">
               <button
-                onClick={() => navigate('/exchanges')}
-                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700 font-dm transition-colors"
+                onClick={() => navigate('/skills/new')}
+                className="relative overflow-hidden rounded-2xl p-6 text-left group hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                style={{ background:'linear-gradient(135deg, #1c1c1e 0%, #2d2d30 100%)' }}
               >
-                View all <ChevronRight className="w-3 h-3" />
-              </button>
-            }
-          />
-
-          {!activeExchanges?.length ? (
-            <EmptyState
-              icon="🤝"
-              title="No active exchanges"
-              description="Propose an exchange to get started."
-              action={<Button variant="primary" size="sm" onClick={() => navigate('/browse')}>Browse skills</Button>}
-            />
-          ) : (
-            activeExchanges.map((ex, i) => (
-              <Reveal key={ex.id} delay={i * 60}>
-                <ExchangeCard ex={ex} user={user} onClick={() => navigate(`/exchanges/${ex.id}`)} />
-              </Reveal>
-            ))
-          )}
-
-          {recentReviews?.length > 0 && (
-            <>
-              <SectionHead title="Recent reviews" />
-              {recentReviews.map((r, i) => (
-                <Reveal key={r.id} delay={i * 60}>
-                  <div className="bg-white border border-gray-100 rounded-2xl p-4 hover:border-gray-200 transition-colors">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Avatar src={r.reviewer.avatar_url} name={r.reviewer.full_name} size="sm" />
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-gray-900 font-sora">{r.reviewer.full_name}</p>
-                        <Stars rating={r.rating} />
-                      </div>
-                      <span className="text-xs text-gray-400 font-dm">{timeAgo(r.created_at)}</span>
-                    </div>
-                    {r.comment && (
-                      <p className="text-sm text-gray-500 font-dm italic">"{r.comment}"</p>
-                    )}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ background:'radial-gradient(circle at 80% 50%, rgba(245,158,11,0.15) 0%, transparent 70%)' }} />
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10" style={{ background:'radial-gradient(#f59e0b, transparent)', transform:'translate(30%,-30%)' }} />
+                <div className="relative">
+                  <div className="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Plus className="w-5 h-5 text-gray-900" />
                   </div>
-                </Reveal>
-              ))}
-            </>
-          )}
-        </div>
+                  <p className="text-white font-black text-lg mb-1" style={{ fontFamily:"'Sora',sans-serif" }}>Post a Skill</p>
+                  <p className="text-gray-400 text-sm">Share what you can teach or learn</p>
+                  <ArrowRight className="w-4 h-4 text-amber-400 mt-3 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </button>
 
-        {/* Right sidebar */}
-        <div className="space-y-6">
+              <button
+                onClick={() => navigate('/browse')}
+                className="relative overflow-hidden rounded-2xl p-6 text-left group hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                style={{ background:'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)', border:'1px solid #bbf7d0' }}
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-20" style={{ background:'radial-gradient(#10b981, transparent)', transform:'translate(30%,-30%)' }} />
+                <div className="relative">
+                  <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                  <p className="text-gray-900 font-black text-lg mb-1" style={{ fontFamily:"'Sora',sans-serif" }}>Browse Skills</p>
+                  <p className="text-gray-500 text-sm">Find your next exchange partner</p>
+                  <ArrowRight className="w-4 h-4 text-emerald-500 mt-3 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </button>
+            </div>
+          </Reveal>
 
-          {/* Top matches */}
-          <div>
-            <SectionHead
-              title={
-                <span className="flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                  Top matches
-                </span>
-              }
-              action={
-                <button
-                  onClick={() => navigate('/browse')}
-                  className="text-xs text-gray-400 hover:text-gray-700 font-dm transition-colors"
-                >
-                  See all
-                </button>
-              }
-            />
-            {!matches.length ? (
-              <div className="bg-gray-50 border border-dashed border-gray-200 rounded-2xl p-5 text-center">
-                <p className="text-sm text-gray-400 font-dm">Add more skills to see matches!</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {matches.map((m, i) => (
-                  <Reveal key={i} delay={i * 70}>
-                    <MatchCard m={m} onClick={() => navigate(`/profile/${m.user.username}`)} />
-                  </Reveal>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* My skills */}
-          <div>
-            <SectionHead
-              title="My skills"
-              action={
-                <button
-                  onClick={() => navigate('/skills/new')}
-                  className="text-xs text-gray-400 hover:text-gray-700 font-dm transition-colors"
-                >
-                  + Add
-                </button>
-              }
-            />
-            {!mySkills?.length ? (
-              <div className="bg-gray-50 border border-dashed border-gray-200 rounded-2xl p-5 text-center">
-                <p className="text-sm text-gray-400 font-dm">No skills yet. Add one!</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {mySkills.map((s, i) => (
-                  <Reveal key={s.id} delay={i * 60}>
-                    <div className="bg-white border border-gray-100 rounded-2xl p-3 flex items-center gap-3 hover:border-gray-200 hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg">{s.category?.icon}</span>
-                      <p className="text-sm font-semibold text-gray-900 font-sora flex-1 truncate">{s.title}</p>
-                      <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full font-sora ${
-                        s.is_offering
-                          ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-blue-50 text-blue-700'
-                      }`}>
-                        {s.is_offering ? 'Offering' : 'Want'}
-                      </span>
+          {/* My Skills */}
+          {data?.mySkills?.length > 0 && (
+            <div>
+              <Reveal>
+                <SectionHeader title="✨ My Skills" action={() => navigate('/skills/new')} actionLabel="Add skill" />
+              </Reveal>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {data.mySkills.map((skill, i) => (
+                  <Reveal key={skill.id} delay={i * 60}>
+                    <div onClick={() => navigate(`/skills/${skill.id}`)} className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-2xl cursor-pointer">
+                      <SkillCard skill={{ ...skill, user }} />
                     </div>
                   </Reveal>
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
+          {/* Recommended */}
+          {data?.recommended?.length > 0 && (
+            <div>
+              <Reveal>
+                <div className="relative overflow-hidden rounded-3xl mb-5 h-28">
+                  <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&q=80" alt="" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-transparent" />
+                  <div className="absolute inset-0 flex items-center px-6">
+                    <div>
+                      <p className="text-amber-400 text-xs font-bold uppercase tracking-widest">Recommended</p>
+                      <p className="text-white font-black text-xl" style={{ fontFamily:"'Sora',sans-serif" }}>Skills for you 🎯</p>
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {data.recommended.map((skill, i) => (
+                  <Reveal key={skill.id} delay={i * 60}>
+                    <div onClick={() => navigate(`/skills/${skill.id}`)} className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-2xl cursor-pointer">
+                      <SkillCard skill={skill} />
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recent exchanges */}
+          {data?.recentExchanges?.length > 0 && (
+            <div>
+              <Reveal>
+                <SectionHeader title="🤝 Recent Exchanges" action={() => navigate('/exchanges')} actionLabel="View all" />
+              </Reveal>
+              <div className="space-y-3">
+                {data.recentExchanges.slice(0, 3).map((ex, i) => (
+                  <Reveal key={ex.id} delay={i * 60}>
+                    <div
+                      onClick={() => navigate(`/exchanges/${ex.id}`)}
+                      className="bg-white border border-gray-100 rounded-2xl p-4 flex items-center gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                    >
+                      <Avatar src={ex.partner?.avatar_url} name={ex.partner?.full_name} size="md" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-gray-900 text-sm truncate" style={{ fontFamily:"'Sora',sans-serif" }}>{ex.partner?.full_name}</p>
+                        <p className="text-xs text-gray-500 truncate">{ex.offered_skill?.title} ↔ {ex.requested_skill?.title}</p>
+                      </div>
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${ex.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : ex.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}`} style={{ fontFamily:"'Sora',sans-serif" }}>
+                        {ex.status}
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </div>
   )
 }

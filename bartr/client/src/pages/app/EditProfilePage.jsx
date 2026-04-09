@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Camera, User, BookOpen, GraduationCap, Hash, AlignLeft, ArrowLeft, Check } from 'lucide-react'
+import { Camera, User, BookOpen, GraduationCap, AlignLeft, ArrowLeft, Check, Sparkles } from 'lucide-react'
 import { usersApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -19,110 +19,106 @@ const schema = z.object({
   year_of_study: z.coerce.number().int().min(1).max(8).optional().or(z.literal('')),
 })
 
-/* ── Scroll-reveal wrapper ── */
-function Reveal({ children, delay = 0 }) {
-  const [v, setV] = useState(false)
-  const ref = useRef()
+/* ─── Custom Cursor ─────────────────────────────────────────────────────────── */
+function CustomCursor() {
+  const dot = useRef(null); const ring = useRef(null)
+  const pos = useRef({x:0,y:0}); const rp = useRef({x:0,y:0}); const [h,setH] = useState(false)
   useEffect(() => {
-    const io = new IntersectionObserver(([e]) => e.isIntersecting && setV(true), { threshold: 0.08 })
-    if (ref.current) io.observe(ref.current)
-    return () => io.disconnect()
-  }, [])
+    const mv=(e)=>{pos.current={x:e.clientX,y:e.clientY};if(dot.current){dot.current.style.left=`${e.clientX}px`;dot.current.style.top=`${e.clientY}px`}}
+    const ov=(e)=>setH(!!e.target.closest('button,a,[role=button],input,textarea'))
+    window.addEventListener('mousemove',mv);window.addEventListener('mouseover',ov)
+    let raf;const a=()=>{rp.current.x+=(pos.current.x-rp.current.x)*.1;rp.current.y+=(pos.current.y-rp.current.y)*.1;if(ring.current){ring.current.style.left=`${rp.current.x}px`;ring.current.style.top=`${rp.current.y}px`};raf=requestAnimationFrame(a)};raf=requestAnimationFrame(a)
+    return()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseover',ov);cancelAnimationFrame(raf)}
+  },[])
   return (
-    <div
-      ref={ref}
-      style={{
-        transitionDelay: `${delay}ms`,
-        opacity: v ? 1 : 0,
-        transform: v ? 'translateY(0)' : 'translateY(14px)',
-        transition: 'opacity .4s ease, transform .4s ease',
-      }}
-    >
-      {children}
-    </div>
+    <>
+      <div ref={dot} style={{position:'fixed',width:8,height:8,borderRadius:'50%',background:'#f59e0b',pointerEvents:'none',zIndex:9999,transform:'translate(-50%,-50%)',mixBlendMode:'multiply'}} />
+      <div ref={ring} style={{position:'fixed',width:h?48:32,height:h?48:32,borderRadius:'50%',border:`2px solid ${h?'#f59e0b':'rgba(245,158,11,0.4)'}`,pointerEvents:'none',zIndex:9998,transform:'translate(-50%,-50%)',transition:'width .3s ease,height .3s ease,border-color .3s ease'}} />
+    </>
   )
 }
 
-/* ── Parallax hero header ── */
-function ProfileHero({ user, avatarRef, onAvatarClick, uploading }) {
-  const heroRef = useRef()
-  const orb1 = useRef()
-  const orb2 = useRef()
-  const orb3 = useRef()
-  const [scrollY, setScrollY] = useState(0)
-
+/* ─── Reveal ─────────────────────────────────────────────────────────────────── */
+function Reveal({ children, delay = 0 }) {
+  const [v, setV] = useState(false); const ref = useRef()
   useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    const io = new IntersectionObserver(([e])=>{if(e.isIntersecting){setV(true);io.disconnect()}},{threshold:.05})
+    if(ref.current) io.observe(ref.current); return()=>io.disconnect()
   }, [])
+  return <div ref={ref} style={{transitionDelay:`${delay}ms`,opacity:v?1:0,transform:v?'translateY(0)':'translateY(24px)',transition:'opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)'}}>{children}</div>
+}
+
+/* ─── Profile Hero ───────────────────────────────────────────────────────────── */
+function ProfileHero({ user, avatarRef, onAvatarClick, uploading, scrollY }) {
+  const scale = Math.max(1 - scrollY * 0.0004, 0.94)
+  const opacity = Math.max(1 - scrollY * 0.004, 0)
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 })
+  const heroRef = useRef()
 
   const handleMouseMove = (e) => {
-    const r = heroRef.current.getBoundingClientRect()
-    const dx = ((e.clientX - r.left) / r.width - 0.5) * 18
-    const dy = ((e.clientY - r.top) / r.height - 0.5) * 18
-    if (orb1.current) orb1.current.style.transform = `translate(${dx}px, ${dy}px)`
-    if (orb2.current) orb2.current.style.transform = `translate(${-dx * 0.5}px, ${-dy * 0.5}px)`
-    if (orb3.current) orb3.current.style.transform = `translate(${dx * 0.4}px, ${-dy * 0.7}px)`
+    const r = heroRef.current?.getBoundingClientRect()
+    if (!r) return
+    setMousePos({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height })
   }
-
-  const handleMouseLeave = () => {
-    [orb1, orb2, orb3].forEach(r => { if (r.current) r.current.style.transform = '' })
-  }
-
-  const scale = Math.max(1 - scrollY * 0.0004, 0.95)
-  const opacity = Math.max(1 - scrollY * 0.005, 0)
 
   return (
-    <div
-      ref={heroRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+    <div ref={heroRef} onMouseMove={handleMouseMove}
       style={{ transform: `scale(${scale})`, opacity, transformOrigin: 'top center' }}
-      className="relative overflow-hidden rounded-3xl bg-gray-50 border border-gray-100 px-8 py-10 mb-6"
+      className="relative overflow-hidden rounded-[2rem] mb-8"
     >
-      {/* Orbs */}
-      <div ref={orb1} className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-blue-100 opacity-40" style={{ transition: 'transform .1s ease-out' }} />
-      <div ref={orb2} className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-emerald-100 opacity-35" style={{ transition: 'transform .1s ease-out' }} />
-      <div ref={orb3} className="absolute top-6 left-1/2 w-20 h-20 rounded-full bg-yellow-100 opacity-50" style={{ transition: 'transform .12s ease-out', animation: 'floatC 6s ease-in-out infinite' }} />
+      {/* BG */}
+      <div className="absolute inset-0">
+        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&q=80" alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-950/92 via-gray-900/80 to-gray-950/90" />
+        <div className="absolute inset-0 transition-all duration-75" style={{ background: `radial-gradient(circle at ${mousePos.x*100}% ${mousePos.y*100}%, rgba(245,158,11,0.12) 0%, transparent 60%)` }} />
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.1) 1px,transparent 1px)', backgroundSize: '40px 40px' }} />
+      </div>
 
-      <style>{`@keyframes floatC { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }`}</style>
-
-      <div className="relative flex flex-col items-center text-center">
+      <div className="relative flex flex-col items-center text-center px-8 pt-10 pb-10">
         {/* Avatar */}
-        <div className="relative mb-4">
-          <div className="ring-4 ring-white rounded-full shadow-md">
+        <div className="relative mb-5">
+          <div className="absolute inset-0 rounded-full opacity-30 animate-pulse" style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.6), transparent 70%)', transform: 'scale(1.3)' }} />
+          <div className="ring-4 ring-amber-400/40 ring-offset-2 ring-offset-transparent rounded-full shadow-2xl relative">
             <Avatar src={user?.avatar_url} name={user?.full_name} size="xl" />
           </div>
-          <button
-            type="button"
-            onClick={onAvatarClick}
-            className="absolute bottom-0 right-0 w-9 h-9 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-gray-700 active:scale-95 transition-all shadow-md"
+          <button type="button" onClick={onAvatarClick}
+            className="absolute bottom-0 right-0 w-10 h-10 bg-amber-400 text-gray-900 rounded-full flex items-center justify-center hover:bg-amber-300 active:scale-90 transition-all shadow-lg"
           >
             <Camera className="w-4 h-4" />
           </button>
           <input ref={avatarRef} type="file" accept="image/*" className="hidden" />
         </div>
 
-        <h1 className="text-2xl font-bold font-sora text-gray-900">{user?.full_name || 'Your Name'}</h1>
-        <p className="text-sm text-gray-400 font-dm mt-1">{user?.university || 'Add your university below'}</p>
+        <h1 className="text-2xl font-black text-white mb-1" style={{ fontFamily: "'Sora', sans-serif" }}>
+          {user?.full_name || 'Your Name'}
+        </h1>
+        <p className="text-amber-400/70 text-sm mb-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          {user?.university || 'Add your university below'}
+        </p>
+
+        <div className="inline-flex items-center gap-1.5 text-xs text-gray-400 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          <Sparkles className="w-3 h-3 text-amber-400" />
+          Editing your profile
+        </div>
 
         {uploading && (
-          <span className="mt-2 text-xs text-yellow-600 font-dm bg-yellow-50 px-3 py-1 rounded-full">
+          <div className="mt-3 flex items-center gap-2 text-xs text-amber-300 bg-amber-400/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-amber-400/20">
+            <div className="w-3 h-3 border-2 border-amber-300 border-t-transparent rounded-full animate-spin" />
             Uploading photo…
-          </span>
+          </div>
         )}
       </div>
     </div>
   )
 }
 
-/* ── Styled field row with icon ── */
-function FieldRow({ icon: Icon, children }) {
+/* ─── Field Row ──────────────────────────────────────────────────────────────── */
+function FieldRow({ icon: Icon, accentColor = 'amber', children }) {
+  const colors = { amber: 'bg-amber-50 border-amber-100 text-amber-500', blue: 'bg-blue-50 border-blue-100 text-blue-500', emerald: 'bg-emerald-50 border-emerald-100 text-emerald-500' }
   return (
     <div className="flex items-start gap-3">
-      <div className="w-8 h-8 mt-1 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
-        <Icon className="w-3.5 h-3.5 text-gray-400" />
+      <div className={`w-9 h-9 mt-1 rounded-xl border flex items-center justify-center flex-shrink-0 ${colors[accentColor]}`}>
+        <Icon className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">{children}</div>
     </div>
@@ -135,6 +131,13 @@ export default function EditProfilePage() {
   const qc = useQueryClient()
   const avatarRef = useRef()
   const [saved, setSaved] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const { register, handleSubmit, formState: { errors }, setError } = useForm({
     resolver: zodResolver(schema),
@@ -154,80 +157,73 @@ export default function EditProfilePage() {
       qc.invalidateQueries({ queryKey: QUERY_KEYS.USER_PROFILE(user?.username) })
       refreshUser()
       setSaved(true)
-      setTimeout(() => navigate(`/profile/${user?.username}`), 800)
+      setTimeout(() => navigate(`/profile/${user?.username}`), 900)
     },
     onError: (err) => setError('root', { message: extractError(err) }),
   })
 
   const avatarMutation = useMutation({
     mutationFn: (formData) => usersApi.updateAvatar(formData),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: QUERY_KEYS.ME })
-      refreshUser()
-    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: QUERY_KEYS.ME }); refreshUser() },
   })
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0]
     if (!file) return
-    const fd = new FormData()
-    fd.append('avatar', file)
+    const fd = new FormData(); fd.append('avatar', file)
     avatarMutation.mutate(fd)
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-6">
+    <div className="max-w-lg mx-auto px-4 py-6" style={{ cursor: 'none' }}>
+      <CustomCursor />
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap'); *{cursor:none!important}`}</style>
 
-      {/* Back button */}
+      {/* Back */}
       <Reveal>
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 font-dm mb-4 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-700 mb-5 transition-colors group" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+            <ArrowLeft className="w-3.5 h-3.5" />
+          </div>
+          Back
         </button>
       </Reveal>
 
-      {/* Parallax hero with avatar */}
       <ProfileHero
-        user={user}
-        avatarRef={avatarRef}
-        onAvatarClick={() => {
-          avatarRef.current.onchange = handleAvatarChange
-          avatarRef.current?.click()
-        }}
+        user={user} avatarRef={avatarRef}
+        onAvatarClick={() => { avatarRef.current.onchange = handleAvatarChange; avatarRef.current?.click() }}
         uploading={avatarMutation.isPending}
+        scrollY={scrollY}
       />
 
-      {/* Form card */}
+      {/* Form */}
       <Reveal delay={80}>
-        <div className="bg-white rounded-3xl border border-gray-100 p-6 space-y-5">
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 space-y-6">
 
-          {/* Error banner */}
           {errors.root && (
             <div className="bg-red-50 border border-red-100 rounded-2xl px-4 py-3 flex items-start gap-2">
               <span className="text-red-400 mt-0.5">⚠</span>
-              <p className="text-sm text-red-600 font-dm">{errors.root.message}</p>
+              <p className="text-sm text-red-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>{errors.root.message}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit(d => profileMutation.mutate(d))} className="space-y-5">
 
-            <FieldRow icon={User}>
+            <FieldRow icon={User} accentColor="amber">
               <Input label="Full name" error={errors.full_name?.message} {...register('full_name')} />
             </FieldRow>
 
-            <FieldRow icon={AlignLeft}>
+            <FieldRow icon={AlignLeft} accentColor="blue">
               <Textarea label="Bio" placeholder="Tell people about yourself…" rows={3} error={errors.bio?.message} {...register('bio')} />
             </FieldRow>
 
-            <FieldRow icon={GraduationCap}>
+            <FieldRow icon={GraduationCap} accentColor="emerald">
               <Input label="University" placeholder="MIT, Stanford…" {...register('university')} />
             </FieldRow>
 
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 mt-1 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
-                <BookOpen className="w-3.5 h-3.5 text-gray-400" />
+              <div className="w-9 h-9 mt-1 rounded-xl border bg-purple-50 border-purple-100 text-purple-500 flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-4 h-4" />
               </div>
               <div className="flex-1 grid grid-cols-2 gap-3 min-w-0">
                 <Input label="Department" placeholder="Computer Science" {...register('department')} />
@@ -240,25 +236,27 @@ export default function EditProfilePage() {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="flex-1 py-2.5 rounded-2xl border border-gray-200 text-sm font-semibold font-sora text-gray-600 hover:bg-gray-50 active:scale-98 transition-all"
+                className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 hover:border-gray-400 active:scale-98 transition-all"
+                style={{ fontFamily: "'Sora', sans-serif" }}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={profileMutation.isPending || saved}
-                className={`flex-1 py-2.5 rounded-2xl text-sm font-semibold font-sora transition-all duration-200 flex items-center justify-center gap-2
+                className={`flex-1 py-3 rounded-2xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg
                   ${saved
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-gray-900 text-white hover:bg-gray-700 active:scale-98 disabled:opacity-60'
+                    ? 'bg-emerald-500 text-white shadow-emerald-200'
+                    : 'bg-gray-900 text-white hover:bg-gray-700 active:scale-98 disabled:opacity-60 shadow-gray-200'
                   }`}
+                style={{ fontFamily: "'Sora', sans-serif" }}
               >
                 {saved ? (
                   <><Check className="w-4 h-4" /> Saved!</>
                 ) : profileMutation.isPending ? (
-                  'Saving…'
+                  <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Saving…</>
                 ) : (
-                  'Save changes'
+                  'Save Changes'
                 )}
               </button>
             </div>
@@ -267,13 +265,11 @@ export default function EditProfilePage() {
         </div>
       </Reveal>
 
-      {/* File format hint */}
       <Reveal delay={120}>
-        <p className="text-center text-xs text-gray-400 font-dm mt-4">
+        <p className="text-center text-xs text-gray-400 mt-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
           Profile photo: JPG, PNG or WebP · Max 5 MB
         </p>
       </Reveal>
-
     </div>
   )
 }

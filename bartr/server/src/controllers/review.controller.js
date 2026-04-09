@@ -18,6 +18,11 @@ export const submitReview = async (req, res, next) => {
     const isOtherParticipant = exchange.offerer_id === reviewee_id || exchange.requester_id === reviewee_id
     if (!isOtherParticipant) return forbidden(res, 'Reviewee must be part of this exchange.')
 
+    const existingReview = await prisma.review.findUnique({
+      where: { exchange_id_reviewer_id: { exchange_id, reviewer_id: req.user.id } },
+    })
+    if (existingReview) return badRequest(res, 'You have already reviewed this exchange.')
+
     const review = await prisma.review.create({
       data: { exchange_id, reviewer_id: req.user.id, reviewee_id, rating, comment },
       include: {

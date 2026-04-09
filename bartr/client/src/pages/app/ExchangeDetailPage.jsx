@@ -2,58 +2,57 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import {
-  Send, AlertCircle, ArrowLeft, CheckCircle2, XCircle,
+  Send, ArrowLeft, CheckCircle2, XCircle,
   Clock, Zap, Star, ShieldAlert, MessageCircle, Check,
 } from 'lucide-react'
 import { exchangesApi, reviewsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useSocket } from '../../context/SocketContext.jsx'
-import {
-  Avatar, Card, Spinner, Button, Badge, Stars,
-} from '../../components/shared.jsx'
-import { timeAgo, exchangeStatusColor, exchangeStatusLabel, extractError } from '../../utils/helpers.js'
+import { Avatar, Spinner, Stars } from '../../components/shared.jsx'
+import { timeAgo, exchangeStatusLabel, extractError } from '../../utils/helpers.js'
 
-// ─── Reveal ──────────────────────────────────────────────────────────────────
-function Reveal({ children, delay = 0, className = '' }) {
-  const ref = useRef(null)
-  const [visible, setVisible] = useState(false)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setVisible(true); obs.disconnect() }
-    }, { threshold: 0.12 })
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
+/* ─── Custom Cursor ─────────────────────────────────────────────────────────── */
+function CustomCursor() {
+  const dot = useRef(null); const ring = useRef(null)
+  const pos = useRef({x:0,y:0}); const rp = useRef({x:0,y:0}); const [h,setH]=useState(false)
+  useEffect(()=>{
+    const mv=(e)=>{pos.current={x:e.clientX,y:e.clientY};if(dot.current){dot.current.style.left=`${e.clientX}px`;dot.current.style.top=`${e.clientY}px`}}
+    const ov=(e)=>setH(!!e.target.closest('button,a,[role=button],input,textarea'))
+    window.addEventListener('mousemove',mv);window.addEventListener('mouseover',ov)
+    let raf;const a=()=>{rp.current.x+=(pos.current.x-rp.current.x)*.1;rp.current.y+=(pos.current.y-rp.current.y)*.1;if(ring.current){ring.current.style.left=`${rp.current.x}px`;ring.current.style.top=`${rp.current.y}px`};raf=requestAnimationFrame(a)};raf=requestAnimationFrame(a)
+    return()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseover',ov);cancelAnimationFrame(raf)}
+  },[])
   return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(18px)',
-        transition: `opacity 0.55s ease ${delay}ms, transform 0.55s ease ${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
+    <>
+      <div ref={dot} style={{position:'fixed',width:8,height:8,borderRadius:'50%',background:'#f59e0b',pointerEvents:'none',zIndex:9999,transform:'translate(-50%,-50%)',mixBlendMode:'multiply'}} />
+      <div ref={ring} style={{position:'fixed',width:h?48:32,height:h?48:32,borderRadius:'50%',border:`2px solid ${h?'#f59e0b':'rgba(245,158,11,0.4)'}`,pointerEvents:'none',zIndex:9998,transform:'translate(-50%,-50%)',transition:'width .3s ease,height .3s ease,border-color .3s ease'}} />
+    </>
   )
 }
 
-// ─── Status steps ─────────────────────────────────────────────────────────────
-const STATUS_STEPS = ['PENDING', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED']
-
-const STATUS_META = {
-  PENDING:     { icon: Clock,        color: 'text-amber-500',  bg: 'bg-amber-50',   label: 'Pending' },
-  ACCEPTED:    { icon: Check,        color: 'text-blue-500',   bg: 'bg-blue-50',    label: 'Accepted' },
-  IN_PROGRESS: { icon: Zap,          color: 'text-violet-500', bg: 'bg-violet-50',  label: 'In Progress' },
-  COMPLETED:   { icon: CheckCircle2, color: 'text-emerald-500',bg: 'bg-emerald-50', label: 'Completed' },
-  CANCELLED:   { icon: XCircle,      color: 'text-red-400',    bg: 'bg-red-50',     label: 'Cancelled' },
-  DISPUTED:    { icon: ShieldAlert,  color: 'text-orange-500', bg: 'bg-orange-50',  label: 'Disputed' },
+/* ─── Reveal ─────────────────────────────────────────────────────────────────── */
+function Reveal({ children, delay = 0, className = '' }) {
+  const [v, setV] = useState(false); const ref = useRef()
+  useEffect(()=>{
+    const io=new IntersectionObserver(([e])=>{if(e.isIntersecting){setV(true);io.disconnect()}},{threshold:.08})
+    if(ref.current) io.observe(ref.current); return()=>io.disconnect()
+  },[])
+  return <div ref={ref} className={className} style={{transitionDelay:`${delay}ms`,opacity:v?1:0,transform:v?'translateY(0)':'translateY(18px)',transition:'opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)'}}>{children}</div>
 }
 
+/* ─── Status config ──────────────────────────────────────────────────────────── */
+const STATUS_STEPS = ['PENDING', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED']
+const STATUS_META = {
+  PENDING:     { icon: Clock,        color:'text-amber-500',   bg:'bg-amber-50',    bar:'bg-amber-400',   label:'Pending' },
+  ACCEPTED:    { icon: Check,        color:'text-blue-500',    bg:'bg-blue-50',     bar:'bg-blue-400',    label:'Accepted' },
+  IN_PROGRESS: { icon: Zap,          color:'text-violet-500',  bg:'bg-violet-50',   bar:'bg-violet-400',  label:'In Progress' },
+  COMPLETED:   { icon: CheckCircle2, color:'text-emerald-500', bg:'bg-emerald-50',  bar:'bg-emerald-400', label:'Completed' },
+  CANCELLED:   { icon: XCircle,      color:'text-red-400',     bg:'bg-red-50',      bar:'bg-red-400',     label:'Cancelled' },
+  DISPUTED:    { icon: ShieldAlert,  color:'text-orange-500',  bg:'bg-orange-50',   bar:'bg-orange-400',  label:'Disputed' },
+}
+
+/* ─── Status Timeline ────────────────────────────────────────────────────────── */
 function StatusTimeline({ status }) {
   const idx = STATUS_STEPS.indexOf(status)
   const meta = STATUS_META[status] || STATUS_META.PENDING
@@ -61,9 +60,8 @@ function StatusTimeline({ status }) {
   if (status === 'CANCELLED' || status === 'DISPUTED') {
     const Icon = meta.icon
     return (
-      <span className={`inline-flex items-center gap-1.5 text-xs font-semibold font-sora px-3 py-1.5 rounded-full ${meta.bg} ${meta.color}`}>
-        <Icon className="w-3.5 h-3.5" />
-        {meta.label}
+      <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ${meta.bg} ${meta.color}`} style={{fontFamily:"'Sora',sans-serif"}}>
+        <Icon className="w-3.5 h-3.5" /> {meta.label}
       </span>
     )
   }
@@ -71,31 +69,22 @@ function StatusTimeline({ status }) {
   return (
     <div className="flex items-center gap-1.5">
       {STATUS_STEPS.map((s, i) => {
-        const m = STATUS_META[s]
-        const done = i <= idx
-        const Icon = m.icon
+        const m = STATUS_META[s]; const done = i <= idx; const Icon = m.icon
         return (
-          <div key={s} className="flex items-center gap-1.5">
-            <div
-              className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 ${done ? `${m.bg} ${m.color}` : 'bg-gray-100 text-gray-300'}`}
-              title={m.label}
-            >
-              <Icon className="w-3 h-3" />
+          <div key={s} className="flex items-center gap-1">
+            <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 ${done ? `${m.bg} ${m.color}` : 'bg-gray-100 text-gray-300'}`}>
+              <Icon className="w-3.5 h-3.5" />
             </div>
-            {i < STATUS_STEPS.length - 1 && (
-              <div className={`h-0.5 w-5 rounded-full transition-all duration-500 ${i < idx ? 'bg-emerald-300' : 'bg-gray-150'}`} />
-            )}
+            {i < STATUS_STEPS.length - 1 && <div className={`h-0.5 w-6 rounded-full transition-all duration-500 ${i < idx ? 'bg-emerald-300' : 'bg-gray-200'}`} />}
           </div>
         )
       })}
-      <span className={`ml-1 text-xs font-semibold font-sora ${meta.color}`}>
-        {meta.label}
-      </span>
+      <span className={`ml-1 text-xs font-bold ${meta.color}`} style={{fontFamily:"'Sora',sans-serif"}}>{meta.label}</span>
     </div>
   )
 }
 
-// ─── Review Modal ─────────────────────────────────────────────────────────────
+/* ─── Review Modal ───────────────────────────────────────────────────────────── */
 function ReviewModal({ exchange, userId, onClose }) {
   const qc = useQueryClient()
   const [rating, setRating] = useState(5)
@@ -104,179 +93,87 @@ function ReviewModal({ exchange, userId, onClose }) {
 
   const mutation = useMutation({
     mutationFn: () => reviewsApi.submit({ exchange_id: exchange.id, reviewee_id: revieweeId, rating, comment }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: QUERY_KEYS.EXCHANGE(exchange.id) })
-      onClose()
-    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: QUERY_KEYS.EXCHANGE(exchange.id) }); onClose() },
+    onError: () => {},
   })
 
+  const errorMsg = mutation.error?.response?.data?.message ?? null
+
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4" onClick={onClose}>
       <div
-        className="bg-white rounded-3xl p-7 max-w-md w-full border border-gray-100"
-        style={{ boxShadow: '0 24px 64px -12px rgba(0,0,0,0.18)' }}
+        className="bg-white rounded-3xl p-7 max-w-md w-full"
+        style={{boxShadow:'0 32px 80px rgba(0,0,0,0.2)',animation:'modalIn .4s cubic-bezier(.34,1.56,.64,1)'}}
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-2xl bg-yellow-50 flex items-center justify-center">
-            <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+        <style>{`@keyframes modalIn{from{opacity:0;transform:scale(.88) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}`}</style>
+
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center">
+            <Star className="w-6 h-6 text-amber-400 fill-amber-400" />
           </div>
           <div>
-            <h3 className="font-sora font-bold text-gray-900 text-lg leading-tight">Leave a review</h3>
-            <p className="text-xs text-gray-400 font-dm">How was your skill exchange?</p>
+            <h3 className="font-black text-gray-900 text-lg" style={{fontFamily:"'Sora',sans-serif"}}>Leave a Review</h3>
+            <p className="text-xs text-gray-400" style={{fontFamily:"'DM Sans',sans-serif"}}>How was your skill exchange?</p>
           </div>
         </div>
 
-        {/* Stars */}
-        <div className="flex gap-1.5 mb-5">
-          {[1, 2, 3, 4, 5].map(n => (
-            <button
-              key={n}
-              onClick={() => setRating(n)}
-              className="transition-transform hover:scale-110 active:scale-95 focus:outline-none"
-            >
-              <Star
-                className={`w-8 h-8 transition-colors ${n <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-100'}`}
-              />
+        <div className="flex gap-2 mb-6">
+          {[1,2,3,4,5].map(n => (
+            <button key={n} onClick={() => setRating(n)} className="transition-all hover:scale-110 active:scale-95 focus:outline-none">
+              <Star className={`w-9 h-9 transition-all duration-150 ${n <= rating ? 'text-amber-400 fill-amber-400 scale-110' : 'text-gray-200 fill-gray-100'}`} />
             </button>
           ))}
         </div>
 
-        {/* Comment */}
         <textarea
           value={comment}
           onChange={e => setComment(e.target.value)}
           placeholder="Share your experience (optional)…"
           rows={3}
-          className="w-full px-4 py-3 rounded-2xl border border-gray-200 text-sm font-dm focus:outline-none focus:ring-2 focus:ring-yellow-300 resize-none mb-5 bg-gray-50/60 placeholder:text-gray-300"
+          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 text-sm focus:outline-none focus:border-amber-400 resize-none mb-5 transition-all"
+          style={{fontFamily:"'DM Sans',sans-serif"}}
         />
 
+        {errorMsg && (
+          <div className="flex items-center gap-2 px-4 py-3 mb-4 rounded-2xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium" style={{fontFamily:"'DM Sans',sans-serif"}}>
+            <span>⚠️</span> {errorMsg}
+          </div>
+        )}
+
         <div className="flex gap-3">
-          <Button variant="secondary" size="sm" onClick={onClose} className="flex-1">Cancel</Button>
-          <Button
-            variant="primary"
-            size="sm"
+          <button onClick={onClose} className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:border-gray-400 transition-all" style={{fontFamily:"'Sora',sans-serif"}}>
+            Cancel
+          </button>
+          <button
             onClick={() => mutation.mutate()}
-            loading={mutation.isPending}
-            className="flex-1"
+            disabled={mutation.isPending}
+            className="flex-1 py-3 rounded-2xl bg-amber-400 text-gray-900 text-sm font-bold hover:bg-amber-300 transition-all shadow-lg shadow-amber-200 flex items-center justify-center gap-2"
+            style={{fontFamily:"'Sora',sans-serif"}}
           >
-            Submit review
-          </Button>
+            {mutation.isPending ? <div className="w-4 h-4 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" /> : '⭐ Submit Review'}
+          </button>
         </div>
       </div>
     </div>
   )
 }
 
-// ─── Skill Chip ───────────────────────────────────────────────────────────────
-function SkillChip({ label, variant = 'green' }) {
-  const colors = {
-    green: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-    blue:  'bg-blue-50 text-blue-700 border-blue-100',
-  }
-  return (
-    <span className={`inline-flex items-center text-xs font-sora font-semibold px-2.5 py-1 rounded-xl border ${colors[variant]}`}>
-      {label}
-    </span>
-  )
-}
-
-// ─── Action Buttons ───────────────────────────────────────────────────────────
-function ActionBar({ exchange, isOfferer, actionMutation, onReview }) {
-  const pending = actionMutation.isPending
-  const act = (action) => actionMutation.mutate({ action })
-
-  const myConfirmed = isOfferer ? exchange.offerer_confirmed : exchange.requester_confirmed
-
-  return (
-    <div className="flex gap-2 mt-4 flex-wrap">
-      {exchange.status === 'PENDING' && !isOfferer && (
-        <>
-          <Button
-            variant="primary" size="sm"
-            onClick={() => act('accept')} loading={pending}
-            className="gap-1.5"
-          >
-            <CheckCircle2 className="w-3.5 h-3.5" /> Accept
-          </Button>
-          <Button
-            variant="danger" size="sm"
-            onClick={() => act('decline')} loading={pending}
-            className="gap-1.5"
-          >
-            <XCircle className="w-3.5 h-3.5" /> Decline
-          </Button>
-        </>
-      )}
-
-      {['ACCEPTED', 'IN_PROGRESS'].includes(exchange.status) && (
-        <>
-          <Button
-            variant={myConfirmed ? 'ghost' : 'primary'} size="sm"
-            onClick={() => act('complete')} loading={pending}
-            className="gap-1.5"
-            disabled={myConfirmed}
-          >
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            {myConfirmed ? 'Confirmed ✓' : 'Mark complete'}
-          </Button>
-          <Button
-            variant="ghost" size="sm"
-            onClick={() => act('cancel')}
-            className="gap-1.5 text-gray-500"
-          >
-            <XCircle className="w-3.5 h-3.5" /> Cancel
-          </Button>
-          <Button
-            variant="ghost" size="sm"
-            onClick={() => act('dispute')}
-            className="gap-1.5 text-red-500 hover:bg-red-50"
-          >
-            <ShieldAlert className="w-3.5 h-3.5" /> Dispute
-          </Button>
-        </>
-      )}
-
-      {exchange.status === 'COMPLETED' && !exchange.reviews?.some(r => r.reviewer_id === exchange.offerer_id) && (
-        <Button
-          variant="yellow" size="sm"
-          onClick={onReview}
-          className="gap-1.5"
-        >
-          <Star className="w-3.5 h-3.5 fill-current" /> Leave review
-        </Button>
-      )}
-    </div>
-  )
-}
-
-// ─── Message Bubble ───────────────────────────────────────────────────────────
+/* ─── Message Bubble ─────────────────────────────────────────────────────────── */
 function MessageBubble({ msg, isMine }) {
   return (
-    <div className={`flex gap-2 group ${isMine ? 'flex-row-reverse' : ''}`}>
-      {!isMine && (
-        <Avatar
-          src={msg.sender?.avatar_url}
-          name={msg.sender?.full_name}
-          size="xs"
-          className="mt-auto mb-0.5 shrink-0"
-        />
-      )}
+    <div className={`flex gap-2 group ${isMine ? 'flex-row-reverse' : ''}`}
+      style={{animation:'msgIn .3s cubic-bezier(.34,1.56,.64,1)'}}>
+      {!isMine && <Avatar src={msg.sender?.avatar_url} name={msg.sender?.full_name} size="xs" className="mt-auto mb-0.5 shrink-0" />}
       <div className={`max-w-[72%] flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
-        <div
-          className={`px-4 py-2.5 rounded-2xl text-sm font-dm leading-relaxed transition-all ${
-            isMine
-              ? 'bg-bartr-dark text-white rounded-tr-sm'
-              : 'bg-gray-100 text-gray-900 rounded-tl-sm'
-          }`}
-        >
+        <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed transition-all ${
+          isMine
+            ? 'bg-gray-900 text-white rounded-tr-sm shadow-lg shadow-gray-900/20'
+            : 'bg-gray-100 text-gray-900 rounded-tl-sm'
+        }`} style={{fontFamily:"'DM Sans',sans-serif"}}>
           {msg.content}
         </div>
-        <p className="text-[10px] text-gray-400 font-dm mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <p className="text-[10px] text-gray-400 mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{fontFamily:"'DM Sans',sans-serif"}}>
           {timeAgo(msg.created_at)}
         </p>
       </div>
@@ -284,25 +181,65 @@ function MessageBubble({ msg, isMine }) {
   )
 }
 
-// ─── Typing indicator ─────────────────────────────────────────────────────────
+/* ─── Typing Indicator ───────────────────────────────────────────────────────── */
 function TypingIndicator({ name }) {
   return (
     <div className="flex gap-2 items-end">
       <div className="bg-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 flex gap-1 items-center">
-        {[0, 1, 2].map(i => (
-          <span
-            key={i}
-            className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
-            style={{ animationDelay: `${i * 0.15}s` }}
-          />
-        ))}
+        {[0,1,2].map(i => <span key={i} className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{animationDelay:`${i*.15}s`}} />)}
       </div>
-      <span className="text-xs text-gray-400 font-dm mb-2">{name} is typing…</span>
+      <span className="text-xs text-gray-400 mb-2" style={{fontFamily:"'DM Sans',sans-serif"}}>{name} is typing…</span>
     </div>
   )
 }
 
-// ─── ExchangeDetailPage ───────────────────────────────────────────────────────
+/* ─── Action Bar ─────────────────────────────────────────────────────────────── */
+function ActionBar({ exchange, isOfferer, actionMutation, onReview }) {
+  const pending = actionMutation.isPending
+  const act = (action) => actionMutation.mutate({ action })
+  const myConfirmed = isOfferer ? exchange.offerer_confirmed : exchange.requester_confirmed
+
+  return (
+    <div className="flex gap-2 mt-4 flex-wrap">
+      {exchange.status === 'PENDING' && !isOfferer && (
+        <>
+          <button onClick={() => act('accept')} disabled={pending}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-400 transition-all" style={{fontFamily:"'Sora',sans-serif"}}>
+            <CheckCircle2 className="w-3.5 h-3.5" /> Accept
+          </button>
+          <button onClick={() => act('decline')} disabled={pending}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-50 text-red-500 text-xs font-bold hover:bg-red-100 border border-red-100 transition-all" style={{fontFamily:"'Sora',sans-serif"}}>
+            <XCircle className="w-3.5 h-3.5" /> Decline
+          </button>
+        </>
+      )}
+      {['ACCEPTED', 'IN_PROGRESS'].includes(exchange.status) && (
+        <>
+          <button onClick={() => act('complete')} disabled={pending || myConfirmed}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all ${myConfirmed ? 'bg-gray-100 text-gray-400' : 'bg-gray-900 text-white hover:bg-gray-700'}`} style={{fontFamily:"'Sora',sans-serif"}}>
+            <CheckCircle2 className="w-3.5 h-3.5" /> {myConfirmed ? 'Confirmed ✓' : 'Mark Complete'}
+          </button>
+          <button onClick={() => act('cancel')} disabled={pending}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gray-50 text-gray-500 text-xs font-bold hover:bg-gray-100 border border-gray-200 transition-all" style={{fontFamily:"'Sora',sans-serif"}}>
+            <XCircle className="w-3.5 h-3.5" /> Cancel
+          </button>
+          <button onClick={() => act('dispute')} disabled={pending}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-50 text-red-500 text-xs font-bold hover:bg-red-100 border border-red-100 transition-all" style={{fontFamily:"'Sora',sans-serif"}}>
+            <ShieldAlert className="w-3.5 h-3.5" /> Dispute
+          </button>
+        </>
+      )}
+      {exchange.status === 'COMPLETED' && !exchange.reviews?.some(r => r.reviewer_id === exchange.offerer_id) && (
+        <button onClick={onReview}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-400 text-gray-900 text-xs font-bold hover:bg-amber-300 transition-all shadow-md shadow-amber-200" style={{fontFamily:"'Sora',sans-serif"}}>
+          <Star className="w-3.5 h-3.5 fill-current" /> Leave Review
+        </button>
+      )}
+    </div>
+  )
+}
+
+/* ─── ExchangeDetailPage ─────────────────────────────────────────────────────── */
 export default function ExchangeDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -317,7 +254,6 @@ export default function ExchangeDetailPage() {
   const [showReview, setShowReview] = useState(false)
   const typingTimer = useRef(null)
 
-  // ── Queries ────────────────────────────────────────────────────────────────
   const { data: exchange, isLoading } = useQuery({
     queryKey: QUERY_KEYS.EXCHANGE(id),
     queryFn: () => exchangesApi.get(id).then(r => r.data.data.exchange),
@@ -330,7 +266,6 @@ export default function ExchangeDetailPage() {
   })
   const historyMessages = msgData || []
 
-  // ── Socket ─────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!exchange) return
     joinExchangeRoom(id)
@@ -339,69 +274,39 @@ export default function ExchangeDetailPage() {
 
   useEffect(() => {
     if (!socket) return
-    const onMessage = ({ message }) => {
+    const onMsg = ({ message }) => {
       setLiveMessages(prev => prev.some(m => m.id === message.id) ? prev : [...prev, message])
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
-    const onTypingStart = ({ userId: uid, full_name }) => {
-      if (uid !== user?.id) setTypingUsers(prev => [...new Set([...prev, full_name])])
-    }
-    const onTypingStop = ({ userId: uid }) => {
-      setTypingUsers(prev => prev.slice(1))
-    }
-    socket.on('exchange:new_message', onMessage)
+    const onTypingStart = ({ userId: uid, full_name }) => { if (uid !== user?.id) setTypingUsers(prev => [...new Set([...prev, full_name])]) }
+    const onTypingStop = ({ userId: uid }) => { setTypingUsers(prev => prev.slice(1)) }
+    socket.on('exchange:new_message', onMsg)
     socket.on('typing_start', onTypingStart)
     socket.on('typing_stop', onTypingStop)
-    return () => {
-      socket.off('exchange:new_message', onMessage)
-      socket.off('typing_start', onTypingStart)
-      socket.off('typing_stop', onTypingStop)
-    }
+    return () => { socket.off('exchange:new_message', onMsg); socket.off('typing_start', onTypingStart); socket.off('typing_stop', onTypingStop) }
   }, [socket, user?.id])
 
-  useEffect(() => {
-    if (exchange) exchangesApi.markMessagesRead(id).catch(() => {})
-  }, [id, exchange])
-
+  useEffect(() => { if (exchange) exchangesApi.markMessagesRead(id).catch(() => {}) }, [id, exchange])
   useEffect(() => { messagesEndRef.current?.scrollIntoView() }, [historyMessages])
 
-  const allMessages = [
-    ...historyMessages,
-    ...liveMessages.filter(m => !historyMessages.some(h => h.id === m.id)),
-  ]
+  const allMessages = [...historyMessages, ...liveMessages.filter(m => !historyMessages.some(h => h.id === m.id))]
 
-  // ── Mutations ──────────────────────────────────────────────────────────────
-  const sendMutation = useMutation({
-    mutationFn: (content) => exchangesApi.sendMessage(id, content),
-  })
+  const sendMutation = useMutation({ mutationFn: (content) => exchangesApi.sendMessage(id, content) })
 
   const actionMutation = useMutation({
-    mutationFn: ({ action }) => ({
-      accept:  () => exchangesApi.accept(id),
-      decline: () => exchangesApi.decline(id),
-      complete:() => exchangesApi.complete(id),
-      cancel:  () => exchangesApi.cancel(id),
-      dispute: () => exchangesApi.dispute(id),
-    }[action]()),
+    mutationFn: ({ action }) => ({ accept:()=>exchangesApi.accept(id), decline:()=>exchangesApi.decline(id), complete:()=>exchangesApi.complete(id), cancel:()=>exchangesApi.cancel(id), dispute:()=>exchangesApi.dispute(id) }[action]()),
     onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.EXCHANGE(id) }),
   })
 
-  // ── Handlers ───────────────────────────────────────────────────────────────
   const handleSend = useCallback(() => {
     const content = input.trim()
     if (!content) return
     setInput('')
     emitTypingStop(id)
     clearTimeout(typingTimer.current)
-    setLiveMessages(prev => [...prev, {
-      id: `opt-${Date.now()}`,
-      sender_id: user?.id,
-      sender: user,
-      content,
-      created_at: new Date().toISOString(),
-    }])
+    setLiveMessages(prev => [...prev, { id:`opt-${Date.now()}`, sender_id:user?.id, sender:user, content, created_at:new Date().toISOString() }])
     sendMutation.mutate(content)
-    setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
+    setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior:'smooth' }), 50)
   }, [input, id, user, emitTypingStop, sendMutation])
 
   const handleInputChange = (e) => {
@@ -411,150 +316,124 @@ export default function ExchangeDetailPage() {
     typingTimer.current = setTimeout(() => emitTypingStop(id), 2000)
   }
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
-  }
+  const handleKeyDown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }
 
-  // ── Derived ────────────────────────────────────────────────────────────────
-  if (isLoading) return (
-    <div className="flex justify-center py-24">
-      <Spinner size="lg" />
-    </div>
-  )
-  if (!exchange) return (
-    <div className="text-center py-24">
-      <p className="text-gray-400 font-dm">Exchange not found.</p>
-    </div>
-  )
+  if (isLoading) return <div className="flex justify-center py-24"><Spinner size="lg" /></div>
+  if (!exchange) return <div className="text-center py-24"><p className="text-gray-400" style={{fontFamily:"'DM Sans',sans-serif"}}>Exchange not found.</p></div>
 
   const isOfferer = exchange.offerer_id === user?.id
   const partner = isOfferer ? exchange.requester : exchange.offerer
   const mySkill = isOfferer ? exchange.offered_skill : exchange.requested_skill
   const theirSkill = isOfferer ? exchange.requested_skill : exchange.offered_skill
   const canChat = ['ACCEPTED', 'IN_PROGRESS'].includes(exchange.status)
-  const isCompleted = exchange.status === 'COMPLETED'
-  const hasReviewed = exchange.reviews?.some(r => r.reviewer_id === user?.id)
   const partnerOnline = isOnline(partner?.id)
+  const statusMeta = STATUS_META[exchange.status] || STATUS_META.PENDING
 
   return (
-    <div className="max-w-4xl mx-auto pb-8">
+    <div className="max-w-4xl mx-auto pb-8" style={{cursor:'none'}}>
+      <CustomCursor />
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap');
+        *{cursor:none!important}
+        @keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+      `}</style>
 
-      {/* Back nav */}
+      {/* Back */}
       <Reveal delay={0}>
-        <button
-          onClick={() => navigate('/exchanges')}
-          className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 font-dm mb-5 transition-colors group"
-        >
-          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+        <button onClick={() => navigate('/exchanges')} className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-700 mb-5 transition-colors group" style={{fontFamily:"'DM Sans',sans-serif"}}>
+          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+            <ArrowLeft className="w-3.5 h-3.5" />
+          </div>
           Back to exchanges
         </button>
       </Reveal>
 
-      {/* ── Exchange Header Card ─────────────────────────────────────────── */}
+      {/* Exchange Header */}
       <Reveal delay={60}>
-        <Card className="p-5 mb-4 border border-gray-100 hover:-translate-y-0 rounded-3xl overflow-hidden">
+        <div className="relative bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden mb-4">
+          {/* Top accent */}
+          <div className={`absolute top-0 left-0 right-0 h-1 ${statusMeta.bar}`} />
 
-          {/* Subtle top accent strip matching status */}
-          <div className={`absolute top-0 left-0 right-0 h-0.5 ${
-            exchange.status === 'COMPLETED'   ? 'bg-emerald-200' :
-            exchange.status === 'IN_PROGRESS' ? 'bg-violet-200' :
-            exchange.status === 'ACCEPTED'    ? 'bg-blue-200' :
-            exchange.status === 'CANCELLED'   ? 'bg-red-200' :
-            exchange.status === 'DISPUTED'    ? 'bg-orange-200' :
-            'bg-amber-200'
-          }`} />
+          <div className="p-6 pt-7">
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              {/* Partner info */}
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className={`absolute inset-0 rounded-full ${partnerOnline ? 'ring-2 ring-emerald-400 ring-offset-2' : ''}`} />
+                  <Avatar src={partner.avatar_url} name={partner.full_name} size="md" />
+                  <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white ${partnerOnline ? 'bg-emerald-400' : 'bg-gray-300'}`} />
+                </div>
+                <div>
+                  <p className="font-black text-gray-900 text-base" style={{fontFamily:"'Sora',sans-serif"}}>{partner.full_name}</p>
+                  <p className="text-xs text-gray-400 mb-1" style={{fontFamily:"'DM Sans',sans-serif"}}>{partner.university}</p>
+                  <p className={`text-[10px] font-bold ${partnerOnline ? 'text-emerald-500' : 'text-gray-300'}`} style={{fontFamily:"'Sora',sans-serif"}}>
+                    {partnerOnline ? '● Online now' : '● Offline'}
+                  </p>
+                </div>
+              </div>
 
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            {/* Partner info */}
-            <div className="flex items-center gap-3">
-              <Avatar
-                src={partner.avatar_url}
-                name={partner.full_name}
-                size="md"
-                online={partnerOnline}
-              />
-              <div>
-                <p className="font-sora font-bold text-gray-900 leading-tight">{partner.full_name}</p>
-                <p className="text-xs text-gray-400 font-dm mt-0.5">{partner.university}</p>
-                <p className={`text-[10px] font-dm mt-1 ${partnerOnline ? 'text-emerald-500' : 'text-gray-300'}`}>
-                  {partnerOnline ? '● Online now' : '● Offline'}
-                </p>
+              <div className="flex flex-col items-end gap-2">
+                <StatusTimeline status={exchange.status} />
+                <p className="text-[10px] text-gray-400" style={{fontFamily:"'DM Sans',sans-serif"}}>Started {timeAgo(exchange.created_at)}</p>
               </div>
             </div>
 
-            {/* Status */}
-            <div className="flex flex-col items-end gap-2">
-              <StatusTimeline status={exchange.status} />
-              <p className="text-[10px] text-gray-300 font-dm">
-                Started {timeAgo(exchange.created_at)}
-              </p>
+            {/* Skill swap */}
+            <div className="flex items-center gap-3 mt-5 flex-wrap">
+              <span className="text-xs font-bold bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl border border-emerald-100" style={{fontFamily:"'Sora',sans-serif"}}>{mySkill?.title}</span>
+              <div className="flex items-center gap-1 text-gray-300">
+                <div className="w-6 h-px bg-gray-300" />
+                <span className="text-sm">↔</span>
+                <div className="w-6 h-px bg-gray-300" />
+              </div>
+              <span className="text-xs font-bold bg-blue-50 text-blue-700 px-3 py-1.5 rounded-xl border border-blue-100" style={{fontFamily:"'Sora',sans-serif"}}>{theirSkill?.title}</span>
             </div>
-          </div>
 
-          {/* Skill swap row */}
-          <div className="flex items-center gap-2 mt-4 flex-wrap">
-            <SkillChip label={mySkill?.title} variant="green" />
-            <div className="flex items-center gap-0.5 text-gray-300">
-              <div className="w-8 h-px bg-gray-200" />
-              <span className="text-xs text-gray-400 font-dm px-1">↔</span>
-              <div className="w-8 h-px bg-gray-200" />
-            </div>
-            <SkillChip label={theirSkill?.title} variant="blue" />
+            <ActionBar exchange={exchange} isOfferer={isOfferer} actionMutation={actionMutation} onReview={() => setShowReview(true)} />
           </div>
-
-          {/* Actions */}
-          <ActionBar
-            exchange={exchange}
-            isOfferer={isOfferer}
-            actionMutation={actionMutation}
-            onReview={() => setShowReview(true)}
-          />
-        </Card>
+        </div>
       </Reveal>
 
-      {/* ── Chat Card ───────────────────────────────────────────────────── */}
+      {/* Chat Card */}
       <Reveal delay={120}>
-        <Card className="flex flex-col rounded-3xl border border-gray-100 overflow-hidden" style={{ height: '500px' }}>
-
-          {/* Chat Header */}
-          <div className="flex items-center gap-2.5 px-4 py-3 border-b border-gray-100 bg-gray-50/60 shrink-0">
-            <MessageCircle className="w-4 h-4 text-gray-400" />
-            <span className="text-sm font-sora font-semibold text-gray-700">Messages</span>
-            {allMessages.length > 0 && (
-              <span className="ml-auto text-xs text-gray-300 font-dm">{allMessages.length} messages</span>
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col" style={{height:520}}>
+          {/* Chat header */}
+          <div className="flex items-center gap-3 px-5 py-3.5 border-b border-gray-100 bg-gray-50/60 shrink-0">
+            <div className="w-8 h-8 bg-gray-900 rounded-xl flex items-center justify-center">
+              <MessageCircle className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-black text-gray-900" style={{fontFamily:"'Sora',sans-serif"}}>Messages</p>
+              {allMessages.length > 0 && <p className="text-[10px] text-gray-400" style={{fontFamily:"'DM Sans',sans-serif"}}>{allMessages.length} messages</p>}
+            </div>
+            {canChat && (
+              <div className="ml-auto flex items-center gap-1.5">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                <span className="text-xs text-emerald-600 font-bold" style={{fontFamily:"'Sora',sans-serif"}}>Live</span>
+              </div>
             )}
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scroll-smooth">
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 scroll-smooth">
             {allMessages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full gap-2">
-                <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5 text-gray-300" />
+              <div className="flex flex-col items-center justify-center h-full gap-3">
+                <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center">
+                  <MessageCircle className="w-7 h-7 text-gray-200" />
                 </div>
-                <p className="text-sm text-gray-400 font-dm text-center max-w-xs">
-                  {canChat
-                    ? 'No messages yet. Say hello!'
-                    : 'The exchange must be accepted before you can chat.'}
+                <p className="text-sm text-gray-400 text-center max-w-xs" style={{fontFamily:"'DM Sans',sans-serif"}}>
+                  {canChat ? 'No messages yet. Say hello! 👋' : 'The exchange must be accepted before you can chat.'}
                 </p>
               </div>
             )}
 
-            {allMessages.map((msg) => (
-              <MessageBubble
-                key={msg.id}
-                msg={msg}
-                isMine={msg.sender_id === user?.id}
-              />
-            ))}
-
+            {allMessages.map(msg => <MessageBubble key={msg.id} msg={msg} isMine={msg.sender_id === user?.id} />)}
             {typingUsers.length > 0 && <TypingIndicator name={typingUsers[0]} />}
-
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input bar */}
-          <div className="border-t border-gray-100 bg-white px-3 py-3 flex gap-2 shrink-0">
+          {/* Input */}
+          <div className="border-t border-gray-100 bg-white px-4 py-3 flex gap-2.5 shrink-0">
             <input
               ref={inputRef}
               value={input}
@@ -562,27 +441,21 @@ export default function ExchangeDetailPage() {
               onKeyDown={handleKeyDown}
               disabled={!canChat}
               placeholder={canChat ? 'Type a message… (Enter to send)' : 'Accept the exchange to start chatting'}
-              className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50/60 text-sm font-dm focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-all placeholder:text-gray-300"
+              className="flex-1 px-4 py-3 rounded-2xl border-2 border-gray-200 text-sm focus:outline-none focus:border-amber-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              style={{fontFamily:"'DM Sans',sans-serif"}}
             />
             <button
               onClick={handleSend}
               disabled={!canChat || !input.trim()}
-              className="w-10 h-10 bg-bartr-dark text-white rounded-xl flex items-center justify-center hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95 shrink-0"
+              className="w-11 h-11 bg-gray-900 text-white rounded-2xl flex items-center justify-center hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shrink-0 shadow-lg shadow-gray-900/20"
             >
               <Send className="w-4 h-4" />
             </button>
           </div>
-        </Card>
+        </div>
       </Reveal>
 
-      {/* Review Modal */}
-      {showReview && (
-        <ReviewModal
-          exchange={exchange}
-          userId={user?.id}
-          onClose={() => setShowReview(false)}
-        />
-      )}
+      {showReview && <ReviewModal exchange={exchange} userId={user?.id} onClose={() => setShowReview(false)} />}
     </div>
   )
 }
