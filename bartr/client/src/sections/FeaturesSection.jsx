@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useRef } from 'react'
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion'
 import { useScrollAnimation, fadeUpVariant } from '../hooks/useScrollAnimation'
 
 /* ── Tab content components ────────────────────────────────────────────────── */
@@ -81,35 +81,21 @@ function CollaborateTab() {
       ].map((c, i) => (
         <div key={i} className="bg-gray-50 border border-gray-100 rounded-2xl p-3">
           <div className="flex items-center justify-between mb-2">
-            <span
-              className={`text-[9px] font-bold px-2 py-0.5 rounded-full font-sora ${
-                c.status === 'Live'
-                  ? 'bg-emerald-100 text-emerald-700'
-                  : 'bg-yellow-100 text-yellow-700'
-              }`}
-            >
+            <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full font-sora ${c.status === 'Live' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'}`}>
               {c.status === 'Live' && '● '}{c.status}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <div className="text-center flex-1">
-              <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-xs font-bold font-sora mx-auto mb-1">
-                {c.a[0]}
-              </div>
+              <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-xs font-bold font-sora mx-auto mb-1">{c.a[0]}</div>
               <p className="text-[10px] font-semibold text-gray-700 font-sora">{c.a}</p>
-              <span className="text-[9px] text-gray-400 bg-white border border-gray-200 px-1.5 py-0.5 rounded-full font-dm">
-                {c.aSkill}
-              </span>
+              <span className="text-[9px] text-gray-400 bg-white border border-gray-200 px-1.5 py-0.5 rounded-full font-dm">{c.aSkill}</span>
             </div>
             <div className="text-yellow-400 font-bold text-lg">⇄</div>
             <div className="text-center flex-1">
-              <div className="w-8 h-8 bg-rose-100 rounded-full flex items-center justify-center text-rose-600 text-xs font-bold font-sora mx-auto mb-1">
-                {c.b[0]}
-              </div>
+              <div className="w-8 h-8 bg-rose-100 rounded-full flex items-center justify-center text-rose-600 text-xs font-bold font-sora mx-auto mb-1">{c.b[0]}</div>
               <p className="text-[10px] font-semibold text-gray-700 font-sora">{c.b}</p>
-              <span className="text-[9px] text-gray-400 bg-white border border-gray-200 px-1.5 py-0.5 rounded-full font-dm">
-                {c.bSkill}
-              </span>
+              <span className="text-[9px] text-gray-400 bg-white border border-gray-200 px-1.5 py-0.5 rounded-full font-dm">{c.bSkill}</span>
             </div>
           </div>
         </div>
@@ -132,27 +118,27 @@ function StepRow({ number, label, labelColor, heading, body, isLast, activeStep,
       className="flex gap-5 cursor-pointer group"
       onClick={() => onClick(idx)}
     >
-      {/* Timeline column */}
       <div className="flex flex-col items-center shrink-0">
-        <div
-          className={`w-9 h-9 rounded-full border-2 flex items-center justify-center font-bold text-sm font-sora transition-all duration-300 ${
-            isActive
-              ? 'bg-bartr-dark border-bartr-dark text-white'
-              : 'border-gray-300 text-gray-400 group-hover:border-indigo-400 group-hover:text-indigo-500'
-          }`}
+        <motion.div
+          animate={isActive
+            ? { scale: 1.1, backgroundColor: '#111827', borderColor: '#111827', color: '#fff' }
+            : { scale: 1, backgroundColor: '#fff', borderColor: '#d1d5db', color: '#9ca3af' }
+          }
+          transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+          className="w-9 h-9 rounded-full border-2 flex items-center justify-center font-bold text-sm font-sora"
         >
           {number}
-        </div>
+        </motion.div>
         {!isLast && (
-          <div className={`w-0.5 flex-1 mt-2 transition-colors duration-300 ${isActive ? 'bg-indigo-400' : 'bg-gray-200'}`} />
+          <motion.div
+            animate={{ backgroundColor: isActive ? '#a5b4fc' : '#e5e7eb' }}
+            transition={{ duration: 0.4 }}
+            className="w-0.5 flex-1 mt-2"
+          />
         )}
       </div>
-
-      {/* Content */}
       <div className={`pb-10 flex-1 pt-1 transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-50 group-hover:opacity-75'}`}>
-        <span className={`text-[10px] font-bold uppercase tracking-widest font-sora ${labelColor}`}>
-          {label}
-        </span>
+        <span className={`text-[10px] font-bold uppercase tracking-widest font-sora ${labelColor}`}>{label}</span>
         <h3 className="text-xl font-bold font-sora text-gray-900 mt-1 mb-2 leading-snug">{heading}</h3>
         <p className="text-sm text-gray-500 font-dm leading-relaxed">{body}</p>
       </div>
@@ -164,32 +150,36 @@ function StepRow({ number, label, labelColor, heading, body, isLast, activeStep,
 const TABS = ['Exchange Skills', 'Share Work', 'Collaborate']
 
 const STEPS = [
-  {
-    label: '+ Platform',
-    labelColor: 'text-indigo-500',
-    heading: 'Exchange Skills Seamlessly',
-    body: 'Post what you know, request what you need. Our smart matching connects you with the right student in minutes — no money involved.',
-    tab: 0,
-  },
-  {
-    label: 'Portfolio',
-    labelColor: 'text-rose-500',
-    heading: 'Portfolio & Work Sharing',
-    body: 'Upload your work, share your Figma files, GitHub repos, or writing samples. Build a verifiable portfolio as you exchange.',
-    tab: 1,
-  },
-  {
-    label: 'Community',
-    labelColor: 'text-emerald-600',
-    heading: 'Real-Time Collaboration',
-    body: 'Jump into live skill sessions with matched students. Track exchanges, rate each other, and build lasting campus connections.',
-    tab: 2,
-  },
+  { label: '+ Platform', labelColor: 'text-indigo-500', heading: 'Exchange Skills Seamlessly', body: 'Post what you know, request what you need. Our smart matching connects you with the right student in minutes — no money involved.', tab: 0 },
+  { label: 'Portfolio', labelColor: 'text-rose-500', heading: 'Portfolio & Work Sharing', body: 'Upload your work, share your Figma files, GitHub repos, or writing samples. Build a verifiable portfolio as you exchange.', tab: 1 },
+  { label: 'Community', labelColor: 'text-emerald-600', heading: 'Real-Time Collaboration', body: 'Jump into live skill sessions with matched students. Track exchanges, rate each other, and build lasting campus connections.', tab: 2 },
 ]
 
 export default function FeaturesSection() {
   const [activeStep, setActiveStep] = useState(0)
   const [activeTab, setActiveTab] = useState(0)
+
+  const sectionRef = useRef(null)
+  const panelRef = useRef(null)
+
+  // Scroll parallax for the background text
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  })
+
+  const bgTextX = useTransform(scrollYProgress, [0, 1], ['-8%', '8%'])
+  const bgTextOpacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
+  const smoothBgTextX = useSpring(bgTextX, { stiffness: 50, damping: 20 })
+
+  // Scroll zoom for the panel
+  const { scrollYProgress: panelProgress } = useScroll({
+    target: panelRef,
+    offset: ['start end', 'center center'],
+  })
+  const panelScale = useTransform(panelProgress, [0, 1], [0.88, 1])
+  const panelOpacity = useTransform(panelProgress, [0, 0.5], [0, 1])
+  const smoothPanelScale = useSpring(panelScale, { stiffness: 80, damping: 20 })
 
   const handleStepClick = (idx) => {
     setActiveStep(idx)
@@ -197,13 +187,16 @@ export default function FeaturesSection() {
   }
 
   return (
-    <section className="py-24 px-6 bg-white relative overflow-hidden" id="features">
-      {/* Large background text */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+    <section ref={sectionRef} className="py-24 px-6 bg-white relative overflow-hidden" id="features">
+      {/* Parallax background text */}
+      <motion.div
+        style={{ x: smoothBgTextX, opacity: bgTextOpacity }}
+        className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden will-change-transform"
+      >
         <p className="text-[90px] md:text-[140px] font-extrabold font-sora text-gray-100 whitespace-nowrap select-none leading-none">
           student skills.
         </p>
-      </div>
+      </motion.div>
 
       <div className="max-w-6xl mx-auto relative">
         {/* Header */}
@@ -214,9 +207,7 @@ export default function FeaturesSection() {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <span className="text-xs font-semibold tracking-widest uppercase text-indigo-500 font-sora">
-            How it works
-          </span>
+          <span className="text-xs font-semibold tracking-widest uppercase text-indigo-500 font-sora">How it works</span>
           <h2 className="text-4xl md:text-5xl font-extrabold font-sora text-gray-900 mt-3 max-w-xl mx-auto leading-tight">
             Make the most out of every student skill.
           </h2>
@@ -242,19 +233,15 @@ export default function FeaturesSection() {
             ))}
           </div>
 
-          {/* Right — tabbed panel */}
+          {/* Right — scroll-zoom tabbed panel */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden sticky top-24"
+            ref={panelRef}
+            style={{ scale: smoothPanelScale, opacity: panelOpacity }}
+            className="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden sticky top-24 will-change-transform"
           >
             {/* Panel header */}
             <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-100">
-              <span className="w-6 h-6 bg-yellow-300 rounded-md flex items-center justify-center text-xs font-black font-sora">
-                B
-              </span>
+              <span className="w-6 h-6 bg-yellow-300 rounded-md flex items-center justify-center text-xs font-black font-sora">B</span>
               <span className="text-sm font-bold font-sora text-gray-900">Bartr</span>
               <span className="ml-auto text-xs text-gray-400 font-dm">app.bartr.io</span>
             </div>
@@ -264,15 +251,8 @@ export default function FeaturesSection() {
               {TABS.map((tab, i) => (
                 <button
                   key={tab}
-                  onClick={() => {
-                    setActiveTab(i)
-                    setActiveStep(i)
-                  }}
-                  className={`text-xs font-semibold py-3 px-3 border-b-2 transition-all font-sora whitespace-nowrap ${
-                    activeTab === i
-                      ? 'border-bartr-dark text-bartr-dark'
-                      : 'border-transparent text-gray-400 hover:text-gray-600'
-                  }`}
+                  onClick={() => { setActiveTab(i); setActiveStep(i) }}
+                  className={`text-xs font-semibold py-3 px-3 border-b-2 transition-all font-sora whitespace-nowrap ${activeTab === i ? 'border-bartr-dark text-bartr-dark' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                 >
                   {tab}
                 </button>
@@ -284,10 +264,10 @@ export default function FeaturesSection() {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeTab}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.25 }}
+                  initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -12, scale: 0.98 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                 >
                   {activeTab === 0 && <ExchangeTab />}
                   {activeTab === 1 && <ShareTab />}

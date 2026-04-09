@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion'
+import { useRef } from 'react'
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
 import {
   useScrollAnimation,
   staggerContainerVariant,
@@ -15,6 +16,7 @@ const BENEFITS = [
     color: 'bg-indigo-50 text-indigo-500',
     title: 'Learn by Teaching',
     body: 'The best way to master a skill is to teach it. Bartr turns knowledge-sharing into a two-way growth engine for every student.',
+    parallaxY: 0,
   },
   {
     icon: (
@@ -25,6 +27,7 @@ const BENEFITS = [
     color: 'bg-yellow-50 text-yellow-600',
     title: 'Campus Networking',
     body: 'Connect with students across departments and years. Build your campus network organically through meaningful skill exchanges.',
+    parallaxY: -20,
   },
   {
     icon: (
@@ -35,6 +38,7 @@ const BENEFITS = [
     color: 'bg-emerald-50 text-emerald-500',
     title: 'Completely Free',
     body: 'No subscription, no credits, no hidden fees — ever. Bartr runs entirely on the principle of equal skill exchange between students.',
+    parallaxY: -10,
   },
   {
     icon: (
@@ -45,6 +49,7 @@ const BENEFITS = [
     color: 'bg-rose-50 text-rose-500',
     title: 'Real Experience',
     body: 'Every exchange builds your portfolio and your resume. Skill-based collaboration counts as real project experience for employers.',
+    parallaxY: 15,
   },
   {
     icon: (
@@ -55,6 +60,7 @@ const BENEFITS = [
     color: 'bg-purple-50 text-purple-500',
     title: 'Verified Exchanges',
     body: 'Both parties confirm completion and rate the exchange. Build a trusted reputation score that follows you throughout your degree.',
+    parallaxY: -25,
   },
   {
     icon: (
@@ -65,35 +71,92 @@ const BENEFITS = [
     color: 'bg-orange-50 text-orange-500',
     title: 'Instant Matching',
     body: 'Our algorithm matches skill supply with demand in real time. No waiting weeks — find your skill partner within hours of posting.',
+    parallaxY: 5,
   },
 ]
 
-export default function BenefitsSection() {
-  const [ref, controls] = useScrollAnimation(0.1)
+/* Individual card with its own parallax offset */
+function BenefitCard({ b, i }) {
+  const cardRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ['start end', 'end start'],
+  })
+
+  const y = useTransform(scrollYProgress, [0, 1], [b.parallaxY * 1.5, b.parallaxY * -1.5])
+  const smoothY = useSpring(y, { stiffness: 60, damping: 18 })
 
   return (
-    <section className="py-24 px-6 bg-bartr-bg" id="benefits">
+    <motion.div
+      ref={cardRef}
+      style={{ y: smoothY }}
+      variants={staggerChildVariant}
+      whileHover={{ y: -6, scale: 1.02, boxShadow: '0 16px 40px rgba(0,0,0,0.1)' }}
+      transition={{ type: 'spring', stiffness: 280, damping: 22 }}
+      className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm will-change-transform"
+    >
+      <div className={`w-11 h-11 rounded-xl ${b.color} flex items-center justify-center mb-4`}>
+        {b.icon}
+      </div>
+      <h3 className="text-base font-bold font-sora text-gray-900 mb-2">{b.title}</h3>
+      <p className="text-sm text-gray-500 font-dm leading-relaxed">{b.body}</p>
+    </motion.div>
+  )
+}
+
+export default function BenefitsSection() {
+  const [ref, controls] = useScrollAnimation(0.1)
+  const sectionRef = useRef(null)
+
+  // Section-level scroll for the heading parallax
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'center center'],
+  })
+
+  const headingY = useTransform(scrollYProgress, [0, 1], [40, 0])
+  const headingScale = useTransform(scrollYProgress, [0, 1], [0.92, 1])
+  const smoothHeadingY = useSpring(headingY, { stiffness: 80, damping: 22 })
+  const smoothHeadingScale = useSpring(headingScale, { stiffness: 80, damping: 22 })
+
+  return (
+    <section ref={sectionRef} className="py-24 px-6 bg-bartr-bg" id="benefits">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
+        {/* Header — scroll-zoom in as it enters viewport */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          style={{ y: smoothHeadingY, scale: smoothHeadingScale }}
+          className="text-center mb-16 will-change-transform"
         >
-          <span className="text-xs font-semibold tracking-widest uppercase text-indigo-500 font-sora">
+          <motion.span
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="text-xs font-semibold tracking-widest uppercase text-indigo-500 font-sora"
+          >
             Why Bartr
-          </span>
-          <h2 className="text-4xl md:text-5xl font-extrabold font-sora text-gray-900 mt-3 leading-tight max-w-lg mx-auto">
+          </motion.span>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, delay: 0.1 }}
+            className="text-4xl md:text-5xl font-extrabold font-sora text-gray-900 mt-3 leading-tight max-w-lg mx-auto"
+          >
             Built for students, by students.
-          </h2>
-          <p className="text-gray-500 mt-4 max-w-md mx-auto font-dm text-lg">
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-gray-500 mt-4 max-w-md mx-auto font-dm text-lg"
+          >
             Every feature is designed around how students actually learn and collaborate.
-          </p>
+          </motion.p>
         </motion.div>
 
-        {/* Benefits grid */}
+        {/* Benefits grid — staggered + individual parallax */}
         <motion.div
           ref={ref}
           initial="hidden"
@@ -102,17 +165,7 @@ export default function BenefitsSection() {
           className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"
         >
           {BENEFITS.map((b, i) => (
-            <motion.div
-              key={b.title}
-              variants={staggerChildVariant}
-              className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
-            >
-              <div className={`w-11 h-11 rounded-xl ${b.color} flex items-center justify-center mb-4`}>
-                {b.icon}
-              </div>
-              <h3 className="text-base font-bold font-sora text-gray-900 mb-2">{b.title}</h3>
-              <p className="text-sm text-gray-500 font-dm leading-relaxed">{b.body}</p>
-            </motion.div>
+            <BenefitCard key={b.title} b={b} i={i} />
           ))}
         </motion.div>
 
@@ -124,9 +177,13 @@ export default function BenefitsSection() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-center mt-16"
         >
-          <button className="bg-bartr-dark text-white text-sm font-semibold px-8 py-3.5 rounded-full font-sora hover:bg-gray-800 active:scale-95 transition-all shadow-lg shadow-gray-900/10">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            className="bg-bartr-dark text-white text-sm font-semibold px-8 py-3.5 rounded-full font-sora hover:bg-gray-800 transition-all shadow-lg shadow-gray-900/10"
+          >
             Start exchanging skills →
-          </button>
+          </motion.button>
         </motion.div>
       </div>
     </section>

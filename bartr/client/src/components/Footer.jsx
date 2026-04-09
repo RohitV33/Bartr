@@ -63,7 +63,7 @@ export default function Footer() {
                 className="w-full sm:w-72 bg-white/10 border border-white/20 text-white placeholder-gray-500 rounded-full px-5 py-3 text-sm outline-none focus:border-yellow-300 transition-colors font-dm"
               />
               <button className="w-full sm:w-auto bg-yellow-300 text-bartr-dark text-sm font-bold px-7 py-3 rounded-full font-sora hover:bg-yellow-400 active:scale-95 transition-all whitespace-nowrap">
-                Join the waitlist →
+               Get Started →
               </button>
             </div>
           </motion.div>
