@@ -24,9 +24,11 @@ import ExchangesPage from './pages/app/ExchangesPage.jsx'
 import ExchangeDetailPage from './pages/app/ExchangeDetailPage.jsx'
 import NotificationsPage from './pages/app/NotificationsPage.jsx'
 import PortfolioPage from './pages/app/PortfolioPage.jsx'
+import { ThemeProvider } from './context/themeContext.jsx'
 
 const AppProviders = ({ children }) => (
   <QueryClientProvider client={queryClient}>
+    <ThemeProvider> 
     <AuthProvider>
       <SocketProvider>
         <NotificationProvider>
@@ -34,6 +36,7 @@ const AppProviders = ({ children }) => (
         </NotificationProvider>
       </SocketProvider>
     </AuthProvider>
+    </ThemeProvider>
     {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
   </QueryClientProvider>
 )

@@ -144,7 +144,7 @@ function Pill({ active, onClick, children, accent }) {
           ? accent
             ? 'bg-amber-400 text-gray-900 border-amber-400 shadow-md shadow-amber-200'
             : 'bg-gray-900 text-white border-gray-900 shadow-md'
-          : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400 hover:shadow-sm'
+          : 'bg-bartr-surface border-bartr-border text-bartr-muted hover:border-bartr-text hover:shadow-sm'
         }`}
       style={{ fontFamily: "'Sora', sans-serif" }}
     >
@@ -218,7 +218,7 @@ export default function BrowsePage() {
       {/* Filter row */}
       <Reveal delay={0}>
         <div className="flex items-center gap-2 mb-4 flex-wrap">
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mr-2" style={{ fontFamily: "'Sora', sans-serif" }}>Type</span>
+          <span className="text-xs font-bold text-bartr-muted uppercase tracking-widest mr-2" style={{ fontFamily: "'Sora', sans-serif" }}>Type</span>
           {TYPE_OPTIONS.map(opt => (
             <Pill key={opt.value} active={type === opt.value} onClick={() => handleType(opt.value)}>{opt.label}</Pill>
           ))}
@@ -227,7 +227,7 @@ export default function BrowsePage() {
 
       <Reveal delay={80}>
         <div className="flex items-center gap-2 mb-8 flex-wrap">
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mr-2" style={{ fontFamily: "'Sora', sans-serif" }}>Category</span>
+          <span className="text-xs font-bold text-bartr-muted uppercase tracking-widest mr-2" style={{ fontFamily: "'Sora', sans-serif" }}>Category</span>
           <Pill active={!category} onClick={() => handleCategory('')} accent>All</Pill>
           {categories.map(cat => (
             <Pill key={cat.id} active={category === cat.slug} onClick={() => handleCategory(cat.slug)} accent>
@@ -243,7 +243,7 @@ export default function BrowsePage() {
         <Reveal>
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>No skills found</h3>
+            <h3 className="text-xl font-bold text-bartr-text mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>No skills found</h3>
             <button onClick={() => navigate('/skills/new')} className="bg-gray-900 text-white px-6 py-3 rounded-2xl text-sm font-bold hover:bg-gray-700 transition-all">
               Post a skill
             </button>
@@ -254,8 +254,8 @@ export default function BrowsePage() {
           <Reveal>
             <div className="flex items-center justify-between mb-6">
               <div>
-                <span className="text-2xl font-black text-gray-900" style={{ fontFamily: "'Sora', sans-serif" }}>{pagination?.total || 0}</span>
-                <span className="text-gray-500 ml-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>skills available</span>
+                <span className="text-2xl font-black text-bartr-text" style={{ fontFamily: "'Sora', sans-serif" }}>{pagination?.total || 0}</span>
+                <span className="text-bartr-muted ml-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>skills available</span>
               </div>
               {isFetching && !isLoading && <Spinner size="sm" />}
             </div>
@@ -276,7 +276,7 @@ export default function BrowsePage() {
                 <button
                   disabled={page === 1}
                   onClick={() => setPage(p => p - 1)}
-                  className="px-5 py-2.5 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition-all"
+                  className="px-5 py-2.5 rounded-2xl border-2 border-bartr-border text-sm font-bold text-bartr-muted hover:bg-bartr-surface disabled:opacity-30 transition-all"
                   style={{ fontFamily: "'Sora', sans-serif" }}
                 >
                   <ChevronLeft className="w-4 h-4" /> Prev
@@ -284,7 +284,7 @@ export default function BrowsePage() {
                 <button
                   disabled={page >= pagination.totalPages}
                   onClick={() => setPage(p => p + 1)}
-                  className="px-5 py-2.5 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition-all"
+                  className="px-5 py-2.5 rounded-2xl border-2 border-bartr-border text-sm font-bold text-bartr-muted hover:bg-bartr-surface disabled:opacity-30 transition-all"
                   style={{ fontFamily: "'Sora', sans-serif" }}
                 >
                   Next <ChevronRight className="w-4 h-4" />

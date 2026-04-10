@@ -70,13 +70,13 @@ function StatCard({ icon: Icon, label, value, color, delay }) {
     <Reveal delay={delay}>
       <div className={`relative overflow-hidden rounded-2xl p-5 border ${color} group hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}>
         <div className="flex items-center justify-between mb-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/80 shadow-sm">
-            <Icon className="w-5 h-5 text-gray-700" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-bartr-surface shadow-sm">
+            <Icon className="w-5 h-5 text-bartr-text" />
           </div>
-          <TrendingUp className="w-4 h-4 text-gray-400 group-hover:text-emerald-500 transition-colors" />
+          <TrendingUp className="w-4 h-4 text-bartr-muted group-hover:text-emerald-500 transition-colors" />
         </div>
-        <p className="text-3xl font-black text-gray-900 mb-0.5" style={{ fontFamily:"'Sora',sans-serif" }}>{value}</p>
-        <p className="text-xs text-gray-500 font-medium" style={{ fontFamily:"'DM Sans',sans-serif" }}>{label}</p>
+        <p className="text-3xl font-black text-bartr-text mb-0.5" style={{ fontFamily:"'Sora',sans-serif" }}>{value}</p>
+        <p className="text-xs text-bartr-muted font-medium" style={{ fontFamily:"'DM Sans',sans-serif" }}>{label}</p>
       </div>
     </Reveal>
   )
@@ -87,7 +87,7 @@ function SectionHeader({ title, action, actionLabel }) {
   const navigate = useNavigate()
   return (
     <div className="flex items-center justify-between mb-4">
-      <h2 className="text-lg font-black text-gray-900" style={{ fontFamily:"'Sora',sans-serif" }}>{title}</h2>
+      <h2 className="text-lg font-black text-bartr-text" style={{ fontFamily:"'Sora',sans-serif" }}>{title}</h2>
       {action && (
         <button onClick={action} className="flex items-center gap-1 text-sm font-bold text-amber-600 hover:text-amber-700 transition-colors" style={{ fontFamily:"'Sora',sans-serif" }}>
           {actionLabel} <ChevronRight className="w-4 h-4" />
@@ -121,10 +121,10 @@ export default function DashboardPage() {
 
       {/* Stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <StatCard icon={Sparkles} label="Skills Offered" value={data?.stats?.skillsOffered ?? '—'} color="bg-amber-50 border-amber-100" delay={0} />
-        <StatCard icon={BookOpen} label="Skills Wanted" value={data?.stats?.skillsWanted ?? '—'} color="bg-blue-50 border-blue-100" delay={80} />
-        <StatCard icon={Zap} label="Exchanges" value={data?.stats?.exchanges ?? '—'} color="bg-emerald-50 border-emerald-100" delay={160} />
-        <StatCard icon={Star} label="Reputation" value={user?.reputation_score?.toFixed(1) ?? '—'} color="bg-rose-50 border-rose-100" delay={240} />
+        <StatCard icon={Sparkles} label="Skills Offered" value={data?.stats?.skillsOffered ?? '—'} color="bg-amber-50 border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20" delay={0} />
+        <StatCard icon={BookOpen} label="Skills Wanted" value={data?.stats?.skillsWanted ?? '—'} color="bg-blue-50 border-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20" delay={80} />
+        <StatCard icon={Zap} label="Exchanges" value={data?.stats?.exchanges ?? '—'} color="bg-emerald-50 border-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20" delay={160} />
+        <StatCard icon={Star} label="Reputation" value={user?.reputation_score?.toFixed(1) ?? '—'} color="bg-rose-50 border-rose-100 dark:bg-rose-500/10 dark:border-rose-500/20" delay={240} />
       </div>
 
       {isLoading ? (
@@ -153,16 +153,15 @@ export default function DashboardPage() {
 
               <button
                 onClick={() => navigate('/browse')}
-                className="relative overflow-hidden rounded-2xl p-6 text-left group hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                style={{ background:'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)', border:'1px solid #bbf7d0' }}
+                className="relative overflow-hidden rounded-2xl p-6 text-left group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-emerald-50 border border-emerald-100 dark:bg-emerald-500/5 dark:border-emerald-500/20"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-20" style={{ background:'radial-gradient(#10b981, transparent)', transform:'translate(30%,-30%)' }} />
                 <div className="relative">
                   <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Users className="w-5 h-5 text-white" />
                   </div>
-                  <p className="text-gray-900 font-black text-lg mb-1" style={{ fontFamily:"'Sora',sans-serif" }}>Browse Skills</p>
-                  <p className="text-gray-500 text-sm">Find your next exchange partner</p>
+                  <p className="text-bartr-text font-black text-lg mb-1" style={{ fontFamily:"'Sora',sans-serif" }}>Browse Skills</p>
+                  <p className="text-bartr-muted text-sm">Find your next exchange partner</p>
                   <ArrowRight className="w-4 h-4 text-emerald-500 mt-3 group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>
@@ -225,12 +224,12 @@ export default function DashboardPage() {
                   <Reveal key={ex.id} delay={i * 60}>
                     <div
                       onClick={() => navigate(`/exchanges/${ex.id}`)}
-                      className="bg-white border border-gray-100 rounded-2xl p-4 flex items-center gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                      className="bg-bartr-surface border border-bartr-border rounded-2xl p-4 flex items-center gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
                     >
                       <Avatar src={ex.partner?.avatar_url} name={ex.partner?.full_name} size="md" />
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-gray-900 text-sm truncate" style={{ fontFamily:"'Sora',sans-serif" }}>{ex.partner?.full_name}</p>
-                        <p className="text-xs text-gray-500 truncate">{ex.offered_skill?.title} ↔ {ex.requested_skill?.title}</p>
+                        <p className="font-bold text-bartr-text text-sm truncate" style={{ fontFamily:"'Sora',sans-serif" }}>{ex.partner?.full_name}</p>
+                        <p className="text-xs text-bartr-muted truncate">{ex.offered_skill?.title} ↔ {ex.requested_skill?.title}</p>
                       </div>
                       <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${ex.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : ex.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}`} style={{ fontFamily:"'Sora',sans-serif" }}>
                         {ex.status}

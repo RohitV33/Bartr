@@ -14,7 +14,7 @@ export const Avatar = ({ src, name = '', size = 'md', online = false, className 
         )}
       </div>
       {online && (
-        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-white" />
+        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-bartr-bg" />
       )}
     </div>
   )
@@ -38,10 +38,10 @@ export const Button = ({
 }) => {
   const base = 'inline-flex items-center justify-center gap-2 font-sora font-semibold rounded-full transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed'
   const variants = {
-    primary: 'bg-bartr-dark text-white hover:bg-gray-800 shadow-sm',
-    secondary: 'bg-white text-bartr-dark border border-gray-200 hover:border-gray-300 hover:bg-gray-50',
+    primary: 'bg-bartr-dark text-white hover:bg-gray-800 dark:bg-yellow-300 dark:text-bartr-dark dark:hover:bg-yellow-400 shadow-sm',
+    secondary: 'bg-bartr-surface text-bartr-text border border-bartr-border hover:bg-gray-50 dark:hover:bg-gray-800',
     yellow: 'bg-yellow-300 text-bartr-dark hover:bg-yellow-400',
-    ghost: 'text-gray-600 hover:text-gray-900 hover:bg-gray-100',
+    ghost: 'text-bartr-muted hover:text-bartr-text hover:bg-gray-100 dark:hover:bg-gray-800',
     danger: 'bg-red-500 text-white hover:bg-red-600',
   }
   const sizes = {
@@ -70,7 +70,7 @@ export const Button = ({
 // ── Card ──────────────────────────────────────────────────────────────────────
 export const Card = ({ children, className = '', hover = false, ...props }) => (
   <div
-    className={`bg-white rounded-2xl border border-gray-100 ${hover ? 'hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer' : ''} ${className}`}
+    className={`bg-bartr-card rounded-2xl border border-bartr-border ${hover ? 'hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer' : ''} ${className}`}
     {...props}
   >
     {children}
@@ -80,10 +80,10 @@ export const Card = ({ children, className = '', hover = false, ...props }) => (
 // ── Input ─────────────────────────────────────────────────────────────────────
 export const Input = forwardRef(({ label, error, className = '', ...props }, ref) => (
   <div className="flex flex-col gap-1.5">
-    {label && <label className="text-sm font-medium text-gray-700 font-sora">{label}</label>}
+    {label && <label className="text-sm font-medium text-bartr-text font-sora">{label}</label>}
     <input
       ref={ref}
-      className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-white font-dm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all ${error ? 'border-red-400' : 'border-gray-200'} ${className}`}
+      className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-bartr-surface font-dm text-bartr-text placeholder-bartr-muted/50 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all ${error ? 'border-red-400' : 'border-bartr-border'} ${className}`}
       {...props}
     />
     {error && <p className="text-xs text-red-500 font-dm">{error}</p>}
@@ -94,10 +94,10 @@ Input.displayName = 'Input'
 // ── Textarea ──────────────────────────────────────────────────────────────────
 export const Textarea = forwardRef(({ label, error, className = '', ...props }, ref) => (
   <div className="flex flex-col gap-1.5">
-    {label && <label className="text-sm font-medium text-gray-700 font-sora">{label}</label>}
+    {label && <label className="text-sm font-medium text-bartr-text font-sora">{label}</label>}
     <textarea
       ref={ref}
-      className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-white font-dm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all resize-none ${error ? 'border-red-400' : 'border-gray-200'} ${className}`}
+      className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-bartr-surface font-dm text-bartr-text placeholder-bartr-muted/50 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all resize-none ${error ? 'border-red-400' : 'border-bartr-border'} ${className}`}
       {...props}
     />
     {error && <p className="text-xs text-red-500 font-dm">{error}</p>}
@@ -108,10 +108,10 @@ Textarea.displayName = 'Textarea'
 // ── Select ────────────────────────────────────────────────────────────────────
 export const Select = forwardRef(({ label, error, children, className = '', ...props }, ref) => (
   <div className="flex flex-col gap-1.5">
-    {label && <label className="text-sm font-medium text-gray-700 font-sora">{label}</label>}
+    {label && <label className="text-sm font-medium text-bartr-text font-sora">{label}</label>}
     <select
       ref={ref}
-      className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-white font-dm text-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all ${error ? 'border-red-400' : 'border-gray-200'} ${className}`}
+      className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-bartr-surface font-dm text-bartr-text focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all ${error ? 'border-red-400' : 'border-bartr-border'} ${className}`}
       {...props}
     >
       {children}
@@ -168,18 +168,18 @@ export const SkillCard = ({ skill, onClick }) => (
       </div>
       <ProficiencyBadge level={skill.proficiency_level} />
     </div>
-    <h3 className="font-sora font-semibold text-gray-900 mb-1 line-clamp-1">{skill.title}</h3>
-    <p className="text-sm text-gray-500 font-dm line-clamp-2 mb-4">{skill.description}</p>
+    <h3 className="font-sora font-semibold text-bartr-text mb-1 line-clamp-1">{skill.title}</h3>
+    <p className="text-sm text-bartr-muted font-dm line-clamp-2 mb-4">{skill.description}</p>
     {skill.user && (
-      <div className="flex items-center gap-2 pt-3 border-t border-gray-50">
+      <div className="flex items-center gap-2 pt-3 border-t border-bartr-border">
         <Avatar src={skill.user.avatar_url} name={skill.user.full_name} size="sm" />
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-gray-800 font-sora truncate">{skill.user.full_name}</p>
-          <p className="text-xs text-gray-400 font-dm truncate">{skill.user.university || 'University'}</p>
+          <p className="text-xs font-semibold text-bartr-text font-sora truncate">{skill.user.full_name}</p>
+          <p className="text-xs text-bartr-muted font-dm truncate">{skill.user.university || 'University'}</p>
         </div>
         <div className="ml-auto flex items-center gap-1">
           <Stars rating={skill.user.reputation_score} />
-          <span className="text-xs text-gray-500">{skill.user.reputation_score?.toFixed(1)}</span>
+          <span className="text-xs text-bartr-muted">{skill.user.reputation_score?.toFixed(1)}</span>
         </div>
       </div>
     )}
@@ -190,8 +190,8 @@ export const SkillCard = ({ skill, onClick }) => (
 export const PageHeader = ({ title, subtitle, action }) => (
   <div className="flex items-start justify-between gap-4 mb-8">
     <div>
-      <h1 className="font-sora text-2xl font-bold text-gray-900">{title}</h1>
-      {subtitle && <p className="text-gray-500 font-dm mt-1">{subtitle}</p>}
+      <h1 className="font-sora text-2xl font-bold text-bartr-text">{title}</h1>
+      {subtitle && <p className="text-bartr-muted font-dm mt-1">{subtitle}</p>}
     </div>
     {action}
   </div>
@@ -199,12 +199,12 @@ export const PageHeader = ({ title, subtitle, action }) => (
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 export const Toast = ({ toast, onDismiss }) => (
-  <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 max-w-xs w-full flex items-start gap-3 animate-slide-up">
+  <div className="bg-bartr-surface rounded-2xl shadow-xl border border-bartr-border p-4 max-w-xs w-full flex items-start gap-3 animate-slide-up">
     <div className="w-8 h-8 rounded-full bg-yellow-300 flex items-center justify-center text-sm shrink-0">🔔</div>
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-semibold text-gray-900 font-sora">{toast.title}</p>
-      <p className="text-xs text-gray-500 font-dm mt-0.5 line-clamp-2">{toast.body}</p>
+      <p className="text-sm font-semibold text-bartr-text font-sora">{toast.title}</p>
+      <p className="text-xs text-bartr-muted font-dm mt-0.5 line-clamp-2">{toast.body}</p>
     </div>
-    <button onClick={() => onDismiss(toast.id)} className="text-gray-400 hover:text-gray-600 shrink-0">✕</button>
+    <button onClick={() => onDismiss(toast.id)} className="text-bartr-muted hover:text-bartr-text shrink-0">✕</button>
   </div>
 )

@@ -75,7 +75,7 @@ function ProfileHero({ user, isMe, scrollY, onEdit, onExchange }) {
         <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 mb-6">
           <Stars rating={user?.reputation_score} />
           <span className="text-white font-black text-sm" style={{fontFamily:"'Sora',sans-serif"}}>{user?.reputation_score?.toFixed(1)}</span>
-          <span className="text-gray-400 text-xs">({user?._count?.reviews_received || 0} reviews)</span>
+          <span className="text-gray-300 text-xs">({user?._count?.reviews_received || 0} reviews)</span>
         </div>
 
         {/* Actions */}
@@ -102,16 +102,16 @@ function SkillItem({ skill, onClick }) {
     <button onClick={onClick} className="w-full text-left">
       <div
         onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
-        className="bg-white border border-gray-100 rounded-2xl p-4 flex items-center gap-3 transition-all duration-200"
+        className="bg-bartr-surface border border-bartr-border rounded-2xl p-4 flex items-center gap-3 transition-all duration-200"
         style={{ boxShadow: h ? '0 8px 24px rgba(0,0,0,0.1)' : '0 1px 4px rgba(0,0,0,0.04)', transform: h ? 'translateX(4px)' : 'none' }}
       >
-        <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-xl shrink-0">{skill.category?.icon}</div>
+        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-xl shrink-0">{skill.category?.icon}</div>
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-gray-900 text-sm" style={{fontFamily:"'Sora',sans-serif"}}>{skill.title}</p>
-          <p className="text-xs text-gray-500 line-clamp-1" style={{fontFamily:"'DM Sans',sans-serif"}}>{skill.description}</p>
+          <p className="font-bold text-bartr-text text-sm" style={{fontFamily:"'Sora',sans-serif"}}>{skill.title}</p>
+          <p className="text-xs text-bartr-muted line-clamp-1" style={{fontFamily:"'DM Sans',sans-serif"}}>{skill.description}</p>
         </div>
         <ProficiencyBadge level={skill.proficiency_level} />
-        <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" style={{opacity: h?1:0, transform: h?'translateX(2px)':'none', transition:'all .2s'}} />
+        <ChevronRight className="w-4 h-4 text-bartr-muted shrink-0" style={{opacity: h?1:0, transform: h?'translateX(2px)':'none', transition:'all .2s'}} />
       </div>
     </button>
   )
@@ -161,8 +161,8 @@ export default function ProfilePage() {
             <div>
               <Reveal>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-200 to-transparent" />
-                  <h2 className="text-sm font-black text-gray-500 uppercase tracking-widest" style={{fontFamily:"'Sora',sans-serif"}}>✨ Offering ({offerings.length})</h2>
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-200/50 to-transparent" />
+                  <h2 className="text-sm font-black text-bartr-muted uppercase tracking-widest" style={{fontFamily:"'Sora',sans-serif"}}>✨ Offering ({offerings.length})</h2>
                   <div className="h-px flex-1 bg-gradient-to-l from-transparent via-amber-200 to-transparent" />
                 </div>
               </Reveal>
@@ -189,13 +189,13 @@ export default function ProfilePage() {
               <div className="space-y-2.5">
                 {requests.map((skill, i) => (
                   <Reveal key={skill.id} delay={i * 60}>
-                    <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-4 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-xl shrink-0">{skill.category?.icon}</div>
+                    <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-4 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-xl shrink-0">{skill.category?.icon}</div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-gray-900 text-sm" style={{fontFamily:"'Sora',sans-serif"}}>{skill.title}</p>
-                        <p className="text-xs text-gray-500 line-clamp-1" style={{fontFamily:"'DM Sans',sans-serif"}}>{skill.description}</p>
+                        <p className="font-bold text-bartr-text text-sm" style={{fontFamily:"'Sora',sans-serif"}}>{skill.title}</p>
+                        <p className="text-xs text-bartr-muted line-clamp-1" style={{fontFamily:"'DM Sans',sans-serif"}}>{skill.description}</p>
                       </div>
-                      <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full" style={{fontFamily:"'Sora',sans-serif"}}>Wants</span>
+                      <span className="text-xs font-bold bg-blue-500/10 text-blue-500 px-2.5 py-1 rounded-full" style={{fontFamily:"'Sora',sans-serif"}}>Wants</span>
                     </div>
                   </Reveal>
                 ))}
@@ -216,17 +216,17 @@ export default function ProfilePage() {
               <div className="space-y-3">
                 {user.reviews_received.map((r, i) => (
                   <Reveal key={r.id} delay={i * 60}>
-                    <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                    <div className="bg-bartr-surface border border-bartr-border rounded-2xl p-5 shadow-sm">
                       <div className="flex items-center gap-3 mb-3">
                         <Avatar src={r.reviewer.avatar_url} name={r.reviewer.full_name} size="sm" />
                         <div className="flex-1">
-                          <p className="text-sm font-bold text-gray-900" style={{fontFamily:"'Sora',sans-serif"}}>{r.reviewer.full_name}</p>
+                          <p className="text-sm font-bold text-bartr-text" style={{fontFamily:"'Sora',sans-serif"}}>{r.reviewer.full_name}</p>
                           <Stars rating={r.rating} />
                         </div>
-                        <span className="text-xs text-gray-400" style={{fontFamily:"'DM Sans',sans-serif"}}>{timeAgo(r.created_at)}</span>
+                        <span className="text-xs text-bartr-muted" style={{fontFamily:"'DM Sans',sans-serif"}}>{timeAgo(r.created_at)}</span>
                       </div>
                       {r.comment && (
-                        <p className="text-sm text-gray-600 italic border-l-2 border-amber-300 pl-3" style={{fontFamily:"'DM Sans',sans-serif"}}>"{r.comment}"</p>
+                        <p className="text-sm text-bartr-muted italic border-l-2 border-amber-300 pl-3" style={{fontFamily:"'DM Sans',sans-serif"}}>"{r.comment}"</p>
                       )}
                     </div>
                   </Reveal>
@@ -246,17 +246,17 @@ export default function ProfilePage() {
               <div className="space-y-3">
                 {user.portfolios.map((item, i) => (
                   <Reveal key={item.id} delay={i * 80}>
-                    <div className="overflow-hidden rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                    <div className="overflow-hidden rounded-2xl border border-bartr-border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
                       <div className="relative overflow-hidden">
                         <img src={item.file_url} alt={item.title} className="w-full h-36 object-cover hover:scale-105 transition-transform duration-500" />
                         <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
                       </div>
-                      <div className="p-3 bg-white">
-                        <p className="text-sm font-bold text-gray-900" style={{fontFamily:"'Sora',sans-serif"}}>{item.title}</p>
-                        {item.description && <p className="text-xs text-gray-500 mt-0.5 line-clamp-2" style={{fontFamily:"'DM Sans',sans-serif"}}>{item.description}</p>}
+                      <div className="p-3 bg-bartr-surface">
+                        <p className="text-sm font-bold text-bartr-text" style={{fontFamily:"'Sora',sans-serif"}}>{item.title}</p>
+                        {item.description && <p className="text-xs text-bartr-muted mt-0.5 line-clamp-2" style={{fontFamily:"'DM Sans',sans-serif"}}>{item.description}</p>}
                         {item.tags?.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
-                            {item.tags.map(tag => <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded font-medium">{tag}</span>)}
+                            {item.tags.map(tag => <span key={tag} className="text-xs bg-bartr-bg text-bartr-muted px-1.5 py-0.5 rounded font-medium">{tag}</span>)}
                           </div>
                         )}
                       </div>

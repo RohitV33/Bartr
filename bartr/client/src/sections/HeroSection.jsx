@@ -67,7 +67,7 @@ export default function HeroSection() {
           className="absolute inset-0"
           style={{
             backgroundImage:
-              'linear-gradient(#e0ddd5 1px, transparent 1px), linear-gradient(90deg, #e0ddd5 1px, transparent 1px)',
+              'linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
@@ -90,7 +90,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-1.5 text-xs font-semibold text-gray-600 shadow-sm mb-8 font-sora"
+          className="inline-flex items-center gap-2 bg-bartr-surface border border-bartr-border rounded-full px-4 py-1.5 text-xs font-semibold text-bartr-muted shadow-sm mb-8 font-sora"
         >
           <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
           Student skill exchange platform — now in beta
@@ -102,7 +102,7 @@ export default function HeroSection() {
           className="will-change-transform"
         >
           {/* Corrected: Use motion.h1 for opening and closing tags */}
-          <motion.h1 className="font-sora text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight text-gray-900 mb-6">
+          <motion.h1 className="font-sora text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight text-bartr-text mb-6">
             Exchange skills, <br className="hidden md:block" />
             grow{' '}
             <span className="relative inline-grid overflow-hidden py-4">
@@ -116,7 +116,7 @@ export default function HeroSection() {
                     x: { type: "spring", stiffness: 100, damping: 20 },
                     opacity: { duration: 0.3 } 
                   }}
-                  className={`${WORDS[index].color} rounded-lg px-4 py-1 inline-block whitespace-nowrap`}
+                  className={`${WORDS[index].color} text-bartr-dark rounded-lg px-4 py-1 inline-block whitespace-nowrap`}
                 >
                   {WORDS[index].text}
                 </motion.span>
@@ -130,7 +130,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.45 }}
-          className="text-lg md:text-xl text-gray-500 max-w-xl leading-relaxed mb-10 font-dm will-change-transform"
+          className="text-lg md:text-xl text-bartr-muted max-w-xl leading-relaxed mb-10 font-dm will-change-transform"
         >
           Bartr connects students to swap skills — no money, no hassle. Trade
           your expertise for what you need, and build real experience along the
@@ -156,7 +156,7 @@ export default function HeroSection() {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => navigate('/login')}
-            className="text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors px-4 py-3.5 font-sora flex items-center gap-1.5 border border-gray-200 rounded-full hover:bg-white"
+            className="text-sm font-semibold text-bartr-muted hover:text-bartr-text transition-colors px-4 py-3.5 font-sora flex items-center gap-1.5 border border-bartr-border rounded-full hover:bg-bartr-surface"
           >
             Log in
           </motion.button>
@@ -167,7 +167,7 @@ export default function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9, duration: 0.5 }}
-          className="text-xs text-gray-400 mt-6 font-dm"
+          className="text-xs text-bartr-muted mt-6 font-dm"
         >
           Trusted by 1,200+ students across 40+ universities
         </motion.p>

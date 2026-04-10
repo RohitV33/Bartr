@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ================= BASE ================= */
 @layer base {
   *, *::before, *::after {
     box-sizing: border-box;
@@ -13,11 +14,14 @@
 
   body {
     font-family: 'DM Sans', sans-serif;
-    background-color: #f7f6f2;
-    color: #1a1a1a;
+    background-color: var(--bg);
+    color: var(--text);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+
+    /* ✨ Smooth theme transition */
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -25,31 +29,62 @@
   }
 }
 
+/* ================= CUSTOM VARIABLES ================= */
+:root {
+  color-scheme: light;
+
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --card: #ffffff;
+  --border: #f1f5f9;
+  --sidebar: #ffffff;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg: #0b0f1a;
+  --surface: #111827;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --card: #1e293b;
+  --border: #334155;
+  --sidebar: #0f172a;
+}
+
+
+/* ================= UTILITIES ================= */
 @layer utilities {
   .font-sora {
     font-family: 'Sora', sans-serif;
   }
+
   .font-dm {
     font-family: 'DM Sans', sans-serif;
   }
 }
 
-/* Custom scrollbar */
+/* ================= SCROLLBAR ================= */
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #f7f6f2;
+  background: var(--bg);
 }
+
 ::-webkit-scrollbar-thumb {
   background: #d1cfc7;
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #b0ada4;
 }
 
-/* Accordion transition */
+/* ================= ACCORDION ================= */
 .accordion-content {
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
               opacity 0.3s ease,

@@ -45,8 +45,8 @@ function FaqItem({ q, a, isOpen, onClick, index }) {
     <motion.div
       ref={itemRef}
       style={{ x: smoothX, opacity }}
-      className={`border border-gray-100 rounded-2xl overflow-hidden transition-all duration-200 will-change-transform ${
-        isOpen ? 'bg-white shadow-sm' : 'bg-white hover:border-gray-200'
+      className={`border border-bartr-border rounded-2xl overflow-hidden transition-all duration-200 will-change-transform ${
+        isOpen ? 'bg-bartr-surface shadow-sm' : 'bg-bartr-surface hover:border-bartr-text/20'
       }`}
     >
       <button
@@ -54,11 +54,11 @@ function FaqItem({ q, a, isOpen, onClick, index }) {
         className="w-full flex items-center justify-between px-6 py-5 text-left group"
         aria-expanded={isOpen}
       >
-        <span className={`text-sm font-semibold font-sora transition-colors ${isOpen ? 'text-gray-900' : 'text-gray-700 group-hover:text-gray-900'}`}>
+        <span className={`text-sm font-semibold font-sora transition-colors ${isOpen ? 'text-bartr-text' : 'text-bartr-muted group-hover:text-bartr-text'}`}>
           {q}
         </span>
         <motion.span
-          animate={isOpen ? { rotate: 45, backgroundColor: '#111827', color: '#fff' } : { rotate: 0, backgroundColor: '#f3f4f6', color: '#6b7280' }}
+          animate={isOpen ? { rotate: 45, backgroundColor: 'var(--bartr-dark)', color: '#fff' } : { rotate: 0, backgroundColor: 'var(--border)', color: 'var(--muted)' }}
           transition={{ type: 'spring', stiffness: 300, damping: 22 }}
           className="ml-4 w-7 h-7 rounded-full flex items-center justify-center shrink-0"
         >
@@ -75,7 +75,7 @@ function FaqItem({ q, a, isOpen, onClick, index }) {
             exit={{ height: 0, opacity: 0, y: -8 }}
             transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
           >
-            <p className="px-6 pb-5 text-sm text-gray-500 font-dm leading-relaxed">{a}</p>
+            <p className="px-6 pb-5 text-sm text-bartr-muted font-dm leading-relaxed">{a}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -109,11 +109,11 @@ export default function FAQSection() {
   const smoothOrbY = useSpring(orbY, { stiffness: 40, damping: 18 })
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 bg-white overflow-hidden" id="faq">
+    <section ref={sectionRef} className="py-24 px-6 bg-bartr-bg overflow-hidden" id="faq">
       {/* Decorative parallax blob */}
       <motion.div
         style={{ y: smoothOrbY, x: orbX }}
-        className="absolute right-0 top-1/4 w-96 h-96 bg-indigo-50/60 rounded-full blur-3xl pointer-events-none will-change-transform -translate-x-1/2"
+        className="absolute right-0 top-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none will-change-transform -translate-x-1/2"
       />
 
       <div className="max-w-3xl mx-auto relative">
@@ -135,7 +135,7 @@ export default function FAQSection() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl md:text-5xl font-extrabold font-sora text-gray-900 mt-3 leading-tight"
+            className="text-4xl md:text-5xl font-extrabold font-sora text-bartr-text mt-3 leading-tight"
           >
             Common questions
           </motion.h2>
@@ -144,7 +144,7 @@ export default function FAQSection() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-gray-500 mt-4 font-dm"
+            className="text-bartr-muted mt-4 font-dm"
           >
             Everything you need to know about skill exchange on Bartr.
           </motion.p>
@@ -172,12 +172,12 @@ export default function FAQSection() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mt-12 text-center"
         >
-          <p className="text-sm text-gray-500 font-dm mb-4">Still have questions?</p>
+          <p className="text-sm text-bartr-muted font-dm mb-4">Still have questions?</p>
           <motion.a
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
             href="#contact-us"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-bartr-dark border border-gray-200 px-6 py-3 rounded-full hover:bg-gray-50 transition-colors font-sora"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-bartr-text border border-bartr-border px-6 py-3 rounded-full hover:bg-bartr-surface transition-colors font-sora"
           >
             Contact our team →
           </motion.a>

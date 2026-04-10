@@ -7,6 +7,7 @@ import { useNotifications } from '../context/NotificationContext.jsx'
 import { notificationsApi } from '../api/endpoints.js'
 import { QUERY_KEYS } from '../store/queryClient.js'
 import { Avatar, Toast } from './shared.jsx'
+import ThemeToggle from './ThemeToggle.jsx'
 
 const NAV_LINKS = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -31,12 +32,12 @@ export const AppLayout = ({ children }) => {
   const unread = notifData?.pagination?.total ?? 0
 
   return (
-    <div className="min-h-screen bg-bartr-bg flex">
+    <div className="min-h-screen bg-bartr-bg text-bartr-text flex transition-colors duration-300">
       {/* ── Sidebar (desktop) ── */}
-      <aside className="hidden md:flex flex-col w-60 shrink-0 bg-white border-r border-gray-100 fixed inset-y-0 left-0 z-30">
+      <aside className="hidden md:flex flex-col w-60 shrink-0 bg-bartr-sidebar border-r border-bartr-border fixed inset-y-0 left-0 z-30 transition-colors duration-300">
         {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-gray-50">
-          <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 font-sora font-bold text-lg">
+        <div className="h-16 flex items-center px-6 border-b border-bartr-border">
+          <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 font-sora font-bold text-lg text-bartr-text">
             <span className="w-7 h-7 bg-yellow-300 rounded-lg flex items-center justify-center text-bartr-dark font-black text-sm">B</span>
             Bartr
           </button>
@@ -49,7 +50,7 @@ export const AppLayout = ({ children }) => {
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium font-dm transition-all ${isActive ? 'bg-bartr-dark text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium font-dm transition-all ${isActive ? 'bg-bartr-dark text-white dark:bg-yellow-300 dark:text-bartr-dark' : 'text-bartr-muted hover:bg-bartr-bg hover:text-bartr-text'}`
               }
             >
               <Icon className="w-4 h-4" />
@@ -74,21 +75,24 @@ export const AppLayout = ({ children }) => {
           </button>
         </div>
 
-        {/* User footer */}
-        <div className="border-t border-gray-50 p-3">
+        {/* Theme Toggle & User footer */}
+        <div className="border-t border-bartr-border p-3 space-y-2">
+          <div className="px-3 py-2">
+             <ThemeToggle />
+          </div>
           <button
             onClick={() => navigate(`/profile/${user?.username}`)}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors text-left"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-bartr-bg transition-colors text-left"
           >
             <Avatar src={user?.avatar_url} name={user?.full_name} size="sm" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 font-sora truncate">{user?.full_name}</p>
-              <p className="text-xs text-gray-400 font-dm truncate">@{user?.username}</p>
+              <p className="text-sm font-semibold text-bartr-text font-sora truncate">{user?.full_name}</p>
+              <p className="text-xs text-bartr-muted font-dm truncate">@{user?.username}</p>
             </div>
           </button>
           <button
             onClick={logout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors text-sm font-dm mt-1"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-bartr-muted hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-sm font-dm"
           >
             <LogOut className="w-4 h-4" />
             Sign out
@@ -97,8 +101,8 @@ export const AppLayout = ({ children }) => {
       </aside>
 
       {/* ── Mobile header ── */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100 h-14 flex items-center px-4 justify-between">
-        <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 font-sora font-bold text-base">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-bartr-sidebar border-b border-bartr-border h-14 flex items-center px-4 justify-between transition-colors duration-300">
+        <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 font-sora font-bold text-base text-bartr-text">
           <span className="w-6 h-6 bg-yellow-300 rounded-lg flex items-center justify-center text-bartr-dark font-black text-xs">B</span>
           Bartr
         </button>
@@ -106,7 +110,10 @@ export const AppLayout = ({ children }) => {
           <button onClick={() => navigate('/skills/new')} className="w-8 h-8 bg-yellow-300 rounded-full flex items-center justify-center">
             <Plus className="w-4 h-4 text-bartr-dark" />
           </button>
-          <button onClick={() => setMobileOpen(o => !o)} className="p-1">
+          <div className="w-8 h-8 flex items-center justify-center">
+            <ThemeToggle />
+          </div>
+          <button onClick={() => setMobileOpen(o => !o)} className="p-1 text-bartr-text">
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
@@ -114,7 +121,7 @@ export const AppLayout = ({ children }) => {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-30 bg-white pt-14">
+        <div className="md:hidden fixed inset-0 z-30 bg-bartr-sidebar pt-14 transition-colors duration-300">
           <nav className="p-4 space-y-1">
             {NAV_LINKS.map(({ to, icon: Icon, label }) => (
               <NavLink
@@ -122,7 +129,7 @@ export const AppLayout = ({ children }) => {
                 to={to}
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm ${isActive ? 'bg-bartr-dark text-white' : 'text-gray-700 hover:bg-gray-50'}`
+                  `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm ${isActive ? 'bg-bartr-dark text-white dark:bg-yellow-300 dark:text-bartr-dark' : 'text-bartr-text hover:bg-bartr-bg'}`
                 }
               >
                 <Icon className="w-4 h-4" />
@@ -131,7 +138,7 @@ export const AppLayout = ({ children }) => {
             ))}
             <button
               onClick={() => { navigate(`/profile/${user?.username}`); setMobileOpen(false) }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm text-gray-700 hover:bg-gray-50"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm text-bartr-text hover:bg-bartr-bg"
             >
               <User className="w-4 h-4" />
               My Profile

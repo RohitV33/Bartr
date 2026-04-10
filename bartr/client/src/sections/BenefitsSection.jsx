@@ -93,13 +93,13 @@ function BenefitCard({ b, i }) {
       variants={staggerChildVariant}
       whileHover={{ y: -6, scale: 1.02, boxShadow: '0 16px 40px rgba(0,0,0,0.1)' }}
       transition={{ type: 'spring', stiffness: 280, damping: 22 }}
-      className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm will-change-transform"
+      className="bg-bartr-surface rounded-2xl border border-bartr-border p-6 shadow-sm will-change-transform"
     >
       <div className={`w-11 h-11 rounded-xl ${b.color} flex items-center justify-center mb-4`}>
         {b.icon}
       </div>
-      <h3 className="text-base font-bold font-sora text-gray-900 mb-2">{b.title}</h3>
-      <p className="text-sm text-gray-500 font-dm leading-relaxed">{b.body}</p>
+      <h3 className="text-base font-bold font-sora text-bartr-text mb-2">{b.title}</h3>
+      <p className="text-sm text-bartr-muted font-dm leading-relaxed">{b.body}</p>
     </motion.div>
   )
 }
@@ -141,7 +141,7 @@ export default function BenefitsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.55, delay: 0.1 }}
-            className="text-4xl md:text-5xl font-extrabold font-sora text-gray-900 mt-3 leading-tight max-w-lg mx-auto"
+            className="text-4xl md:text-5xl font-extrabold font-sora text-bartr-text mt-3 leading-tight max-w-lg mx-auto"
           >
             Built for students, by students.
           </motion.h2>
@@ -150,7 +150,7 @@ export default function BenefitsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-gray-500 mt-4 max-w-md mx-auto font-dm text-lg"
+            className="text-bartr-muted mt-4 max-w-md mx-auto font-dm text-lg"
           >
             Every feature is designed around how students actually learn and collaborate.
           </motion.p>
