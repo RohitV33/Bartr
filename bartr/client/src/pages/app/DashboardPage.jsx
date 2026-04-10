@@ -7,46 +7,6 @@ import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { Avatar, SkillCard, Spinner } from '../../components/shared.jsx'
 
-/* ─── Custom Cursor ─────────────────────────────────────────────────────────── */
-function CustomCursor() {
-  const dot = useRef(null)
-  const ring = useRef(null)
-  const pos = useRef({ x: 0, y: 0 })
-  const ringPos = useRef({ x: 0, y: 0 })
-  const [hovered, setHovered] = useState(false)
-
-  useEffect(() => {
-    const move = (e) => {
-      pos.current = { x: e.clientX, y: e.clientY }
-      if (dot.current) {
-        dot.current.style.left = `${e.clientX}px`
-        dot.current.style.top = `${e.clientY}px`
-      }
-    }
-    const over = (e) => setHovered(!!e.target.closest('button,a,[role=button],input'))
-    window.addEventListener('mousemove', move)
-    window.addEventListener('mouseover', over)
-    let raf
-    const animate = () => {
-      ringPos.current.x += (pos.current.x - ringPos.current.x) * 0.1
-      ringPos.current.y += (pos.current.y - ringPos.current.y) * 0.1
-      if (ring.current) {
-        ring.current.style.left = `${ringPos.current.x}px`
-        ring.current.style.top = `${ringPos.current.y}px`
-      }
-      raf = requestAnimationFrame(animate)
-    }
-    raf = requestAnimationFrame(animate)
-    return () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseover', over); cancelAnimationFrame(raf) }
-  }, [])
-
-  return (
-    <>
-      <div ref={dot} style={{ position:'fixed', width:8, height:8, borderRadius:'50%', background:'#f59e0b', pointerEvents:'none', zIndex:9999, transform:'translate(-50%,-50%)', mixBlendMode:'multiply' }} />
-      <div ref={ring} style={{ position:'fixed', width: hovered?48:32, height: hovered?48:32, borderRadius:'50%', border:`2px solid ${hovered?'#f59e0b':'rgba(245,158,11,0.4)'}`, pointerEvents:'none', zIndex:9998, transform:'translate(-50%,-50%)', transition:'width .3s ease,height .3s ease,border-color .3s ease' }} />
-    </>
-  )
-}
 
 /* ─── Reveal ─────────────────────────────────────────────────────────────────── */
 function Reveal({ children, delay = 0, className = '' }) {
@@ -154,9 +114,8 @@ export default function DashboardPage() {
   })
 
   return (
-    <div style={{ cursor:'none', fontFamily:"'DM Sans',sans-serif" }}>
-      <CustomCursor />
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap'); *{cursor:none!important}`}</style>
+    <div style={{ fontFamily:"'DM Sans',sans-serif" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap');`}</style>
 
       <WelcomeBanner user={user} scrollY={scrollY} />
 

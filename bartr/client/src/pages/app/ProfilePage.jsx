@@ -8,27 +8,7 @@ import { Avatar, Card, Stars, ProficiencyBadge, Spinner, EmptyState, Button, Bad
 import { timeAgo } from '../../utils/helpers.js'
 import { useEffect, useRef, useState } from 'react'
 
-/* ─── Custom Cursor ─────────────────────────────────────────────────────────── */
-function CustomCursor() {
-  const dot = useRef(null)
-  const ring = useRef(null)
-  const pos = useRef({ x: 0, y: 0 })
-  const rp = useRef({ x: 0, y: 0 })
-  const [h, setH] = useState(false)
-  useEffect(() => {
-    const mv = (e) => { pos.current = { x: e.clientX, y: e.clientY }; if (dot.current) { dot.current.style.left=`${e.clientX}px`; dot.current.style.top=`${e.clientY}px` } }
-    const ov = (e) => setH(!!e.target.closest('button,a,[role=button]'))
-    window.addEventListener('mousemove', mv); window.addEventListener('mouseover', ov)
-    let raf; const a = () => { rp.current.x+=(pos.current.x-rp.current.x)*.1; rp.current.y+=(pos.current.y-rp.current.y)*.1; if(ring.current){ring.current.style.left=`${rp.current.x}px`;ring.current.style.top=`${rp.current.y}px`}; raf=requestAnimationFrame(a) }; raf=requestAnimationFrame(a)
-    return () => { window.removeEventListener('mousemove',mv); window.removeEventListener('mouseover',ov); cancelAnimationFrame(raf) }
-  }, [])
-  return (
-    <>
-      <div ref={dot} style={{position:'fixed',width:8,height:8,borderRadius:'50%',background:'#f59e0b',pointerEvents:'none',zIndex:9999,transform:'translate(-50%,-50%)',mixBlendMode:'multiply'}} />
-      <div ref={ring} style={{position:'fixed',width:h?48:32,height:h?48:32,borderRadius:'50%',border:`2px solid ${h?'#f59e0b':'rgba(245,158,11,0.4)'}`,pointerEvents:'none',zIndex:9998,transform:'translate(-50%,-50%)',transition:'width .3s ease,height .3s ease,border-color .3s ease'}} />
-    </>
-  )
-}
+
 
 /* ─── Reveal ─────────────────────────────────────────────────────────────────── */
 function Reveal({ children, delay = 0, className = '' }) {
@@ -163,9 +143,9 @@ export default function ProfilePage() {
   const requests = user.skills?.filter(s => !s.is_offering) || []
 
   return (
-    <div className="max-w-3xl mx-auto" style={{cursor:'none'}}>
-      <CustomCursor />
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap'); *{cursor:none!important}`}</style>
+    <div className="max-w-3xl mx-auto">
+    
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap');`}</style>
 
       <ProfileHero
         user={user} isMe={isMe} scrollY={scrollY}

@@ -4,68 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Search, Plus, ChevronLeft, ChevronRight, Sparkles, TrendingUp, Users } from 'lucide-react'
 import { skillsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
-import { Spinner, EmptyState, SkillCard, Button } from '../../components/shared.jsx'
-
-/* ─── Custom Cursor ─────────────────────────────────────────────────────────── */
-function CustomCursor() {
-  const dot = useRef(null)
-  const ring = useRef(null)
-  const pos = useRef({ x: 0, y: 0 })
-  const ringPos = useRef({ x: 0, y: 0 })
-  const [hovered, setHovered] = useState(false)
-
-  useEffect(() => {
-    const move = (e) => {
-      pos.current = { x: e.clientX, y: e.clientY }
-      if (dot.current) {
-        dot.current.style.left = `${e.clientX}px`
-        dot.current.style.top = `${e.clientY}px`
-      }
-    }
-    const checkHover = (e) => {
-      const el = e.target
-      setHovered(el.closest('button, a, [role="button"], input, textarea') !== null)
-    }
-    window.addEventListener('mousemove', move)
-    window.addEventListener('mouseover', checkHover)
-
-    let raf
-    const animateRing = () => {
-      ringPos.current.x += (pos.current.x - ringPos.current.x) * 0.12
-      ringPos.current.y += (pos.current.y - ringPos.current.y) * 0.12
-      if (ring.current) {
-        ring.current.style.left = `${ringPos.current.x}px`
-        ring.current.style.top = `${ringPos.current.y}px`
-      }
-      raf = requestAnimationFrame(animateRing)
-    }
-    raf = requestAnimationFrame(animateRing)
-
-    return () => {
-      window.removeEventListener('mousemove', move)
-      window.removeEventListener('mouseover', checkHover)
-      cancelAnimationFrame(raf)
-    }
-  }, [])
-
-  return (
-    <>
-      <div ref={dot} className="cursor-dot" style={{
-        position: 'fixed', width: 8, height: 8, borderRadius: '50%',
-        background: '#f59e0b', pointerEvents: 'none', zIndex: 9999,
-        transform: 'translate(-50%, -50%)', transition: 'transform 0.1s ease',
-        mixBlendMode: 'multiply',
-      }} />
-      <div ref={ring} className="cursor-ring" style={{
-        position: 'fixed', width: hovered ? 48 : 32, height: hovered ? 48 : 32,
-        borderRadius: '50%', border: `2px solid ${hovered ? '#f59e0b' : 'rgba(245,158,11,0.4)'}`,
-        pointerEvents: 'none', zIndex: 9998,
-        transform: 'translate(-50%, -50%)',
-        transition: 'width 0.3s ease, height 0.3s ease, border-color 0.3s ease',
-      }} />
-    </>
-  )
-}
+import { Spinner, SkillCard } from '../../components/shared.jsx'
 
 /* ─── Scroll Reveal ─────────────────────────────────────────────────────────── */
 function Reveal({ children, delay = 0, className = '', direction = 'up' }) {
@@ -87,26 +26,6 @@ function Reveal({ children, delay = 0, className = '', direction = 'up' }) {
       transition: 'opacity 0.6s cubic-bezier(.16,1,.3,1), transform 0.6s cubic-bezier(.16,1,.3,1)',
     }}>
       {children}
-    </div>
-  )
-}
-
-/* ─── Floating Stat Badge ───────────────────────────────────────────────────── */
-function StatBadge({ icon: Icon, label, value, color, delay }) {
-  const [v, setV] = useState(false)
-  useEffect(() => { const t = setTimeout(() => setV(true), delay); return () => clearTimeout(t) }, [delay])
-  return (
-    <div style={{
-      opacity: v ? 1 : 0, transform: v ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.8)',
-      transition: 'all 0.5s cubic-bezier(.34,1.56,.64,1)',
-    }}
-      className={`absolute flex items-center gap-2 ${color} px-4 py-2.5 rounded-2xl shadow-xl backdrop-blur-sm border border-white/20`}
-    >
-      <Icon className="w-4 h-4" />
-      <div>
-        <p className="text-xs font-bold leading-none">{value}</p>
-        <p className="text-[10px] opacity-70 leading-none mt-0.5">{label}</p>
-      </div>
     </div>
   )
 }
@@ -142,7 +61,6 @@ function SearchHero({ q, onChange, onPost }) {
       style={{ transform: `scale(${scale})`, opacity, transformOrigin: 'top center' }}
       className="relative overflow-hidden rounded-[2rem] mb-10"
     >
-      {/* BG image with overlay */}
       <div className="absolute inset-0">
         <img
           src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1400&q=80"
@@ -156,22 +74,11 @@ function SearchHero({ q, onChange, onPost }) {
         }} />
       </div>
 
-      {/* Animated grid lines */}
-      <div className="absolute inset-0 opacity-10" style={{
-        backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-        backgroundSize: '60px 60px',
-      }} />
-
-      {/* Floating badges */}
-      <StatBadge icon={Users} label="Active learners" value="2,400+" color="bg-white/10 text-white" delay={600}
-        style={{ top: '20%', right: '8%' }} />
-
       <div className="relative px-8 pt-14 pb-12">
-        {/* Floating stats */}
         <div className="hidden md:block">
-          <div style={{ position: 'absolute', top: '22%', right: '8%', opacity: 1 }}>
+          <div style={{ position: 'absolute', top: '22%', right: '8%' }}>
             <div className="flex items-center gap-2 bg-amber-400/20 backdrop-blur-md text-amber-200 px-4 py-2.5 rounded-2xl border border-amber-400/20 shadow-xl">
-              <Sparkles className="w-4 h-4" />
+              <Users className="w-4 h-4" />
               <div>
                 <p className="text-xs font-bold leading-none">2,400+</p>
                 <p className="text-[10px] opacity-70 leading-none mt-0.5">Active learners</p>
@@ -202,7 +109,6 @@ function SearchHero({ q, onChange, onPost }) {
             Connect with students. Trade knowledge. Grow together.
           </p>
 
-          {/* Search */}
           <div className="relative flex gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -248,7 +154,7 @@ function Pill({ active, onClick, children, accent }) {
 }
 
 /* ─── Enhanced Skill Card Wrapper ───────────────────────────────────────────── */
-function AnimatedSkillCard({ skill, onClick, index }) {
+function AnimatedSkillCard({ skill, onClick }) {
   const [hovered, setHovered] = useState(false)
   return (
     <div
@@ -260,17 +166,9 @@ function AnimatedSkillCard({ skill, onClick, index }) {
         transition: 'all 0.3s cubic-bezier(.34,1.56,.64,1)',
         boxShadow: hovered ? '0 20px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(245,158,11,0.2)' : '0 2px 8px rgba(0,0,0,0.06)',
         borderRadius: 20,
-        cursor: 'pointer',
         position: 'relative',
       }}
     >
-      {hovered && (
-        <div style={{
-          position: 'absolute', inset: 0, borderRadius: 20, pointerEvents: 'none', zIndex: 1,
-          background: 'linear-gradient(135deg, rgba(245,158,11,0.05) 0%, transparent 100%)',
-          border: '1px solid rgba(245,158,11,0.25)',
-        }} />
-      )}
       <SkillCard skill={skill} />
     </div>
   )
@@ -310,11 +208,9 @@ export default function BrowsePage() {
   const handleType = (val) => { setType(val); setPage(1) }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6" style={{ cursor: 'none' }}>
-      <CustomCursor />
+    <div className="max-w-6xl mx-auto px-4 py-6">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap');
-        * { cursor: none !important; }
       `}</style>
 
       <SearchHero q={q} onChange={handleSearch} onPost={() => navigate('/skills/new')} />
@@ -348,8 +244,7 @@ export default function BrowsePage() {
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🔍</div>
             <h3 className="text-xl font-bold text-gray-800 mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>No skills found</h3>
-            <p className="text-gray-500 mb-6" style={{ fontFamily: "'DM Sans', sans-serif" }}>Try adjusting your filters, or be the first to post this skill.</p>
-            <button onClick={() => navigate('/skills/new')} className="bg-gray-900 text-white px-6 py-3 rounded-2xl text-sm font-bold hover:bg-gray-700 transition-all" style={{ fontFamily: "'Sora', sans-serif" }}>
+            <button onClick={() => navigate('/skills/new')} className="bg-gray-900 text-white px-6 py-3 rounded-2xl text-sm font-bold hover:bg-gray-700 transition-all">
               Post a skill
             </button>
           </div>
@@ -366,24 +261,10 @@ export default function BrowsePage() {
             </div>
           </Reveal>
 
-          {/* Featured top image banner */}
-          <Reveal delay={40}>
-            <div className="relative rounded-3xl overflow-hidden mb-8 h-36">
-              <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1200&q=80" alt="" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-r from-gray-900/80 via-gray-900/40 to-transparent" />
-              <div className="absolute inset-0 flex items-center px-8">
-                <div>
-                  <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-1">Featured this week</p>
-                  <p className="text-white text-xl font-black" style={{ fontFamily: "'Sora', sans-serif" }}>Top Skills in Tech & Design 🔥</p>
-                </div>
-              </div>
-            </div>
-          </Reveal>
-
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {skills.map((skill, i) => (
               <Reveal key={skill.id} delay={(i % 8) * 60}>
-                <AnimatedSkillCard skill={skill} onClick={() => navigate(`/skills/${skill.id}`)} index={i} />
+                <AnimatedSkillCard skill={skill} onClick={() => navigate(`/skills/${skill.id}`)} />
               </Reveal>
             ))}
           </div>
@@ -395,40 +276,15 @@ export default function BrowsePage() {
                 <button
                   disabled={page === 1}
                   onClick={() => setPage(p => p - 1)}
-                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="px-5 py-2.5 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition-all"
                   style={{ fontFamily: "'Sora', sans-serif" }}
                 >
                   <ChevronLeft className="w-4 h-4" /> Prev
                 </button>
-
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-                    .filter(p => p === 1 || p === pagination.totalPages || Math.abs(p - page) <= 1)
-                    .reduce((acc, p, idx, arr) => {
-                      if (idx > 0 && p - arr[idx - 1] > 1) acc.push('…')
-                      acc.push(p)
-                      return acc
-                    }, [])
-                    .map((p, i) =>
-                      p === '…' ? (
-                        <span key={`e-${i}`} className="px-2 text-gray-400 text-sm">…</span>
-                      ) : (
-                        <button
-                          key={p}
-                          onClick={() => setPage(p)}
-                          className={`w-10 h-10 rounded-xl text-sm font-bold transition-all duration-200 ${page === p ? 'bg-gray-900 text-white shadow-lg' : 'text-gray-500 hover:bg-gray-100'}`}
-                          style={{ fontFamily: "'Sora', sans-serif" }}
-                        >
-                          {p}
-                        </button>
-                      )
-                    )}
-                </div>
-
                 <button
                   disabled={page >= pagination.totalPages}
                   onClick={() => setPage(p => p + 1)}
-                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="px-5 py-2.5 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition-all"
                   style={{ fontFamily: "'Sora', sans-serif" }}
                 >
                   Next <ChevronRight className="w-4 h-4" />

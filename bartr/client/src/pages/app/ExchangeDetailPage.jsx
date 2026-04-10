@@ -12,24 +12,6 @@ import { useSocket } from '../../context/SocketContext.jsx'
 import { Avatar, Spinner, Stars } from '../../components/shared.jsx'
 import { timeAgo, exchangeStatusLabel, extractError } from '../../utils/helpers.js'
 
-/* ─── Custom Cursor ─────────────────────────────────────────────────────────── */
-function CustomCursor() {
-  const dot = useRef(null); const ring = useRef(null)
-  const pos = useRef({x:0,y:0}); const rp = useRef({x:0,y:0}); const [h,setH]=useState(false)
-  useEffect(()=>{
-    const mv=(e)=>{pos.current={x:e.clientX,y:e.clientY};if(dot.current){dot.current.style.left=`${e.clientX}px`;dot.current.style.top=`${e.clientY}px`}}
-    const ov=(e)=>setH(!!e.target.closest('button,a,[role=button],input,textarea'))
-    window.addEventListener('mousemove',mv);window.addEventListener('mouseover',ov)
-    let raf;const a=()=>{rp.current.x+=(pos.current.x-rp.current.x)*.1;rp.current.y+=(pos.current.y-rp.current.y)*.1;if(ring.current){ring.current.style.left=`${rp.current.x}px`;ring.current.style.top=`${rp.current.y}px`};raf=requestAnimationFrame(a)};raf=requestAnimationFrame(a)
-    return()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseover',ov);cancelAnimationFrame(raf)}
-  },[])
-  return (
-    <>
-      <div ref={dot} style={{position:'fixed',width:8,height:8,borderRadius:'50%',background:'#f59e0b',pointerEvents:'none',zIndex:9999,transform:'translate(-50%,-50%)',mixBlendMode:'multiply'}} />
-      <div ref={ring} style={{position:'fixed',width:h?48:32,height:h?48:32,borderRadius:'50%',border:`2px solid ${h?'#f59e0b':'rgba(245,158,11,0.4)'}`,pointerEvents:'none',zIndex:9998,transform:'translate(-50%,-50%)',transition:'width .3s ease,height .3s ease,border-color .3s ease'}} />
-    </>
-  )
-}
 
 /* ─── Reveal ─────────────────────────────────────────────────────────────────── */
 function Reveal({ children, delay = 0, className = '' }) {
@@ -330,11 +312,10 @@ export default function ExchangeDetailPage() {
   const statusMeta = STATUS_META[exchange.status] || STATUS_META.PENDING
 
   return (
-    <div className="max-w-4xl mx-auto pb-8" style={{cursor:'none'}}>
-      <CustomCursor />
+    <div className="max-w-4xl mx-auto pb-8" >
+    
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap');
-        *{cursor:none!important}
         @keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
       `}</style>
 
