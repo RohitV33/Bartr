@@ -50,10 +50,9 @@ function ProfileHero({ user, avatarRef, onAvatarClick, uploading, scrollY }) {
     >
       {/* BG */}
       <div className="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&q=80" alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950/92 via-gray-900/80 to-gray-950/90" />
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-amber-500/10 dark:from-indigo-900/40 dark:via-purple-900/40 dark:to-amber-900/40" />
         <div className="absolute inset-0 transition-all duration-75" style={{ background: `radial-gradient(circle at ${mousePos.x*100}% ${mousePos.y*100}%, rgba(245,158,11,0.12) 0%, transparent 60%)` }} />
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.1) 1px,transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="absolute inset-0 opacity-15 dark:opacity-30" style={{ backgroundImage: 'linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px)', backgroundSize: '40px 40px' }} />
       </div>
 
       <div className="relative flex flex-col items-center text-center px-8 pt-10 pb-10">

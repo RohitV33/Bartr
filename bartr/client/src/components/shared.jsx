@@ -1,4 +1,5 @@
 import { forwardRef } from 'react'
+import { PackageOpen } from 'lucide-react'
 import { getInitials, proficiencyColor, proficiencyLabel } from '../utils/helpers.js'
 
 // ── Avatar ────────────────────────────────────────────────────────────────────
@@ -40,9 +41,9 @@ export const Button = ({
   const variants = {
     primary: 'bg-bartr-dark text-white hover:bg-gray-800 dark:bg-yellow-300 dark:text-bartr-dark dark:hover:bg-yellow-400 shadow-sm',
     secondary: 'bg-bartr-surface text-bartr-text border border-bartr-border hover:bg-gray-50 dark:hover:bg-gray-800',
-    yellow: 'bg-yellow-300 text-bartr-dark hover:bg-yellow-400',
+    yellow: 'bg-yellow-300 text-bartr-dark hover:bg-yellow-400 dark:bg-yellow-400 dark:hover:bg-yellow-500',
     ghost: 'text-bartr-muted hover:text-bartr-text hover:bg-gray-100 dark:hover:bg-gray-800',
-    danger: 'bg-red-500 text-white hover:bg-red-600',
+    danger: 'bg-red-500 text-white hover:bg-red-600 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20',
   }
   const sizes = {
     xs: 'px-3 py-1.5 text-xs',
@@ -147,11 +148,13 @@ export const Spinner = ({ size = 'md' }) => {
 }
 
 // ── Empty State ───────────────────────────────────────────────────────────────
-export const EmptyState = ({ icon = '📭', title, description, action }) => (
+export const EmptyState = ({ icon, title, description, action }) => (
   <div className="flex flex-col items-center justify-center py-16 text-center">
-    <div className="text-5xl mb-4">{icon}</div>
-    <h3 className="font-sora font-semibold text-gray-900 text-lg mb-2">{title}</h3>
-    {description && <p className="text-gray-500 text-sm font-dm max-w-xs mb-6">{description}</p>}
+    <div className="mb-4 text-bartr-muted">
+      {icon || <PackageOpen className="w-12 h-12" />}
+    </div>
+    <h3 className="font-sora font-semibold text-bartr-text text-lg mb-2">{title}</h3>
+    {description && <p className="text-bartr-muted text-sm font-dm max-w-xs mb-6">{description}</p>}
     {action}
   </div>
 )
@@ -162,7 +165,7 @@ export const SkillCard = ({ skill, onClick }) => (
     <div className="flex items-start justify-between gap-3 mb-3">
       <div className="flex items-center gap-2">
         <span className="text-xl">{skill.category?.icon}</span>
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full font-sora ${skill.is_offering ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
+        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full font-sora ${skill.is_offering ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400'}`}>
           {skill.is_offering ? 'Offering' : 'Requesting'}
         </span>
       </div>

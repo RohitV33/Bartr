@@ -5,6 +5,7 @@ import { Search, Plus, ChevronLeft, ChevronRight, Sparkles, TrendingUp, Users } 
 import { skillsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { Spinner, SkillCard } from '../../components/shared.jsx'
+import { Briefcase, HandHeart, SearchX } from 'lucide-react'
 
 /* ─── Scroll Reveal ─────────────────────────────────────────────────────────── */
 function Reveal({ children, delay = 0, className = '', direction = 'up' }) {
@@ -62,14 +63,13 @@ function SearchHero({ q, onChange, onPost }) {
       className="relative overflow-hidden rounded-[2rem] mb-10"
     >
       <div className="absolute inset-0">
-        <img
-          src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1400&q=80"
-          alt=""
-          className="w-full h-full object-cover"
-          style={{ transform: `translateY(${scrollY * 0.2}px) scale(1.1)`, transition: 'transform 0s' }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-gray-900/75 to-amber-900/60" />
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-amber-500/10 dark:from-indigo-900/40 dark:via-purple-900/40 dark:to-amber-900/40" />
         <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(var(--border) 1px, transparent 1px)',
+          backgroundSize: '24px 24px',
+          opacity: 0.4
+        }} />
+        <div className="absolute inset-0 transition-opacity duration-300" style={{
           background: `radial-gradient(circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(245,158,11,0.15) 0%, transparent 60%)`
         }} />
       </div>
@@ -100,12 +100,12 @@ function SearchHero({ q, onChange, onPost }) {
           <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 text-xs font-bold px-3 py-1.5 rounded-full border border-amber-400/20 mb-4">
             <Sparkles className="w-3 h-3" /> Skill Exchange Platform
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-3"
+          <h1 className="text-4xl md:text-5xl font-black text-bartr-text leading-tight mb-3"
             style={{ fontFamily: "'Sora', sans-serif" }}>
             Discover &<br />
-            <span className="text-amber-400">Exchange Skills</span>
+            <span className="text-amber-500 dark:text-amber-400">Exchange Skills</span>
           </h1>
-          <p className="text-gray-300 text-base mb-8" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          <p className="text-bartr-muted text-base mb-8" style={{ fontFamily: "'DM Sans', sans-serif" }}>
             Connect with students. Trade knowledge. Grow together.
           </p>
 
@@ -142,8 +142,8 @@ function Pill({ active, onClick, children, accent }) {
       className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 border whitespace-nowrap
         ${active
           ? accent
-            ? 'bg-amber-400 text-gray-900 border-amber-400 shadow-md shadow-amber-200'
-            : 'bg-gray-900 text-white border-gray-900 shadow-md'
+            ? 'bg-amber-400 text-gray-900 border-amber-400 shadow-md shadow-amber-200 dark:shadow-amber-900'
+            : 'bg-gray-900 text-white border-gray-900 shadow-md dark:bg-white dark:text-gray-900 dark:border-white'
           : 'bg-bartr-surface border-bartr-border text-bartr-muted hover:border-bartr-text hover:shadow-sm'
         }`}
       style={{ fontFamily: "'Sora', sans-serif" }}
@@ -176,8 +176,8 @@ function AnimatedSkillCard({ skill, onClick }) {
 
 const TYPE_OPTIONS = [
   { value: '', label: 'All Skills' },
-  { value: 'offering', label: '✨ Offering' },
-  { value: 'requesting', label: '🎯 Requesting' },
+  { value: 'offering', label: <span className="flex items-center gap-1.5"><HandHeart className="w-4 h-4" /> Offering</span> },
+  { value: 'requesting', label: <span className="flex items-center gap-1.5"><Briefcase className="w-4 h-4" /> Requesting</span> },
 ]
 
 export default function BrowsePage() {
@@ -242,9 +242,9 @@ export default function BrowsePage() {
       ) : skills.length === 0 ? (
         <Reveal>
           <div className="text-center py-20">
-            <div className="text-6xl mb-4">🔍</div>
+            <div className="flex justify-center text-bartr-muted mb-4"><SearchX className="w-16 h-16" /></div>
             <h3 className="text-xl font-bold text-bartr-text mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>No skills found</h3>
-            <button onClick={() => navigate('/skills/new')} className="bg-gray-900 text-white px-6 py-3 rounded-2xl text-sm font-bold hover:bg-gray-700 transition-all">
+            <button onClick={() => navigate('/skills/new')} className="bg-bartr-dark text-white dark:bg-white dark:text-gray-900 px-6 py-3 rounded-2xl text-sm font-bold hover:opacity-90 transition-all">
               Post a skill
             </button>
           </div>

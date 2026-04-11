@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, Plus, Sparkles, TrendingUp, Star, Zap, BookOpen, Users, ChevronRight } from 'lucide-react'
+import { ArrowRight, Plus, Sparkles, TrendingUp, Star, Zap, BookOpen, Users, ChevronRight, Briefcase, Handshake, Target } from 'lucide-react'
 import { usersApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -34,9 +34,12 @@ function WelcomeBanner({ user, scrollY }) {
       className="relative overflow-hidden rounded-[2rem] mb-8">
       {/* BG */}
       <div className="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=1400&q=80" alt="" className="w-full h-full object-cover" style={{ transform:`translateY(${scrollY*0.15}px)`, transition:'none' }} />
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950/95 via-gray-900/80 to-amber-900/50" />
-        <div className="absolute inset-0" style={{ backgroundImage:'linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px)', backgroundSize:'50px 50px' }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-amber-500/10 dark:from-indigo-900/40 dark:via-purple-900/40 dark:to-amber-900/40" />
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(var(--border) 1px, transparent 1px)',
+          backgroundSize: '24px 24px',
+          opacity: 0.4
+        }} />
       </div>
 
       {/* Glow orb */}
@@ -47,10 +50,10 @@ function WelcomeBanner({ user, scrollY }) {
           <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 text-xs font-bold px-3 py-1.5 rounded-full border border-amber-400/20 mb-4">
             <Sparkles className="w-3 h-3" /> Welcome back
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-white mb-2" style={{ fontFamily:"'Sora',sans-serif" }}>
-            Hey, {user?.full_name?.split(' ')[0] || 'there'} 👋
+          <h1 className="text-3xl md:text-4xl font-black text-bartr-text mb-2" style={{ fontFamily:"'Sora',sans-serif" }}>
+            Hey, {user?.full_name?.split(' ')[0] || 'there'}!
           </h1>
-          <p className="text-gray-300 text-sm max-w-sm" style={{ fontFamily:"'DM Sans',sans-serif" }}>
+          <p className="text-bartr-muted text-sm max-w-sm" style={{ fontFamily:"'DM Sans',sans-serif" }}>
             Ready to exchange some skills today? You have new opportunities waiting.
           </p>
         </div>
@@ -172,7 +175,7 @@ export default function DashboardPage() {
           {data?.mySkills?.length > 0 && (
             <div>
               <Reveal>
-                <SectionHeader title="✨ My Skills" action={() => navigate('/skills/new')} actionLabel="Add skill" />
+                <SectionHeader title={<span className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-amber-500" /> My Skills</span>} action={() => navigate('/skills/new')} actionLabel="Add skill" />
               </Reveal>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {data.mySkills.map((skill, i) => (
@@ -190,13 +193,12 @@ export default function DashboardPage() {
           {data?.recommended?.length > 0 && (
             <div>
               <Reveal>
-                <div className="relative overflow-hidden rounded-3xl mb-5 h-28">
-                  <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&q=80" alt="" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-transparent" />
+                <div className="relative overflow-hidden rounded-3xl mb-5 h-28 bg-gradient-to-r from-amber-500/10 to-transparent border border-amber-500/20">
+                  <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(var(--border) 1px, transparent 1px)', backgroundSize: '16px 16px', opacity: 0.3 }} />
                   <div className="absolute inset-0 flex items-center px-6">
                     <div>
-                      <p className="text-amber-400 text-xs font-bold uppercase tracking-widest">Recommended</p>
-                      <p className="text-white font-black text-xl" style={{ fontFamily:"'Sora',sans-serif" }}>Skills for you 🎯</p>
+                      <p className="text-amber-500 font-bold uppercase tracking-widest text-xs mb-1 flex items-center gap-1.5"><Target className="w-3.5 h-3.5" /> Recommended</p>
+                      <p className="text-bartr-text font-black text-xl" style={{ fontFamily:"'Sora',sans-serif" }}>Skills for you</p>
                     </div>
                   </div>
                 </div>
@@ -217,7 +219,7 @@ export default function DashboardPage() {
           {data?.recentExchanges?.length > 0 && (
             <div>
               <Reveal>
-                <SectionHeader title="🤝 Recent Exchanges" action={() => navigate('/exchanges')} actionLabel="View all" />
+                <SectionHeader title={<span className="flex items-center gap-2"><Handshake className="w-5 h-5 text-emerald-500" /> Recent Exchanges</span>} action={() => navigate('/exchanges')} actionLabel="View all" />
               </Reveal>
               <div className="space-y-3">
                 {data.recentExchanges.slice(0, 3).map((ex, i) => (

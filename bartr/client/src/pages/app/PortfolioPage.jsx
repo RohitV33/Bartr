@@ -26,9 +26,8 @@ function PortfolioHero({ scrollY }) {
   return (
     <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-[2rem] mb-8">
       <div className="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1483058712412-4245e9b90334?w=1400&q=80" alt="" className="w-full h-full object-cover" style={{transform:`translateY(${scrollY*.15}px)`,transition:'none'}} />
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950/94 via-gray-900/75 to-purple-950/60" />
-        <div className="absolute inset-0 opacity-5" style={{backgroundImage:'radial-gradient(rgba(255,255,255,0.5) 1px,transparent 1px)',backgroundSize:'20px 20px'}} />
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-transparent dark:from-purple-900/40 dark:via-pink-900/40 dark:to-transparent" />
+        <div className="absolute inset-0 opacity-15 dark:opacity-30" style={{backgroundImage:'radial-gradient(var(--border) 1px,transparent 1px)',backgroundSize:'20px 20px'}} />
       </div>
       <div className="absolute right-0 top-0 w-80 h-80 opacity-15" style={{background:'radial-gradient(circle,#a855f7,transparent 70%)',transform:'translate(30%,-30%)'}} />
       <div className="relative px-8 py-10">

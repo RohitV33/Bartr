@@ -37,12 +37,8 @@ function PostHero({ isOffering, scrollY }) {
   return (
     <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-[2rem] mb-8">
       <div className="absolute inset-0">
-        <img
-          src={isOffering ? "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80" : "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&q=80"}
-          alt="" className="w-full h-full object-cover transition-all duration-500"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950/92 via-gray-900/78 to-gray-950/88" />
-        <div className="absolute inset-0 opacity-5" style={{backgroundImage:'radial-gradient(rgba(255,255,255,0.4) 1px,transparent 1px)',backgroundSize:'20px 20px'}} />
+        <div className={`absolute inset-0 bg-gradient-to-br transition-all duration-500 ${isOffering ? 'from-amber-500/10 via-orange-500/10 to-transparent dark:from-amber-900/40 dark:via-orange-900/40' : 'from-blue-500/10 via-cyan-500/10 to-transparent dark:from-blue-900/40 dark:via-cyan-900/40'}`} />
+        <div className="absolute inset-0 opacity-15 dark:opacity-30" style={{backgroundImage:'radial-gradient(var(--border) 1px,transparent 1px)',backgroundSize:'20px 20px'}} />
       </div>
       <div className="absolute top-0 right-0 w-72 h-72 opacity-15" style={{background:`radial-gradient(circle, ${isOffering?'#f59e0b':'#3b82f6'}, transparent 70%)`,transform:'translate(30%,-30%)'}} />
 

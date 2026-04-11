@@ -50,13 +50,13 @@ export const AppLayout = ({ children }) => {
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium font-dm transition-all ${isActive ? 'bg-bartr-dark text-white dark:bg-yellow-300 dark:text-bartr-dark' : 'text-bartr-muted hover:bg-bartr-bg hover:text-bartr-text'}`
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium font-dm transition-all ${isActive ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-gray-900 shadow-md shadow-amber-400/20 dark:shadow-amber-900/20' : 'text-bartr-muted hover:bg-bartr-bg hover:text-bartr-text'}`
               }
             >
               <Icon className="w-4 h-4" />
               {label}
               {label === 'Notifications' && unread > 0 && (
-                <span className="ml-auto bg-yellow-300 text-bartr-dark text-xs font-bold px-1.5 py-0.5 rounded-full font-sora">
+                <span className={`ml-auto text-xs font-bold px-1.5 py-0.5 rounded-full font-sora ${isActive ? 'bg-gray-900 text-white' : 'bg-amber-400 text-gray-900'}`}>
                   {unread > 99 ? '99+' : unread}
                 </span>
               )}
@@ -101,7 +101,7 @@ export const AppLayout = ({ children }) => {
       </aside>
 
       {/* ── Mobile header ── */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-bartr-sidebar border-b border-bartr-border h-14 flex items-center px-4 justify-between transition-colors duration-300">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-bartr-sidebar/80 backdrop-blur-md border-b border-bartr-border h-14 flex items-center px-4 justify-between transition-colors duration-300">
         <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 font-sora font-bold text-base text-bartr-text">
           <span className="w-6 h-6 bg-yellow-300 rounded-lg flex items-center justify-center text-bartr-dark font-black text-xs">B</span>
           Bartr
@@ -120,39 +120,56 @@ export const AppLayout = ({ children }) => {
       </div>
 
       {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-30 bg-bartr-sidebar pt-14 transition-colors duration-300">
-          <nav className="p-4 space-y-1">
+      <div className={`md:hidden fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0'}`} onClick={() => setMobileOpen(false)} />
+        <div className={`absolute top-0 left-0 bottom-0 w-64 bg-bartr-sidebar border-r border-bartr-border pointer-events-auto flex flex-col transition-transform duration-300 ease-out ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="h-14 flex items-center justify-between px-4 border-b border-bartr-border">
+            <button onClick={() => { navigate('/dashboard'); setMobileOpen(false) }} className="flex items-center gap-2 font-sora font-bold text-base text-bartr-text">
+              <span className="w-6 h-6 bg-yellow-300 rounded-lg flex items-center justify-center text-bartr-dark font-black text-xs">B</span>
+              Bartr
+            </button>
+            <button onClick={() => setMobileOpen(false)} className="p-1 text-bartr-text">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
             {NAV_LINKS.map(({ to, icon: Icon, label }) => (
               <NavLink
                 key={to}
                 to={to}
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm ${isActive ? 'bg-bartr-dark text-white dark:bg-yellow-300 dark:text-bartr-dark' : 'text-bartr-text hover:bg-bartr-bg'}`
+                  `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm transition-all ${isActive ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-gray-900 shadow-md shadow-amber-400/20 dark:shadow-amber-900/20' : 'text-bartr-muted hover:bg-bartr-bg hover:text-bartr-text'}`
                 }
               >
                 <Icon className="w-4 h-4" />
                 {label}
+                {label === 'Notifications' && unread > 0 && (
+                  <span className="ml-auto bg-amber-400 text-gray-900 text-xs font-bold px-1.5 py-0.5 rounded-full font-sora">
+                    {unread > 99 ? '99+' : unread}
+                  </span>
+                )}
               </NavLink>
             ))}
+          </nav>
+          <div className="p-4 border-t border-bartr-border space-y-1">
             <button
               onClick={() => { navigate(`/profile/${user?.username}`); setMobileOpen(false) }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm text-bartr-text hover:bg-bartr-bg"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm text-bartr-muted hover:text-bartr-text hover:bg-bartr-bg transition-all"
             >
               <User className="w-4 h-4" />
               My Profile
             </button>
             <button
               onClick={logout}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm text-red-500"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm text-red-500 hover:bg-red-500/10 transition-all"
             >
               <LogOut className="w-4 h-4" />
               Sign out
             </button>
-          </nav>
+          </div>
         </div>
-      )}
+      </div>
 
       {/* ── Main content ── */}
       <main className="flex-1 md:ml-60 pt-14 md:pt-0 min-h-screen">

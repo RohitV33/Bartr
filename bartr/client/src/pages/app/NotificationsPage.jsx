@@ -33,9 +33,8 @@ function NotificationsHero({ scrollY, hasUnread, onMarkAll, loading }) {
   return (
     <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-[2rem] mb-8">
       <div className="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1400&q=80" alt="" className="w-full h-full object-cover" style={{transform:`translateY(${scrollY*.15}px)`,transition:'none'}} />
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950/94 via-gray-900/80 to-blue-950/60" />
-        <div className="absolute inset-0 opacity-5" style={{backgroundImage:'radial-gradient(rgba(255,255,255,0.4) 1px,transparent 1px)',backgroundSize:'22px 22px'}} />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-transparent dark:from-blue-900/40 dark:via-indigo-900/40 dark:to-transparent" />
+        <div className="absolute inset-0 opacity-15 dark:opacity-30" style={{backgroundImage:'radial-gradient(var(--border) 1px,transparent 1px)',backgroundSize:'22px 22px'}} />
       </div>
       <div className="absolute right-0 bottom-0 w-64 h-64 opacity-20" style={{background:'radial-gradient(circle,#3b82f6,transparent 70%)',transform:'translate(30%,30%)'}} />
 

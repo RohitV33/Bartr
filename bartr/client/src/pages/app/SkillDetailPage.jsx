@@ -31,23 +31,22 @@ function SkillHero({ skill, scrollY }) {
     setMousePos({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height })
   }
 
-  const bgImages = [
-    "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1400&q=80",
-    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1400&q=80",
-    "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1400&q=80",
+  const colors = [
+    'from-emerald-500/20 via-teal-500/20 to-cyan-500/20 dark:from-emerald-900/40 dark:via-teal-900/40 dark:to-cyan-900/40',
+    'from-blue-500/20 via-indigo-500/20 to-purple-500/20 dark:from-blue-900/40 dark:via-indigo-900/40 dark:to-purple-900/40',
+    'from-amber-500/20 via-orange-500/20 to-rose-500/20 dark:from-amber-900/40 dark:via-orange-900/40 dark:to-rose-900/40'
   ]
-  const bg = bgImages[(skill?.title?.charCodeAt(0) || 0) % bgImages.length]
+  const bgClass = colors[(skill?.title?.charCodeAt(0) || 0) % colors.length]
 
   return (
     <div ref={ref} onMouseMove={handleMouseMove}
       style={{ transform: `scale(${scale})`, opacity, transformOrigin: 'top center' }}
-      className="relative overflow-hidden rounded-[2rem] mb-8"
+      className="relative overflow-hidden rounded-[2rem] mb-8 bg-bartr-surface border border-bartr-border"
     >
       <div className="absolute inset-0">
-        <img src={bg} alt="" className="w-full h-full object-cover" style={{ transform: `translateY(${scrollY * .15}px)`, transition: 'none' }} />
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950/92 via-gray-900/75 to-gray-950/80" />
+        <div className={`absolute inset-0 bg-gradient-to-br ${bgClass}`} />
         <div className="absolute inset-0 transition-all" style={{ background: `radial-gradient(circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(245,158,11,0.12) 0%, transparent 55%)` }} />
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.15) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.15) 1px,transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="absolute inset-0 opacity-15 dark:opacity-30" style={{ backgroundImage: 'linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px)', backgroundSize: '40px 40px' }} />
       </div>
 
       <div className="relative px-8 pt-10 pb-10">
@@ -60,10 +59,10 @@ function SkillHero({ skill, scrollY }) {
           <ProficiencyBadge level={skill?.proficiency_level} />
         </div>
 
-        <h1 className="text-3xl md:text-4xl font-black text-white mb-4 leading-tight" style={{ fontFamily: "'Sora',sans-serif" }}>
+        <h1 className="text-3xl md:text-4xl font-black text-bartr-text mb-4 leading-tight" style={{ fontFamily: "'Sora',sans-serif" }}>
           {skill?.title}
         </h1>
-        <p className="text-gray-300 text-base leading-relaxed max-w-2xl" style={{ fontFamily: "'DM Sans',sans-serif" }}>
+        <p className="text-bartr-muted text-base leading-relaxed max-w-2xl" style={{ fontFamily: "'DM Sans',sans-serif" }}>
           {skill?.description}
         </p>
         <p className="text-gray-500 text-xs mt-4" style={{ fontFamily: "'DM Sans',sans-serif" }}>

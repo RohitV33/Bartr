@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { GraduationCap, ArrowLeftRight, Star, ChevronRight, Sparkles, Edit3 } from 'lucide-react'
+import { GraduationCap, ArrowLeftRight, Star, ChevronRight, Sparkles, Edit3, UserX, Briefcase, HandHeart, Image as ImageIcon } from 'lucide-react'
 import { usersApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -25,21 +25,21 @@ function Reveal({ children, delay = 0, className = '' }) {
 function ProfileHero({ user, isMe, scrollY, onEdit, onExchange }) {
   const scale = Math.max(1 - scrollY * 0.0003, 0.93)
   const opacity = Math.max(1 - scrollY * 0.004, 0)
-  const bgOffsets = [
-    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1400&q=80",
-    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1400&q=80",
-    "https://images.unsplash.com/photo-1528901166007-3784c7dd3653?w=1400&q=80",
+  const colors = [
+    'from-blue-500/20 via-indigo-500/20 to-purple-500/20',
+    'from-emerald-500/20 via-teal-500/20 to-cyan-500/20',
+    'from-rose-500/20 via-pink-500/20 to-purple-500/20',
+    'from-amber-500/20 via-orange-500/20 to-rose-500/20'
   ]
-  // pick deterministic bg from username
-  const bg = bgOffsets[(user?.username?.charCodeAt(0) || 0) % bgOffsets.length]
+  const bgClass = colors[(user?.username?.charCodeAt(0) || 0) % colors.length]
 
   return (
-    <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-[2rem] mb-8">
+    <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-[2rem] mb-8 bg-bartr-surface border border-bartr-border">
       {/* BG */}
       <div className="absolute inset-0">
-        <img src={bg} alt="" className="w-full h-full object-cover" style={{transform:`translateY(${scrollY*.18}px)`,transition:'none'}} />
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950/70 via-gray-950/60 to-gray-950/95" />
-        <div className="absolute inset-0" style={{backgroundImage:'radial-gradient(rgba(245,158,11,0.08) 1px,transparent 1px)',backgroundSize:'28px 28px'}} />
+        <div className={`absolute inset-0 bg-gradient-to-br ${bgClass}`} />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-bartr-surface/90" />
+        <div className="absolute inset-0 opacity-30 dark:opacity-40" style={{backgroundImage:'radial-gradient(var(--border) 1px,transparent 1px)',backgroundSize:'28px 28px'}} />
       </div>
 
       {/* Glow */}
@@ -59,29 +59,29 @@ function ProfileHero({ user, isMe, scrollY, onEdit, onExchange }) {
           )}
         </div>
 
-        <h1 className="text-3xl font-black text-white mb-1" style={{fontFamily:"'Sora',sans-serif"}}>{user?.full_name}</h1>
-        <p className="text-amber-400/80 text-sm font-medium mb-3" style={{fontFamily:"'DM Sans',sans-serif"}}>@{user?.username}</p>
+        <h1 className="text-3xl font-black text-bartr-text mb-1 relative z-10" style={{fontFamily:"'Sora',sans-serif"}}>{user?.full_name}</h1>
+        <p className="text-amber-500 font-medium mb-3 relative z-10" style={{fontFamily:"'DM Sans',sans-serif"}}>@{user?.username}</p>
 
         {user?.university && (
-          <div className="flex items-center gap-1.5 text-gray-300 text-sm mb-3" style={{fontFamily:"'DM Sans',sans-serif"}}>
-            <GraduationCap className="w-3.5 h-3.5 text-gray-400" />
+          <div className="flex items-center gap-1.5 text-bartr-muted text-sm mb-3 relative z-10" style={{fontFamily:"'DM Sans',sans-serif"}}>
+            <GraduationCap className="w-3.5 h-3.5" />
             {user.university}{user.department ? ` · ${user.department}` : ''}{user.year_of_study ? ` · Year ${user.year_of_study}` : ''}
           </div>
         )}
 
-        {user?.bio && <p className="text-gray-300 text-sm max-w-sm leading-relaxed mb-5" style={{fontFamily:"'DM Sans',sans-serif"}}>{user.bio}</p>}
+        {user?.bio && <p className="text-bartr-muted text-sm max-w-sm leading-relaxed mb-5 relative z-10" style={{fontFamily:"'DM Sans',sans-serif"}}>{user.bio}</p>}
 
         {/* Reputation */}
-        <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 mb-6">
+        <div className="flex items-center gap-2 bg-bartr-surface/60 backdrop-blur-md px-4 py-2 rounded-full border border-bartr-border mb-6 relative z-10">
           <Stars rating={user?.reputation_score} />
-          <span className="text-white font-black text-sm" style={{fontFamily:"'Sora',sans-serif"}}>{user?.reputation_score?.toFixed(1)}</span>
-          <span className="text-gray-300 text-xs">({user?._count?.reviews_received || 0} reviews)</span>
+          <span className="text-bartr-text font-black text-sm" style={{fontFamily:"'Sora',sans-serif"}}>{user?.reputation_score?.toFixed(1)}</span>
+          <span className="text-bartr-muted text-xs">({user?._count?.reviews_received || 0} reviews)</span>
         </div>
 
         {/* Actions */}
-        <div className="flex gap-3">
+        <div className="flex gap-3 relative z-10">
           {isMe ? (
-            <button onClick={onEdit} className="flex items-center gap-2 bg-white text-gray-900 px-6 py-2.5 rounded-full text-sm font-bold hover:bg-amber-400 transition-all duration-200 shadow-lg" style={{fontFamily:"'Sora',sans-serif"}}>
+            <button onClick={onEdit} className="flex items-center gap-2 bg-bartr-dark text-white dark:bg-white dark:text-gray-900 px-6 py-2.5 rounded-full text-sm font-bold hover:opacity-90 transition-all duration-200 shadow-lg" style={{fontFamily:"'Sora',sans-serif"}}>
               <Edit3 className="w-4 h-4" /> Edit Profile
             </button>
           ) : (
@@ -135,7 +135,7 @@ export default function ProfilePage() {
   })
 
   if (isLoading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
-  if (!data) return <EmptyState icon="👤" title="User not found" />
+  if (!data) return <EmptyState icon={<UserX className="w-12 h-12" />} title="User not found" />
 
   const user = data
   const isMe = user.id === me?.id
@@ -162,7 +162,7 @@ export default function ProfilePage() {
               <Reveal>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-200/50 to-transparent" />
-                  <h2 className="text-sm font-black text-bartr-muted uppercase tracking-widest" style={{fontFamily:"'Sora',sans-serif"}}>✨ Offering ({offerings.length})</h2>
+                  <h2 className="text-sm font-black text-bartr-muted uppercase tracking-widest flex items-center gap-2" style={{fontFamily:"'Sora',sans-serif"}}><HandHeart className="w-4 h-4 text-emerald-500" /> Offering ({offerings.length})</h2>
                   <div className="h-px flex-1 bg-gradient-to-l from-transparent via-amber-200 to-transparent" />
                 </div>
               </Reveal>
@@ -181,9 +181,9 @@ export default function ProfilePage() {
             <div>
               <Reveal>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-blue-200 to-transparent" />
-                  <h2 className="text-sm font-black text-gray-500 uppercase tracking-widest" style={{fontFamily:"'Sora',sans-serif"}}>🎯 Wanting ({requests.length})</h2>
-                  <div className="h-px flex-1 bg-gradient-to-l from-transparent via-blue-200 to-transparent" />
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-blue-200/50 dark:via-blue-500/20 to-transparent" />
+                  <h2 className="text-sm font-black text-bartr-muted uppercase tracking-widest flex items-center gap-2" style={{fontFamily:"'Sora',sans-serif"}}><Briefcase className="w-4 h-4 text-blue-500" /> Wanting ({requests.length})</h2>
+                  <div className="h-px flex-1 bg-gradient-to-l from-transparent via-blue-200/50 dark:via-blue-500/20 to-transparent" />
                 </div>
               </Reveal>
               <div className="space-y-2.5">
@@ -208,9 +208,9 @@ export default function ProfilePage() {
             <div>
               <Reveal>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-rose-200 to-transparent" />
-                  <h2 className="text-sm font-black text-gray-500 uppercase tracking-widest" style={{fontFamily:"'Sora',sans-serif"}}>⭐ Reviews</h2>
-                  <div className="h-px flex-1 bg-gradient-to-l from-transparent via-rose-200 to-transparent" />
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-rose-200/50 dark:via-rose-500/20 to-transparent" />
+                  <h2 className="text-sm font-black text-bartr-muted uppercase tracking-widest flex items-center gap-2" style={{fontFamily:"'Sora',sans-serif"}}><Star className="w-4 h-4 text-amber-500" /> Reviews</h2>
+                  <div className="h-px flex-1 bg-gradient-to-l from-transparent via-rose-200/50 dark:via-rose-500/20 to-transparent" />
                 </div>
               </Reveal>
               <div className="space-y-3">
@@ -241,7 +241,7 @@ export default function ProfilePage() {
           {user.portfolios?.length > 0 && (
             <div>
               <Reveal>
-                <h2 className="text-sm font-black text-gray-500 uppercase tracking-widest mb-4" style={{fontFamily:"'Sora',sans-serif"}}>🖼️ Portfolio</h2>
+                <h2 className="text-sm font-black text-bartr-muted uppercase tracking-widest mb-4 flex items-center gap-2" style={{fontFamily:"'Sora',sans-serif"}}><ImageIcon className="w-4 h-4 text-purple-500" /> Portfolio</h2>
               </Reveal>
               <div className="space-y-3">
                 {user.portfolios.map((item, i) => (
