@@ -10,6 +10,11 @@ import {
 
 const BCRYPT_ROUNDS = 12
 
+/** Generate a cryptographically-random 6-digit OTP string */
+function generateOtp() {
+  return String(Math.floor(100000 + Math.random() * 900000))
+}
+
 // ── Register ──────────────────────────────────────────────────────────────────
 export const register = async (req, res, next) => {
   try {
@@ -33,13 +38,14 @@ export const register = async (req, res, next) => {
       select: { id: true, email: true, full_name: true, username: true, is_verified: true },
     })
 
-    // Create verification token
+    // Create verification token + OTP
     const token = generateSecureToken()
+    const otp_code = generateOtp()
     const expires_at = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24h
-    await prisma.emailVerification.create({ data: { user_id: user.id, token, expires_at } })
+    await prisma.emailVerification.create({ data: { user_id: user.id, token, otp_code, expires_at } })
 
     try {
-      await sendVerificationEmail({ email: user.email, full_name: user.full_name }, token)
+      await sendVerificationEmail({ email: user.email, full_name: user.full_name }, token, otp_code)
     } catch (emailErr) {
       console.error('Failed to send verification email:', emailErr.message)
     }
@@ -120,12 +126,40 @@ export const resendVerification = async (req, res, next) => {
     await prisma.emailVerification.deleteMany({ where: { user_id: user.id } })
 
     const token = generateSecureToken()
+    const otp_code = generateOtp()
     const expires_at = new Date(Date.now() + 24 * 60 * 60 * 1000)
-    await prisma.emailVerification.create({ data: { user_id: user.id, token, expires_at } })
+    await prisma.emailVerification.create({ data: { user_id: user.id, token, otp_code, expires_at } })
 
-    await sendVerificationEmail({ email: user.email, full_name: user.full_name }, token)
+    await sendVerificationEmail({ email: user.email, full_name: user.full_name }, token, otp_code)
 
     return ok(res, {}, 'Verification email sent.')
+  } catch (err) {
+    next(err)
+  }
+}
+
+// ── Verify Email by OTP ───────────────────────────────────────────────────────
+export const verifyEmailOtp = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body
+
+    const user = await prisma.user.findUnique({ where: { email } })
+    if (!user) return badRequest(res, 'Invalid OTP.')
+
+    const verification = await prisma.emailVerification.findFirst({
+      where: { user_id: user.id, otp_code: String(otp) },
+      orderBy: { created_at: 'desc' },
+    })
+    if (!verification) return badRequest(res, 'Invalid or expired OTP.')
+    if (verification.used_at) return badRequest(res, 'This OTP has already been used.')
+    if (new Date() > verification.expires_at) return badRequest(res, 'OTP has expired. Please request a new one.')
+
+    await prisma.$transaction([
+      prisma.user.update({ where: { id: user.id }, data: { is_verified: true } }),
+      prisma.emailVerification.update({ where: { id: verification.id }, data: { used_at: new Date() } }),
+    ])
+
+    return ok(res, {}, 'Email verified successfully.')
   } catch (err) {
     next(err)
   }

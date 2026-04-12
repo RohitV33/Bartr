@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { GraduationCap, ArrowLeftRight, Star, ChevronRight, Sparkles, Edit3, UserX, Briefcase, HandHeart, Image as ImageIcon } from 'lucide-react'
-import { usersApi } from '../../api/endpoints.js'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { GraduationCap, ArrowLeftRight, Star, ChevronRight, Edit3, UserX, Briefcase, HandHeart, Image as ImageIcon, Trash2, Pencil } from 'lucide-react'
+import { usersApi, skillsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { Avatar, Card, Stars, ProficiencyBadge, Spinner, EmptyState, Button, Badge } from '../../components/shared.jsx'
@@ -96,24 +96,55 @@ function ProfileHero({ user, isMe, scrollY, onEdit, onExchange }) {
 }
 
 /* ─── Skill Item ─────────────────────────────────────────────────────────────── */
-function SkillItem({ skill, onClick }) {
+function SkillItem({ skill, onClick, isMe, onEdit, onDelete }) {
   const [h, setH] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   return (
-    <button onClick={onClick} className="w-full text-left">
-      <div
-        onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
-        className="bg-bartr-surface border border-bartr-border rounded-2xl p-4 flex items-center gap-3 transition-all duration-200"
-        style={{ boxShadow: h ? '0 8px 24px rgba(0,0,0,0.1)' : '0 1px 4px rgba(0,0,0,0.04)', transform: h ? 'translateX(4px)' : 'none' }}
-      >
+    <div
+      onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
+      className="bg-bartr-surface border border-bartr-border rounded-2xl p-4 flex items-center gap-3 transition-all duration-200"
+      style={{ boxShadow: h ? '0 8px 24px rgba(0,0,0,0.1)' : '0 1px 4px rgba(0,0,0,0.04)', transform: h ? 'translateX(2px)' : 'none' }}
+    >
+      <button onClick={onClick} className="flex items-center gap-3 flex-1 min-w-0 text-left">
         <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-xl shrink-0">{skill.category?.icon}</div>
         <div className="flex-1 min-w-0">
           <p className="font-bold text-bartr-text text-sm" style={{fontFamily:"'Sora',sans-serif"}}>{skill.title}</p>
           <p className="text-xs text-bartr-muted line-clamp-1" style={{fontFamily:"'DM Sans',sans-serif"}}>{skill.description}</p>
         </div>
         <ProficiencyBadge level={skill.proficiency_level} />
-        <ChevronRight className="w-4 h-4 text-bartr-muted shrink-0" style={{opacity: h?1:0, transform: h?'translateX(2px)':'none', transition:'all .2s'}} />
-      </div>
-    </button>
+      </button>
+      {isMe && (
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            onClick={onEdit}
+            title="Edit skill"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-bartr-muted hover:text-indigo-500 hover:bg-indigo-500/10 transition-all"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+          {confirmDelete ? (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => { onDelete(); setConfirmDelete(false) }}
+                className="text-[10px] font-bold bg-red-500 text-white px-2 py-1 rounded-lg hover:bg-red-600 transition-all"
+              >Yes</button>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="text-[10px] font-bold bg-bartr-bg text-bartr-muted px-2 py-1 rounded-lg border border-bartr-border hover:bg-bartr-border transition-all"
+              >No</button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              title="Delete skill"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-bartr-muted hover:text-red-500 hover:bg-red-500/10 transition-all"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -122,6 +153,7 @@ export default function ProfilePage() {
   const navigate = useNavigate()
   const { user: me } = useAuth()
   const [scrollY, setScrollY] = useState(0)
+  const qc = useQueryClient()
 
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY)
@@ -132,6 +164,11 @@ export default function ProfilePage() {
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.USER_PROFILE(username),
     queryFn: () => usersApi.getProfile(username).then(r => r.data.data.user),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (skillId) => skillsApi.delete(skillId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.USER_PROFILE(username) }),
   })
 
   if (isLoading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
@@ -169,7 +206,13 @@ export default function ProfilePage() {
               <div className="space-y-2.5">
                 {offerings.map((skill, i) => (
                   <Reveal key={skill.id} delay={i * 60}>
-                    <SkillItem skill={skill} onClick={() => navigate(`/skills/${skill.id}`)} />
+                    <SkillItem
+                      skill={skill}
+                      onClick={() => navigate(`/skills/${skill.id}`)}
+                      isMe={isMe}
+                      onEdit={() => navigate(`/skills/${skill.id}`)}
+                      onDelete={() => deleteMutation.mutate(skill.id)}
+                    />
                   </Reveal>
                 ))}
               </div>
@@ -196,6 +239,15 @@ export default function ProfilePage() {
                         <p className="text-xs text-bartr-muted line-clamp-1" style={{fontFamily:"'DM Sans',sans-serif"}}>{skill.description}</p>
                       </div>
                       <span className="text-xs font-bold bg-blue-500/10 text-blue-500 px-2.5 py-1 rounded-full" style={{fontFamily:"'Sora',sans-serif"}}>Wants</span>
+                      {isMe && (
+                        <button
+                          onClick={() => deleteMutation.mutate(skill.id)}
+                          title="Remove wanted skill"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-bartr-muted hover:text-red-500 hover:bg-red-500/10 transition-all"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </Reveal>
                 ))}

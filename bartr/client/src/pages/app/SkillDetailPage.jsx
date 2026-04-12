@@ -221,24 +221,35 @@ export default function SkillDetailPage() {
                       </button>
                     ) : (
                       <div className="space-y-3">
-                        {mySkills.map(s => (
-                          <button
-                            key={s.id}
-                            onClick={() => setSelectedMySkill(s.id)}
-                            className={`w-full text-left p-3 rounded-xl border-2 text-sm font-medium transition-all ${selectedMySkill === s.id ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-200 text-gray-700'}`}
-                          >
-                            {s.title}
-                          </button>
-                        ))}
-                        <button
-                          disabled={!selectedMySkill || proposeMutation.isPending}
-                          onClick={() => proposeMutation.mutate({ offeredSkillId: selectedMySkill, requestedSkillId: skill.id })}
-                          className="w-full py-2.5 rounded-2xl bg-amber-400 text-gray-900 text-sm font-bold hover:bg-amber-300 transition-all shadow-lg shadow-amber-200"
-                          style={{ fontFamily: "'Sora',sans-serif" }}
-                        >
-                          {proposeMutation.isPending ? 'Sending...' : '🚀 Send Proposal'}
-                        </button>
-                        <button onClick={() => setShowPropose(false)} className="w-full py-2 text-sm text-gray-400 hover:text-gray-700">
+                        {mySkills.length === 0 ? (
+                          <div className="p-4 bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-200 dark:border-amber-500/20 text-center">
+                            <p className="text-xs text-amber-700 dark:text-amber-400 mb-2" style={{ fontFamily: "'DM Sans',sans-serif" }}>You don't have any skills to offer yet!</p>
+                            <button onClick={() => navigate('/skills/new')} className="text-xs font-bold bg-amber-400 text-gray-900 px-4 py-2 rounded-lg hover:bg-amber-300" style={{ fontFamily: "'Sora',sans-serif" }}>
+                              Post a Skill
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            {mySkills.map(s => (
+                              <button
+                                key={s.id}
+                                onClick={() => setSelectedMySkill(s.id)}
+                                className={`w-full text-left p-3 rounded-xl border-2 text-sm font-medium transition-all ${selectedMySkill === s.id ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-200 text-gray-700 hover:border-gray-300'}`}
+                              >
+                                {s.title}
+                              </button>
+                            ))}
+                            <button
+                              disabled={!selectedMySkill || proposeMutation.isPending}
+                              onClick={() => proposeMutation.mutate({ offeredSkillId: selectedMySkill, requestedSkillId: skill.id })}
+                              className="w-full py-2.5 rounded-2xl bg-amber-400 text-gray-900 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-300 transition-all shadow-lg shadow-amber-200"
+                              style={{ fontFamily: "'Sora',sans-serif" }}
+                            >
+                              {proposeMutation.isPending ? 'Sending...' : '🚀 Send Proposal'}
+                            </button>
+                          </>
+                        )}
+                        <button onClick={() => setShowPropose(false)} className="w-full py-2 text-sm text-gray-400 hover:text-gray-700" style={{ fontFamily: "'DM Sans',sans-serif" }}>
                           Cancel
                         </button>
                       </div>

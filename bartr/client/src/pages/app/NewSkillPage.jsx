@@ -9,6 +9,8 @@ import { Input, Textarea, Select, Spinner } from '../../components/shared.jsx'
 import { extractError } from '../../utils/helpers.js'
 import { useEffect, useRef, useState } from 'react'
 import { ChevronLeft, Sparkles, BookOpen } from 'lucide-react'
+import { aiApi } from '../../api/ai.js'
+import { AiAssistButton } from '../../components/ai/AiAssistButton.jsx'
 
 const schema = z.object({
   title: z.string().min(3, 'At least 3 characters'),
@@ -43,14 +45,14 @@ function PostHero({ isOffering, scrollY }) {
       <div className="absolute top-0 right-0 w-72 h-72 opacity-15" style={{background:`radial-gradient(circle, ${isOffering?'#f59e0b':'#3b82f6'}, transparent 70%)`,transform:'translate(30%,-30%)'}} />
 
       <div className="relative px-8 py-10">
-        <div className={`inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-full border mb-4 ${isOffering ? 'bg-amber-400/20 text-amber-300 border-amber-400/20' : 'bg-blue-400/20 text-blue-300 border-blue-400/20'}`}>
+        <div className={`inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-full border mb-4 ${isOffering ? 'bg-amber-400/20 text-amber-500 dark:text-amber-300 border-amber-400/20' : 'bg-blue-400/20 text-blue-600 dark:text-blue-300 border-blue-400/20'}`}>
           <Sparkles className="w-3 h-3" />
           {isOffering ? 'Share Your Expertise' : 'Find a Teacher'}
         </div>
-        <h1 className="text-3xl font-black text-white mb-2" style={{fontFamily:"'Sora',sans-serif"}}>
+        <h1 className="text-3xl font-black text-bartr-text mb-2" style={{fontFamily:"'Sora',sans-serif"}}>
           {isOffering ? 'Post a Skill ✨' : 'Request a Skill 🎯'}
         </h1>
-        <p className="text-gray-300 text-sm" style={{fontFamily:"'DM Sans',sans-serif"}}>
+        <p className="text-bartr-muted text-sm" style={{fontFamily:"'DM Sans',sans-serif"}}>
           {isOffering ? 'Share what you can teach and connect with eager learners.' : 'Describe what you want to learn and find the perfect teacher.'}
         </p>
       </div>
@@ -61,6 +63,7 @@ function PostHero({ isOffering, scrollY }) {
 export default function NewSkillPage() {
   const navigate = useNavigate()
   const [scrollY, setScrollY] = useState(0)
+  const [isGeneratingDesc, setIsGeneratingDesc] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY)
@@ -88,6 +91,35 @@ export default function NewSkillPage() {
     onError: (err) => setError('root', { message: extractError(err) }),
   })
 
+  const handleGenerateDesc = async () => {
+    const currentTitle = watch('title')
+    const category_id = watch('category_id')
+    const proficiency_level = watch('proficiency_level')
+    const currentIsOffering = watch('is_offering')
+
+    if (!currentTitle || currentTitle.length < 3 || !category_id) {
+      setError('root', { message: 'Please set a title (3+ chars) and select a category before using AI.' })
+      return
+    }
+
+    try {
+      setIsGeneratingDesc(true)
+      const res = await aiApi.generateSkillDescription({
+        title: currentTitle,
+        category_id,
+        proficiency_level,
+        is_offering: currentIsOffering
+      })
+      setValue('description', res.data.data.description, { shouldValidate: true, shouldDirty: true })
+      // clear any root error if success
+      setError('root', { message: '' }) 
+    } catch (err) {
+      setError('root', { message: 'AI generation failed: ' + extractError(err) })
+    } finally {
+      setIsGeneratingDesc(false)
+    }
+  }
+
   if (catsLoading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
   return (
@@ -108,16 +140,16 @@ export default function NewSkillPage() {
       <PostHero isOffering={isOffering} scrollY={scrollY} />
 
       <Reveal delay={60}>
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+        <div className="bg-bartr-surface rounded-3xl border border-bartr-border shadow-sm p-6">
 
           {/* Toggle */}
-          <div className="flex gap-1.5 p-1.5 bg-gray-100 rounded-2xl mb-6">
+          <div className="flex gap-1.5 p-1.5 bg-bartr-bg rounded-2xl mb-6">
             {[true, false].map(val => (
               <button
                 key={String(val)}
                 type="button"
                 onClick={() => setValue('is_offering', val)}
-                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${isOffering === val ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${isOffering === val ? 'bg-bartr-surface text-bartr-text shadow-md border border-bartr-border' : 'text-bartr-muted hover:text-bartr-text'}`}
                 style={{fontFamily:"'Sora',sans-serif"}}
               >
                 {val ? '✨ I can teach this' : '🎯 I want to learn this'}
@@ -126,18 +158,18 @@ export default function NewSkillPage() {
           </div>
 
           {errors.root && (
-            <div className="bg-red-50 border border-red-100 rounded-2xl px-4 py-3 mb-5">
-              <p className="text-sm text-red-600" style={{fontFamily:"'DM Sans',sans-serif"}}>{errors.root.message}</p>
+            <div className="bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-2xl px-4 py-3 mb-5">
+              <p className="text-sm text-red-600 dark:text-red-400" style={{fontFamily:"'DM Sans',sans-serif"}}>{errors.root.message}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit(d => mutation.mutate(d))} className="space-y-6">
 
             <div>
-              <label className="text-sm font-bold text-gray-700 block mb-1.5" style={{fontFamily:"'Sora',sans-serif"}}>Skill title</label>
+              <label className="text-sm font-bold text-bartr-text block mb-1.5" style={{fontFamily:"'Sora',sans-serif"}}>Skill title</label>
               <input
                 placeholder={isOffering ? 'e.g. React Development, Piano Lessons…' : 'e.g. UI/UX Design, Spanish…'}
-                className="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 text-sm focus:outline-none focus:ring-0 focus:border-amber-400 transition-all"
+                className="w-full px-4 py-3 rounded-2xl border-2 border-bartr-border bg-transparent text-bartr-text text-sm focus:outline-none focus:ring-0 focus:border-amber-400 transition-all placeholder:text-bartr-muted/50"
                 style={{fontFamily:"'DM Sans',sans-serif"}}
                 {...register('title')}
               />
@@ -145,13 +177,22 @@ export default function NewSkillPage() {
             </div>
 
             <div>
-              <label className="text-sm font-bold text-gray-700 block mb-1.5" style={{fontFamily:"'Sora',sans-serif"}}>
-                {isOffering ? 'What you can teach' : "What you're looking for"}
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-sm font-bold text-bartr-text" style={{fontFamily:"'Sora',sans-serif"}}>
+                  {isOffering ? 'What you can teach' : "What you're looking for"}
+                </label>
+                <AiAssistButton
+                  label="Write with AI"
+                  variant="glow"
+                  isLoading={isGeneratingDesc}
+                  onClick={handleGenerateDesc}
+                  className="py-1 px-3 text-xs"
+                />
+              </div>
               <textarea
                 rows={4}
                 placeholder={isOffering ? "Describe your experience, what you'll teach…" : "Describe what you want to learn, your current level…"}
-                className="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 text-sm focus:outline-none focus:ring-0 focus:border-amber-400 transition-all resize-none"
+                className="w-full px-4 py-3 rounded-2xl border-2 border-bartr-border bg-transparent text-bartr-text text-sm focus:outline-none focus:ring-0 focus:border-amber-400 transition-all resize-none placeholder:text-bartr-muted/50"
                 style={{fontFamily:"'DM Sans',sans-serif"}}
                 {...register('description')}
               />
@@ -160,7 +201,7 @@ export default function NewSkillPage() {
 
             {/* Category grid */}
             <div>
-              <label className="text-sm font-bold text-gray-700 block mb-3" style={{fontFamily:"'Sora',sans-serif"}}>Category</label>
+              <label className="text-sm font-bold text-bartr-text block mb-3" style={{fontFamily:"'Sora',sans-serif"}}>Category</label>
               <div className="grid grid-cols-4 gap-2">
                 {categories.map(cat => (
                   <button
@@ -169,8 +210,8 @@ export default function NewSkillPage() {
                     onClick={() => setValue('category_id', cat.id, { shouldValidate: true })}
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 text-center transition-all duration-200 group ${
                       selectedCategory === cat.id
-                        ? 'border-gray-900 bg-gray-900 text-white shadow-lg'
-                        : 'border-gray-200 hover:border-gray-400 bg-white text-gray-700 hover:shadow-sm'
+                        ? 'border-bartr-text bg-bartr-text text-bartr-surface shadow-lg dark:bg-yellow-300 dark:border-yellow-300 dark:text-bartr-dark'
+                        : 'border-bartr-border hover:border-bartr-text bg-transparent text-bartr-text hover:shadow-sm'
                     }`}
                   >
                     <span className="text-2xl">{cat.icon}</span>
@@ -183,7 +224,7 @@ export default function NewSkillPage() {
 
             {/* Proficiency */}
             <div>
-              <label className="text-sm font-bold text-gray-700 block mb-3" style={{fontFamily:"'Sora',sans-serif"}}>Proficiency Level</label>
+              <label className="text-sm font-bold text-bartr-text block mb-3" style={{fontFamily:"'Sora',sans-serif"}}>Proficiency Level</label>
               <div className="grid grid-cols-3 gap-2">
                 {['BEGINNER','INTERMEDIATE','EXPERT'].map(lvl => {
                   const icons = { BEGINNER:'🌱', INTERMEDIATE:'⚡', EXPERT:'🔥' }
@@ -195,7 +236,7 @@ export default function NewSkillPage() {
                       type="button"
                       onClick={() => setValue('proficiency_level', lvl)}
                       className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 text-center transition-all duration-200 ${
-                        current === lvl ? 'border-amber-400 bg-amber-50 text-amber-700' : 'border-gray-200 hover:border-gray-400 text-gray-600'
+                        current === lvl ? 'border-amber-400 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' : 'border-bartr-border hover:border-bartr-text bg-transparent text-bartr-text'
                       }`}
                     >
                       <span className="text-xl">{icons[lvl]}</span>
@@ -211,7 +252,7 @@ export default function NewSkillPage() {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:border-gray-400 hover:bg-gray-50 transition-all"
+                className="flex-1 py-3 rounded-2xl border-2 border-bartr-border text-sm font-bold text-bartr-text hover:bg-bartr-bg transition-all"
                 style={{fontFamily:"'Sora',sans-serif"}}
               >
                 Cancel
@@ -219,11 +260,11 @@ export default function NewSkillPage() {
               <button
                 type="submit"
                 disabled={mutation.isPending}
-                className="flex-1 py-3 rounded-2xl bg-gray-900 text-white text-sm font-bold disabled:opacity-60 hover:bg-gray-700 transition-all shadow-lg flex items-center justify-center gap-2"
+                className="flex-1 py-3 rounded-2xl bg-bartr-dark text-white text-sm font-bold disabled:opacity-60 hover:bg-gray-800 dark:bg-yellow-300 dark:text-bartr-dark dark:hover:bg-yellow-400 transition-all shadow-lg flex items-center justify-center gap-2"
                 style={{fontFamily:"'Sora',sans-serif"}}
               >
                 {mutation.isPending
-                  ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Posting…</>
+                  ? <><div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> Posting…</>
                   : isOffering ? '✨ Post Offering' : '🎯 Post Request'
                 }
               </button>

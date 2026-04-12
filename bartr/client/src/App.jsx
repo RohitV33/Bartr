@@ -24,6 +24,7 @@ import ExchangesPage from './pages/app/ExchangesPage.jsx'
 import ExchangeDetailPage from './pages/app/ExchangeDetailPage.jsx'
 import NotificationsPage from './pages/app/NotificationsPage.jsx'
 import PortfolioPage from './pages/app/PortfolioPage.jsx'
+import ContactPage from './pages/ContactPage.jsx'
 import { ThemeProvider } from './context/themeContext.jsx'
 
 const AppProviders = ({ children }) => (
@@ -53,6 +54,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
           <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />

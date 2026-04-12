@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Camera, User, BookOpen, GraduationCap, AlignLeft, ArrowLeft, Check, Sparkles } from 'lucide-react'
 import { usersApi } from '../../api/endpoints.js'
+import { aiApi } from '../../api/ai.js'
+import { AiAssistButton } from '../../components/ai/AiAssistButton.jsx'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { Input, Textarea, Button, Avatar } from '../../components/shared.jsx'
@@ -59,7 +61,7 @@ function ProfileHero({ user, avatarRef, onAvatarClick, uploading, scrollY }) {
         {/* Avatar */}
         <div className="relative mb-5">
           <div className="absolute inset-0 rounded-full opacity-30 animate-pulse" style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.6), transparent 70%)', transform: 'scale(1.3)' }} />
-          <div className="ring-4 ring-amber-400/40 ring-offset-2 ring-offset-transparent rounded-full shadow-2xl relative">
+          <div className="ring-4 ring-amber-400/40 ring-offset-2 ring-offset-transparent dark:ring-offset-bartr-bg rounded-full shadow-2xl relative">
             <Avatar src={user?.avatar_url} name={user?.full_name} size="xl" />
           </div>
           <button type="button" onClick={onAvatarClick}
@@ -70,21 +72,21 @@ function ProfileHero({ user, avatarRef, onAvatarClick, uploading, scrollY }) {
           <input ref={avatarRef} type="file" accept="image/*" className="hidden" />
         </div>
 
-        <h1 className="text-2xl font-black text-white mb-1" style={{ fontFamily: "'Sora', sans-serif" }}>
+        <h1 className="text-2xl font-black text-bartr-text mb-1" style={{ fontFamily: "'Sora', sans-serif" }}>
           {user?.full_name || 'Your Name'}
         </h1>
-        <p className="text-amber-400/70 text-sm mb-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+        <p className="text-bartr-muted text-sm mb-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>
           {user?.university || 'Add your university below'}
         </p>
 
-        <div className="inline-flex items-center gap-1.5 text-xs text-gray-400 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-          <Sparkles className="w-3 h-3 text-amber-400" />
+        <div className="inline-flex items-center gap-1.5 text-xs text-amber-700 bg-amber-500/10 dark:text-amber-300 dark:bg-amber-400/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-amber-500/20 dark:border-amber-400/20" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          <Sparkles className="w-3 h-3 text-amber-500 dark:text-amber-400" />
           Editing your profile
         </div>
 
         {uploading && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-amber-300 bg-amber-400/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-amber-400/20">
-            <div className="w-3 h-3 border-2 border-amber-300 border-t-transparent rounded-full animate-spin" />
+          <div className="mt-3 flex items-center gap-2 text-xs text-amber-700 bg-amber-500/10 dark:text-amber-300 dark:bg-amber-400/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-amber-500/20 dark:border-amber-400/20">
+            <div className="w-3 h-3 border-2 border-amber-500 dark:border-amber-300 border-t-transparent rounded-full animate-spin" />
             Uploading photo…
           </div>
         )}
@@ -113,6 +115,7 @@ export default function EditProfilePage() {
   const avatarRef = useRef()
   const [saved, setSaved] = useState(false)
   const [scrollY, setScrollY] = useState(0)
+  const [isGeneratingBio, setIsGeneratingBio] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY)
@@ -155,6 +158,18 @@ export default function EditProfilePage() {
     avatarMutation.mutate(fd)
   }
 
+  const handleGenerateBio = async () => {
+    try {
+      setIsGeneratingBio(true)
+      const res = await aiApi.generateBio()
+      setValue('bio', res.data.data.bio, { shouldValidate: true, shouldDirty: true })
+    } catch (err) {
+      setError('root', { message: 'AI generation failed: ' + extractError(err) })
+    } finally {
+      setIsGeneratingBio(false)
+    }
+  }
+
   return (
     <div className="max-w-lg mx-auto px-4 py-6">
    
@@ -162,8 +177,8 @@ export default function EditProfilePage() {
 
       {/* Back */}
       <Reveal>
-        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-700 mb-5 transition-colors group" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-bartr-muted hover:text-bartr-text mb-5 transition-colors group" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          <div className="w-7 h-7 rounded-full bg-bartr-surface border border-bartr-border flex items-center justify-center transition-colors">
             <ArrowLeft className="w-3.5 h-3.5" />
           </div>
           Back
@@ -179,12 +194,12 @@ export default function EditProfilePage() {
 
       {/* Form */}
       <Reveal delay={80}>
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 space-y-6">
+        <div className="bg-bartr-surface rounded-3xl border border-bartr-border shadow-sm p-6 space-y-6">
 
           {errors.root && (
-            <div className="bg-red-50 border border-red-100 rounded-2xl px-4 py-3 flex items-start gap-2">
+            <div className="bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-2xl px-4 py-3 flex items-start gap-2">
               <span className="text-red-400 mt-0.5">⚠</span>
-              <p className="text-sm text-red-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>{errors.root.message}</p>
+              <p className="text-sm text-red-600 dark:text-red-400" style={{ fontFamily: "'DM Sans', sans-serif" }}>{errors.root.message}</p>
             </div>
           )}
 
@@ -195,6 +210,15 @@ export default function EditProfilePage() {
             </FieldRow>
 
             <FieldRow icon={AlignLeft} accentColor="blue">
+              <div className="flex justify-end mb-1">
+                <AiAssistButton
+                  label="Write with AI"
+                  variant="glow"
+                  isLoading={isGeneratingBio}
+                  onClick={handleGenerateBio}
+                  className="py-1 px-3 text-[10px]"
+                />
+              </div>
               <Textarea label="Bio" placeholder="Tell people about yourself…" rows={3} error={errors.bio?.message} {...register('bio')} />
             </FieldRow>
 
@@ -203,7 +227,7 @@ export default function EditProfilePage() {
             </FieldRow>
 
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 mt-1 rounded-xl border bg-purple-50 border-purple-100 text-purple-500 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 mt-1 rounded-xl border bg-purple-50 dark:bg-purple-500/10 border-purple-100 dark:border-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center flex-shrink-0">
                 <BookOpen className="w-4 h-4" />
               </div>
               <div className="flex-1 grid grid-cols-2 gap-3 min-w-0">
@@ -217,7 +241,7 @@ export default function EditProfilePage() {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 hover:border-gray-400 active:scale-98 transition-all"
+                className="flex-1 py-3 rounded-2xl border-2 border-bartr-border text-sm font-bold text-bartr-text hover:bg-bartr-bg transition-all"
                 style={{ fontFamily: "'Sora', sans-serif" }}
               >
                 Cancel
@@ -227,15 +251,15 @@ export default function EditProfilePage() {
                 disabled={profileMutation.isPending || saved}
                 className={`flex-1 py-3 rounded-2xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg
                   ${saved
-                    ? 'bg-emerald-500 text-white shadow-emerald-200'
-                    : 'bg-gray-900 text-white hover:bg-gray-700 active:scale-98 disabled:opacity-60 shadow-gray-200'
+                    ? 'bg-emerald-500 text-white'
+                    : 'bg-bartr-dark text-white hover:bg-gray-800 dark:bg-yellow-300 dark:text-bartr-dark dark:hover:bg-yellow-400 active:scale-98 disabled:opacity-60'
                   }`}
                 style={{ fontFamily: "'Sora', sans-serif" }}
               >
                 {saved ? (
                   <><Check className="w-4 h-4" /> Saved!</>
                 ) : profileMutation.isPending ? (
-                  <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Saving…</>
+                  <><div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> Saving…</>
                 ) : (
                   'Save Changes'
                 )}
@@ -247,7 +271,7 @@ export default function EditProfilePage() {
       </Reveal>
 
       <Reveal delay={120}>
-        <p className="text-center text-xs text-gray-400 mt-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+        <p className="text-center text-xs text-bartr-muted mt-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
           Profile photo: JPG, PNG or WebP · Max 5 MB
         </p>
       </Reveal>

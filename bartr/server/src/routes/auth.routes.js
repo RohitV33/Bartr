@@ -6,7 +6,7 @@ import { authLimiter } from '../middleware/rateLimiter.js'
 import { requireAuth } from '../middleware/auth.js'
 import {
   register, login, logout, getMe,
-  verifyEmail, resendVerification,
+  verifyEmail, resendVerification, verifyEmailOtp,
   forgotPassword, resetPassword, googleCallback,
 } from '../controllers/auth.controller.js'
 
@@ -38,6 +38,7 @@ router.post('/login', authLimiter, validate(loginSchema), login)
 router.post('/logout', logout)
 router.get('/me', requireAuth, getMe)
 router.post('/verify-email', validate(verifySchema), verifyEmail)
+router.post('/verify-email-otp', authLimiter, verifyEmailOtp)
 router.post('/resend-verification', requireAuth, resendVerification)
 router.post('/forgot-password', authLimiter, validate(forgotSchema), forgotPassword)
 router.post('/reset-password', authLimiter, validate(resetSchema), resetPassword)

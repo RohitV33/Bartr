@@ -236,6 +236,7 @@ model EmailVerification {
   id         String   @id @default(cuid())
   user_id    String
   token      String   @unique
+  otp_code   String?
   expires_at DateTime
   used_at    DateTime?
   created_at DateTime @default(now())
@@ -243,6 +244,7 @@ model EmailVerification {
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([token])
+  @@index([user_id])
 }
 
 model PasswordReset {

@@ -11,6 +11,8 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import { useSocket } from '../../context/SocketContext.jsx'
 import { Avatar, Spinner, Stars } from '../../components/shared.jsx'
 import { timeAgo, exchangeStatusLabel, extractError } from '../../utils/helpers.js'
+import { aiApi } from '../../api/ai.js'
+import { AiAssistButton, AiResultCard } from '../../components/ai/AiAssistButton.jsx'
 
 
 /* ─── Reveal ─────────────────────────────────────────────────────────────────── */
@@ -236,6 +238,27 @@ export default function ExchangeDetailPage() {
   const [showReview, setShowReview] = useState(false)
   const typingTimer = useRef(null)
 
+  const [aiCoachLoading, setAiCoachLoading] = useState(false)
+  const [aiCoachSuggestion, setAiCoachSuggestion] = useState(null)
+
+  const handleAiCoach = async () => {
+    try {
+      setAiCoachLoading(true)
+      const res = await aiApi.coachExchange({ exchangeId: id })
+      setAiCoachSuggestion(res.data.data.suggestion)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setAiCoachLoading(false)
+    }
+  }
+
+  const useAiSuggestion = () => {
+    setInput(aiCoachSuggestion)
+    setAiCoachSuggestion(null)
+    inputRef.current?.focus()
+  }
+
   const { data: exchange, isLoading } = useQuery({
     queryKey: QUERY_KEYS.EXCHANGE(id),
     queryFn: () => exchangesApi.get(id).then(r => r.data.data.exchange),
@@ -414,17 +437,50 @@ export default function ExchangeDetailPage() {
           </div>
 
           {/* Input */}
-          <div className="border-t border-gray-100 bg-white px-4 py-3 flex gap-2.5 shrink-0">
-            <input
-              ref={inputRef}
-              value={input}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              disabled={!canChat}
-              placeholder={canChat ? 'Type a message… (Enter to send)' : 'Accept the exchange to start chatting'}
-              className="flex-1 px-4 py-3 rounded-2xl border-2 border-gray-200 text-sm focus:outline-none focus:border-amber-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-              style={{fontFamily:"'DM Sans',sans-serif"}}
-            />
+          <div className="border-t border-gray-100 bg-white px-4 py-3 flex gap-2.5 shrink-0 relative">
+            
+            {/* AI Coach Suggestion Popup */}
+            {aiCoachSuggestion && (
+              <div className="absolute bottom-full left-0 right-0 p-4 pb-2 z-10">
+                <AiResultCard 
+                  title="✨ AI Exchange Coach"
+                  content={
+                    <div>
+                      <p className="mb-3">{aiCoachSuggestion}</p>
+                      <button onClick={useAiSuggestion} className="bg-amber-400 text-gray-900 px-3 py-1.5 rounded-lg text-xs font-bold shadow-md hover:bg-amber-300 transition-colors">
+                        Use Suggestion
+                      </button>
+                    </div>
+                  } 
+                  onClose={() => setAiCoachSuggestion(null)}
+                  className="shadow-xl shadow-amber-900/10"
+                />
+              </div>
+            )}
+
+            <div className="flex-1 flex bg-white rounded-2xl border-2 border-gray-200 focus-within:border-amber-400 focus-within:bg-white transition-all overflow-hidden items-center group/input">
+              <input
+                ref={inputRef}
+                value={input}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                disabled={!canChat}
+                placeholder={canChat ? 'Type a message… (Enter to send)' : 'Accept the exchange to start chatting'}
+                className="flex-1 px-4 py-3 text-sm focus:outline-none bg-transparent disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                style={{fontFamily:"'DM Sans',sans-serif"}}
+              />
+              {canChat && (
+                <div className="px-2">
+                  <AiAssistButton 
+                    label="Coach" 
+                    variant="glow"
+                    isLoading={aiCoachLoading}
+                    onClick={handleAiCoach}
+                    className="py-1 px-3 text-[10px] rounded-lg shadow-sm border border-transparent"
+                  />
+                </div>
+              )}
+            </div>
             <button
               onClick={handleSend}
               disabled={!canChat || !input.trim()}

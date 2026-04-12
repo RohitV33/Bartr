@@ -1,6 +1,13 @@
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 
-const NAV_LINKS = ['Features', 'Benefits', 'FAQ', 'Contact us']
+const NAV_LINKS = [
+  { label: 'Features', href: '#features' },
+  { label: 'Benefits', href: '#benefits' },
+  { label: 'FAQ', href: '#faq' },
+  { label: 'Contact us', href: '/contact', isPage: true },
+]
+
 const SOCIAL_LINKS = [
   {
     label: 'Twitter',
@@ -35,6 +42,8 @@ const SOCIAL_LINKS = [
 ]
 
 export default function Footer() {
+  const navigate = useNavigate()
+
   return (
     <footer className="bg-bartr-dark text-white" id="contact-us">
       {/* CTA Banner */}
@@ -53,17 +62,22 @@ export default function Footer() {
               </span>
             </h2>
             <p className="text-gray-400 font-dm text-lg mb-8 max-w-md mx-auto">
-              Join 1,200+ students already trading skills across 40+ campuses. 
+              Join 1,200+ students already trading skills across 40+ campuses.
               It's free — always.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+
+            {/* ── Responsive CTA row ── */}
+            <div className="flex flex-col gap-3 items-center w-full max-w-sm mx-auto sm:max-w-none sm:flex-row sm:justify-center">
               <input
                 type="email"
                 placeholder="your@university.edu"
                 className="w-full sm:w-72 bg-white/10 border border-white/20 text-white placeholder-gray-500 rounded-full px-5 py-3 text-sm outline-none focus:border-yellow-300 transition-colors font-dm"
               />
-              <button className="w-full sm:w-auto bg-yellow-300 text-bartr-dark text-sm font-bold px-7 py-3 rounded-full font-sora hover:bg-yellow-400 active:scale-95 transition-all whitespace-nowrap">
-               Get Started →
+              <button
+                onClick={() => navigate('/register')}
+                className="w-full sm:w-auto bg-yellow-300 text-bartr-dark text-sm font-bold px-7 py-3 rounded-full font-sora hover:bg-yellow-400 active:scale-95 transition-all whitespace-nowrap"
+              >
+                Get Started →
               </button>
             </div>
           </motion.div>
@@ -82,15 +96,25 @@ export default function Footer() {
           </div>
 
           {/* Nav links */}
-          <div className="flex items-center gap-8">
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8">
             {NAV_LINKS.map(link => (
-              <a
-                key={link}
-                href={`#${link.toLowerCase().replace(' ', '-')}`}
-                className="text-sm text-gray-400 hover:text-white transition-colors font-dm"
-              >
-                {link}
-              </a>
+              link.isPage ? (
+                <button
+                  key={link.label}
+                  onClick={() => navigate(link.href)}
+                  className="text-sm text-gray-400 hover:text-white transition-colors font-dm"
+                >
+                  {link.label}
+                </button>
+              ) : (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="text-sm text-gray-400 hover:text-white transition-colors font-dm"
+                >
+                  {link.label}
+                </a>
+              )
             ))}
           </div>
 

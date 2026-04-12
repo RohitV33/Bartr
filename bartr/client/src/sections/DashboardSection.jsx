@@ -8,12 +8,12 @@ import {
   BartrActionCard,
 } from '../components/UICards'
 
-/* Sidebar icon button */
+/* Sidebar icon button — theme-aware */
 function SideIcon({ active, children }) {
   return (
     <button
       className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
-        active ? 'bg-yellow-300 text-bartr-dark' : 'text-gray-400 hover:bg-gray-100'
+        active ? 'bg-yellow-300 text-bartr-dark' : 'text-bartr-muted hover:bg-bartr-bg'
       }`}
     >
       {children}
@@ -46,13 +46,11 @@ export default function DashboardSection() {
   const sectionRef = useRef(null)
   const frameRef = useRef(null)
 
-  // Section scroll progress for heading parallax
   const { scrollYProgress: sectionProgress } = useScroll({
     target: sectionRef,
     offset: ['start end', 'center center'],
   })
 
-  // Frame scroll for zoom-in effect
   const { scrollYProgress: frameProgress } = useScroll({
     target: frameRef,
     offset: ['start end', 'center center'],
@@ -61,7 +59,6 @@ export default function DashboardSection() {
   const headingY = useTransform(sectionProgress, [0, 1], [50, 0])
   const smoothHeadingY = useSpring(headingY, { stiffness: 70, damping: 20 })
 
-  // Scroll zoom: frame starts small and zooms in to full size
   const frameScale = useTransform(frameProgress, [0, 1], [0.82, 1])
   const frameOpacity = useTransform(frameProgress, [0, 0.4], [0, 1])
   const frameY = useTransform(frameProgress, [0, 1], [60, 0])
@@ -69,7 +66,6 @@ export default function DashboardSection() {
   const smoothFrameScale = useSpring(frameScale, { stiffness: 70, damping: 18 })
   const smoothFrameY = useSpring(frameY, { stiffness: 70, damping: 18 })
 
-  // Parallax for sidebar elements
   const { scrollYProgress: innerProgress } = useScroll({
     target: frameRef,
     offset: ['start end', 'end start'],
@@ -78,7 +74,7 @@ export default function DashboardSection() {
   const smoothSidebarY = useSpring(sidebarY, { stiffness: 50, damping: 20 })
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 bg-bartr-bg overflow-hidden" id="features">
+    <section ref={sectionRef} className="py-24 px-6 bg-bartr-bg overflow-hidden" id="platform">
       <div className="max-w-6xl mx-auto">
         {/* Section label — parallax from below */}
         <motion.div
@@ -99,7 +95,7 @@ export default function DashboardSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.55, delay: 0.1 }}
-            className="text-4xl md:text-5xl font-extrabold font-sora text-gray-900 mt-3 leading-tight"
+            className="text-4xl md:text-5xl font-extrabold font-sora text-bartr-text mt-3 leading-tight"
           >
             Everything in one place
           </motion.h2>
@@ -108,7 +104,7 @@ export default function DashboardSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-gray-500 mt-4 max-w-md mx-auto font-dm"
+            className="text-bartr-muted mt-4 max-w-md mx-auto font-dm"
           >
             A clean, focused dashboard built for student skill exchange — no clutter, just connections.
           </motion.p>
@@ -117,7 +113,7 @@ export default function DashboardSection() {
         {/* Device frame — scroll zoom in */}
         <motion.div
           ref={frameRef}
-          className="rounded-2xl border-2 border-gray-900 shadow-2xl overflow-hidden bg-white will-change-transform"
+          className="rounded-2xl border-2 border-bartr-border shadow-2xl overflow-hidden bg-bartr-surface will-change-transform"
           style={{
             scale: smoothFrameScale,
             opacity: frameOpacity,
@@ -126,7 +122,7 @@ export default function DashboardSection() {
           }}
         >
           {/* Window chrome */}
-          <div className="bg-gray-900 px-4 py-2.5 flex items-center gap-2">
+          <div className="bg-bartr-dark px-4 py-2.5 flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-red-400" />
             <span className="w-3 h-3 rounded-full bg-yellow-300" />
             <span className="w-3 h-3 rounded-full bg-emerald-400" />
@@ -142,9 +138,9 @@ export default function DashboardSection() {
             {/* Sidebar — subtle parallax upward */}
             <motion.div
               style={{ y: smoothSidebarY }}
-              className="w-14 bg-gray-50 border-r border-gray-100 flex flex-col items-center py-4 gap-3 shrink-0 will-change-transform"
+              className="w-14 bg-bartr-bg border-r border-bartr-border flex flex-col items-center py-4 gap-3 shrink-0 will-change-transform"
             >
-              <div className="w-7 h-7 bg-yellow-300 rounded-lg flex items-center justify-center font-black text-xs font-sora mb-2">
+              <div className="w-7 h-7 bg-yellow-300 rounded-lg flex items-center justify-center font-black text-xs font-sora mb-2 text-bartr-dark">
                 B
               </div>
               <SideIcon active><HomeIcon /></SideIcon>
@@ -155,14 +151,14 @@ export default function DashboardSection() {
             </motion.div>
 
             {/* Main content */}
-            <div className="flex-1 overflow-y-auto bg-white">
+            <div className="flex-1 overflow-y-auto bg-bartr-surface">
               {/* Top bar */}
-              <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 sticky top-0 bg-white z-10">
-                <div className="flex items-center gap-2 flex-1 bg-gray-50 rounded-lg px-3 py-1.5 border border-gray-100">
-                  <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center gap-3 px-5 py-3 border-b border-bartr-border sticky top-0 bg-bartr-surface z-10">
+                <div className="flex items-center gap-2 flex-1 bg-bartr-bg rounded-lg px-3 py-1.5 border border-bartr-border">
+                  <svg className="w-3.5 h-3.5 text-bartr-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                  <span className="text-xs text-gray-400">Search skills, students…</span>
+                  <span className="text-xs text-bartr-muted">Search skills, students…</span>
                 </div>
                 <button className="bg-bartr-dark text-white text-xs font-semibold px-3 py-1.5 rounded-lg font-sora whitespace-nowrap">
                   Start Exchange
@@ -176,8 +172,8 @@ export default function DashboardSection() {
               <div className="p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-base font-bold font-sora text-gray-900">Good morning, Aisha 👋</h3>
-                    <p className="text-xs text-gray-400 mt-0.5">You have 3 new skill requests today.</p>
+                    <h3 className="text-base font-bold font-sora text-bartr-text">Good morning, Aisha 👋</h3>
+                    <p className="text-xs text-bartr-muted mt-0.5">You have 3 new skill requests today.</p>
                   </div>
                 </div>
 
@@ -198,7 +194,7 @@ export default function DashboardSection() {
 
                 {/* Recent activity strip */}
                 <div className="mt-5">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider font-sora mb-3">
+                  <p className="text-xs font-semibold text-bartr-muted uppercase tracking-wider font-sora mb-3">
                     Recent Matches
                   </p>
                   <div className="space-y-2">
@@ -213,22 +209,22 @@ export default function DashboardSection() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.35, delay: i * 0.1 }}
-                        className="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-2.5 border border-gray-100"
+                        className="flex items-center gap-3 bg-bartr-bg rounded-xl px-3 py-2.5 border border-bartr-border"
                       >
                         <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold font-sora shrink-0">
                           {r.name[0]}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-gray-800 font-sora">{r.name}</p>
-                          <p className="text-[10px] text-gray-400 truncate">
+                          <p className="text-xs font-semibold text-bartr-text font-sora">{r.name}</p>
+                          <p className="text-[10px] text-bartr-muted truncate">
                             Offers: {r.skill} · Wants: {r.want}
                           </p>
                         </div>
                         <div className="text-right shrink-0">
-                          <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full font-sora ${r.status === 'New' ? 'bg-emerald-100 text-emerald-700' : r.status === 'Matched' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-500'}`}>
+                          <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full font-sora ${r.status === 'New' ? 'bg-emerald-100 text-emerald-700' : r.status === 'Matched' ? 'bg-yellow-100 text-yellow-700' : 'bg-bartr-border text-bartr-muted'}`}>
                             {r.status}
                           </span>
-                          <p className="text-[9px] text-gray-400 mt-0.5">{r.time}</p>
+                          <p className="text-[9px] text-bartr-muted mt-0.5">{r.time}</p>
                         </div>
                       </motion.div>
                     ))}

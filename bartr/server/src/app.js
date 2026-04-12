@@ -15,6 +15,7 @@ import exchangeRoutes from './routes/exchange.routes.js'
 import reviewRoutes from './routes/review.routes.js'
 import portfolioRoutes from './routes/portfolio.routes.js'
 import notificationRoutes from './routes/notification.routes.js'
+import aiRoutes from './routes/ai.routes.js'
 
 const app = express()
 
@@ -59,6 +60,7 @@ app.use('/api/exchanges', exchangeRoutes)
 app.use('/api/reviews', reviewRoutes)
 app.use('/api/portfolio', portfolioRoutes)
 app.use('/api/notifications', notificationRoutes)
+app.use('/api/ai', aiRoutes)
 
 // ─── 404 ─────────────────────────────────────────────────────────────────────
 app.use((req, res) => {

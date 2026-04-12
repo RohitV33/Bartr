@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { Bell, CheckCheck, Trash2, Sparkles } from 'lucide-react'
+import { Bell, CheckCheck, Trash2 } from 'lucide-react'
 import { notificationsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { Spinner } from '../../components/shared.jsx'
@@ -19,11 +19,11 @@ function Reveal({ children, delay = 0, className = '' }) {
 }
 
 const NOTIF_META = {
-  MATCH:    { icon:'⚡', bg:'bg-amber-100', text:'text-amber-700',  border:'border-amber-100' },
-  MESSAGE:  { icon:'💬', bg:'bg-blue-100',  text:'text-blue-700',   border:'border-blue-100' },
-  REVIEW:   { icon:'⭐', bg:'bg-yellow-100',text:'text-yellow-700', border:'border-yellow-100' },
-  EXCHANGE: { icon:'🤝', bg:'bg-emerald-100',text:'text-emerald-700',border:'border-emerald-100' },
-  SYSTEM:   { icon:'📢', bg:'bg-gray-100',  text:'text-gray-700',   border:'border-gray-100' },
+  MATCH:    { icon:'⚡', bg:'bg-amber-500/10',   text:'text-amber-600 dark:text-amber-400',   border:'border-amber-200 dark:border-amber-500/30' },
+  MESSAGE:  { icon:'💬', bg:'bg-blue-500/10',    text:'text-blue-600 dark:text-blue-400',     border:'border-blue-200 dark:border-blue-500/30' },
+  REVIEW:   { icon:'⭐', bg:'bg-yellow-500/10',  text:'text-yellow-600 dark:text-yellow-400', border:'border-yellow-200 dark:border-yellow-500/30' },
+  EXCHANGE: { icon:'🤝', bg:'bg-emerald-500/10', text:'text-emerald-600 dark:text-emerald-400',border:'border-emerald-200 dark:border-emerald-500/30' },
+  SYSTEM:   { icon:'📢', bg:'bg-bartr-bg',        text:'text-bartr-muted',                     border:'border-bartr-border' },
 }
 
 /* ─── Hero ───────────────────────────────────────────────────────────────────── */
@@ -31,7 +31,7 @@ function NotificationsHero({ scrollY, hasUnread, onMarkAll, loading }) {
   const scale = Math.max(1 - scrollY * 0.0003, 0.94)
   const opacity = Math.max(1 - scrollY * 0.004, 0)
   return (
-    <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-[2rem] mb-8">
+    <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-[2rem] mb-8 bg-bartr-surface border border-bartr-border">
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-transparent dark:from-blue-900/40 dark:via-indigo-900/40 dark:to-transparent" />
         <div className="absolute inset-0 opacity-15 dark:opacity-30" style={{backgroundImage:'radial-gradient(var(--border) 1px,transparent 1px)',backgroundSize:'22px 22px'}} />
@@ -40,20 +40,20 @@ function NotificationsHero({ scrollY, hasUnread, onMarkAll, loading }) {
 
       <div className="relative px-8 py-10 flex items-end justify-between gap-6">
         <div>
-          <div className="inline-flex items-center gap-2 bg-blue-400/20 text-blue-300 text-xs font-bold px-3 py-1.5 rounded-full border border-blue-400/20 mb-4">
+          <div className="inline-flex items-center gap-2 bg-blue-500/20 text-blue-500 dark:text-blue-300 text-xs font-bold px-3 py-1.5 rounded-full border border-blue-400/20 mb-4">
             <Bell className="w-3 h-3" /> Activity
           </div>
-          <h1 className="text-3xl font-black text-white mb-2" style={{fontFamily:"'Sora',sans-serif"}}>Notifications</h1>
-          <p className="text-gray-300 text-sm" style={{fontFamily:"'DM Sans',sans-serif"}}>Stay up to date with your skill exchanges</p>
+          <h1 className="text-3xl font-black text-bartr-text mb-2" style={{fontFamily:"'Sora',sans-serif"}}>Notifications</h1>
+          <p className="text-bartr-muted text-sm" style={{fontFamily:"'DM Sans',sans-serif"}}>Stay up to date with your skill exchanges</p>
         </div>
         {hasUnread && (
           <button
             onClick={onMarkAll}
             disabled={loading}
-            className="flex items-center gap-2 bg-white/10 backdrop-blur-md text-white text-sm font-bold px-4 py-2.5 rounded-2xl border border-white/20 hover:bg-white/20 transition-all"
+            className="flex items-center gap-2 bg-bartr-bg backdrop-blur-md text-bartr-text text-sm font-bold px-4 py-2.5 rounded-2xl border border-bartr-border hover:bg-bartr-border transition-all"
             style={{fontFamily:"'Sora',sans-serif"}}
           >
-            {loading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <CheckCheck className="w-4 h-4" />}
+            {loading ? <div className="w-4 h-4 border-2 border-bartr-text border-t-transparent rounded-full animate-spin" /> : <CheckCheck className="w-4 h-4" />}
             Mark all read
           </button>
         )}
@@ -81,15 +81,15 @@ function NotifItem({ n, onClick, onDelete, delay }) {
         onMouseEnter={() => setHov(true)}
         onMouseLeave={() => setHov(false)}
         style={{ opacity: deleting ? 0 : 1, transform: deleting ? 'translateX(40px)' : 'none', transition: 'opacity .3s ease, transform .3s ease' }}
-        className={`relative bg-white rounded-2xl border cursor-pointer transition-all duration-200 overflow-hidden
-          ${!n.is_read ? 'border-amber-200' : 'border-gray-100'}
+        className={`relative bg-bartr-surface rounded-2xl border cursor-pointer transition-all duration-200 overflow-hidden
+          ${!n.is_read ? 'border-amber-400/40 dark:border-amber-500/30' : 'border-bartr-border'}
           ${hov ? 'shadow-lg -translate-y-0.5' : 'shadow-sm'}`}
       >
         {/* Unread left bar */}
         {!n.is_read && <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-400 rounded-l-2xl" />}
 
         {/* Unread bg tint */}
-        {!n.is_read && <div className="absolute inset-0 bg-amber-50/50 pointer-events-none" />}
+        {!n.is_read && <div className="absolute inset-0 bg-amber-400/5 pointer-events-none" />}
 
         <div className="flex items-start gap-4 p-4 pl-5 relative">
           {/* Icon */}
@@ -99,9 +99,9 @@ function NotifItem({ n, onClick, onDelete, delay }) {
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <p className={`text-sm font-black mb-0.5 ${!n.is_read ? 'text-gray-900' : 'text-gray-700'}`} style={{fontFamily:"'Sora',sans-serif"}}>{n.title}</p>
-            <p className="text-xs text-gray-500 leading-relaxed" style={{fontFamily:"'DM Sans',sans-serif"}}>{n.body}</p>
-            <p className="text-xs text-gray-400 mt-1.5" style={{fontFamily:"'DM Sans',sans-serif"}}>{timeAgo(n.created_at)}</p>
+            <p className={`text-sm font-black mb-0.5 ${!n.is_read ? 'text-bartr-text' : 'text-bartr-muted'}`} style={{fontFamily:"'Sora',sans-serif"}}>{n.title}</p>
+            <p className="text-xs text-bartr-muted leading-relaxed" style={{fontFamily:"'DM Sans',sans-serif"}}>{n.body}</p>
+            <p className="text-xs text-bartr-muted mt-1.5 opacity-70" style={{fontFamily:"'DM Sans',sans-serif"}}>{timeAgo(n.created_at)}</p>
           </div>
 
           {/* Actions */}
@@ -109,7 +109,7 @@ function NotifItem({ n, onClick, onDelete, delay }) {
             {!n.is_read && <div className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm shadow-amber-200" />}
             <button
               onClick={handleDelete}
-              className="p-1.5 text-gray-200 hover:text-red-400 hover:bg-red-50 rounded-lg transition-all"
+              className="p-1.5 text-bartr-muted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -171,7 +171,7 @@ export default function NotificationsPage() {
 
   return (
     <div>
-      
+
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap');`}</style>
 
       <NotificationsHero
@@ -186,11 +186,11 @@ export default function NotificationsPage() {
       ) : notifications.length === 0 ? (
         <Reveal>
           <div className="text-center py-20">
-            <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-5">
-              <Bell className="w-10 h-10 text-blue-200" />
+            <div className="w-20 h-20 bg-bartr-bg border border-bartr-border rounded-3xl flex items-center justify-center mx-auto mb-5">
+              <Bell className="w-10 h-10 text-bartr-muted" />
             </div>
-            <h3 className="text-xl font-black text-gray-800 mb-2" style={{fontFamily:"'Sora',sans-serif"}}>All caught up! 🎉</h3>
-            <p className="text-gray-500" style={{fontFamily:"'DM Sans',sans-serif"}}>No notifications yet. Start exchanging skills to get updates.</p>
+            <h3 className="text-xl font-black text-bartr-text mb-2" style={{fontFamily:"'Sora',sans-serif"}}>All caught up! 🎉</h3>
+            <p className="text-bartr-muted" style={{fontFamily:"'DM Sans',sans-serif"}}>No notifications yet. Start exchanging skills to get updates.</p>
           </div>
         </Reveal>
       ) : (
@@ -199,7 +199,7 @@ export default function NotificationsPage() {
             <Reveal>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
-                <p className="text-sm font-bold text-gray-600" style={{fontFamily:"'Sora',sans-serif"}}>
+                <p className="text-sm font-bold text-bartr-text" style={{fontFamily:"'Sora',sans-serif"}}>
                   {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
                 </p>
               </div>

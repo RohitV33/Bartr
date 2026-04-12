@@ -45,18 +45,18 @@ function ExchangesHero({ scrollY }) {
   const scale = Math.max(1 - scrollY * 0.0003, 0.94)
   const opacity = Math.max(1 - scrollY * 0.004, 0)
   return (
-    <div style={{ transform:`scale(${scale})`,opacity,transformOrigin:'top center' }} className="relative overflow-hidden rounded-[2rem] mb-8">
+    <div style={{ transform:`scale(${scale})`,opacity,transformOrigin:'top center' }} className="relative overflow-hidden rounded-[2rem] mb-8 bg-violet-50/30 dark:bg-transparent border border-violet-100 dark:border-none">
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-purple-500/10 to-transparent dark:from-violet-900/40 dark:via-purple-900/40 dark:to-transparent" />
         <div className="absolute inset-0 opacity-15 dark:opacity-30" style={{backgroundImage:'radial-gradient(var(--border) 1px,transparent 1px)',backgroundSize:'24px 24px'}} />
       </div>
       <div className="absolute right-0 top-0 w-64 h-64 opacity-20" style={{background:'radial-gradient(circle,#8b5cf6,transparent 70%)',transform:'translate(30%,-30%)'}} />
       <div className="relative px-8 py-10">
-        <div className="inline-flex items-center gap-2 bg-violet-400/20 text-violet-300 text-xs font-bold px-3 py-1.5 rounded-full border border-violet-400/20 mb-4">
+        <div className="inline-flex items-center gap-2 bg-violet-500/10 text-violet-700 dark:bg-violet-400/20 dark:text-violet-300 text-xs font-bold px-3 py-1.5 rounded-full border border-violet-500/20 dark:border-violet-400/20 mb-4">
           <Sparkles className="w-3 h-3" /> Your Activity
         </div>
-        <h1 className="text-3xl font-black text-white mb-2" style={{fontFamily:"'Sora',sans-serif"}}>My Exchanges</h1>
-        <p className="text-gray-300 text-sm" style={{fontFamily:"'DM Sans',sans-serif"}}>Track all your skill exchange proposals and sessions</p>
+        <h1 className="text-3xl font-black text-bartr-text mb-2" style={{fontFamily:"'Sora',sans-serif"}}>My Exchanges</h1>
+        <p className="text-bartr-muted text-sm" style={{fontFamily:"'DM Sans',sans-serif"}}>Track all your skill exchange proposals and sessions</p>
       </div>
     </div>
   )
@@ -89,7 +89,7 @@ function ExchangeRow({ ex, isOfferer, onClick, delay }) {
         onClick={onClick}
         onMouseEnter={() => setHov(true)}
         onMouseLeave={() => setHov(false)}
-        className={`relative bg-white rounded-2xl border transition-all duration-300 overflow-hidden cursor-pointer ${hov ? `shadow-xl ${meta.glow} -translate-y-1` : 'border-gray-100 shadow-sm'}`}
+        className={`relative bg-bartr-surface rounded-2xl border transition-all duration-300 overflow-hidden cursor-pointer ${hov ? `shadow-xl ${meta.glow} -translate-y-1 border-bartr-border` : 'border-bartr-border shadow-sm'}`}
       >
         {/* Status stripe */}
         <div className={`absolute left-0 top-0 bottom-0 w-1 ${meta.stripe} rounded-l-2xl`} />
@@ -99,7 +99,7 @@ function ExchangeRow({ ex, isOfferer, onClick, delay }) {
           <div className="relative shrink-0">
             <Avatar src={partner.avatar_url} name={partner.full_name} size="md" />
             {unread > 0 && (
-              <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center border-2 border-white">
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center border-2 border-bartr-surface">
                 <span className="text-[9px] font-black text-gray-900">{unread}</span>
               </div>
             )}
@@ -108,20 +108,20 @@ function ExchangeRow({ ex, isOfferer, onClick, delay }) {
           {/* Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1.5">
-              <p className="text-sm font-black text-gray-900 truncate" style={{fontFamily:"'Sora',sans-serif"}}>{partner.full_name}</p>
+              <p className="text-sm font-black text-bartr-text truncate" style={{fontFamily:"'Sora',sans-serif"}}>{partner.full_name}</p>
               <StatusBadge status={ex.status} />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-medium bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-lg truncate max-w-[120px]" style={{fontFamily:"'DM Sans',sans-serif"}}>{mySkill?.title}</span>
-              <ArrowRight className="w-3 h-3 text-gray-300 shrink-0" />
-              <span className="text-[11px] font-medium bg-blue-50 text-blue-700 px-2 py-0.5 rounded-lg truncate max-w-[120px]" style={{fontFamily:"'DM Sans',sans-serif"}}>{theirSkill?.title}</span>
+              <span className="text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-lg truncate max-w-[120px]" style={{fontFamily:"'DM Sans',sans-serif"}}>{mySkill?.title}</span>
+              <ArrowRight className="w-3 h-3 text-bartr-muted shrink-0" />
+              <span className="text-[11px] font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-lg truncate max-w-[120px]" style={{fontFamily:"'DM Sans',sans-serif"}}>{theirSkill?.title}</span>
             </div>
           </div>
 
           {/* Right */}
           <div className="shrink-0 flex flex-col items-end gap-1">
-            <p className="text-[11px] text-gray-400" style={{fontFamily:"'DM Sans',sans-serif"}}>{timeAgo(ex.updated_at)}</p>
-            <ChevronRight className="w-4 h-4 text-gray-300" style={{transform:hov?'translateX(3px)':'none',transition:'transform .2s ease'}} />
+            <p className="text-[11px] text-bartr-muted" style={{fontFamily:"'DM Sans',sans-serif"}}>{timeAgo(ex.updated_at)}</p>
+            <ChevronRight className="w-4 h-4 text-bartr-muted" style={{transform:hov?'translateX(3px)':'none',transition:'transform .2s ease'}} />
           </div>
         </div>
       </div>
@@ -150,21 +150,21 @@ export default function ExchangesPage() {
 
   return (
     <div>
- 
+
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap');`}</style>
 
       <ExchangesHero scrollY={scrollY} />
 
       {/* Tabs */}
       <Reveal delay={60}>
-        <div className="flex gap-1.5 p-1.5 bg-gray-100 rounded-2xl mb-8 overflow-x-auto">
+        <div className="flex gap-1.5 p-1.5 bg-bartr-bg border border-bartr-border rounded-2xl mb-8 overflow-x-auto">
           {TABS.map(tab => {
             const active = status === tab.value
             return (
               <button
                 key={tab.value}
                 onClick={() => setStatus(tab.value)}
-                className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-200 ${active ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500 hover:text-gray-700 hover:bg-white/60'}`}
+                className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-200 ${active ? 'bg-bartr-surface text-bartr-text shadow-md' : 'text-bartr-muted hover:text-bartr-text hover:bg-bartr-surface/60'}`}
                 style={{fontFamily:"'Sora',sans-serif"}}
               >
                 {tab.label}
@@ -179,12 +179,12 @@ export default function ExchangesPage() {
       ) : exchanges.length === 0 ? (
         <Reveal delay={80}>
           <div className="text-center py-20">
-            <div className="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-5">
-              <HandshakeIcon className="w-10 h-10 text-gray-300" />
+            <div className="w-20 h-20 bg-bartr-bg border border-bartr-border rounded-3xl flex items-center justify-center mx-auto mb-5">
+              <HandshakeIcon className="w-10 h-10 text-bartr-muted" />
             </div>
-            <h3 className="text-xl font-black text-gray-800 mb-2" style={{fontFamily:"'Sora',sans-serif"}}>No exchanges yet</h3>
-            <p className="text-gray-500 mb-6" style={{fontFamily:"'DM Sans',sans-serif"}}>Browse skills and propose an exchange to get started.</p>
-            <button onClick={() => navigate('/browse')} className="bg-gray-900 text-white px-6 py-3 rounded-2xl text-sm font-bold hover:bg-gray-700 transition-all shadow-lg" style={{fontFamily:"'Sora',sans-serif"}}>
+            <h3 className="text-xl font-black text-bartr-text mb-2" style={{fontFamily:"'Sora',sans-serif"}}>No exchanges yet</h3>
+            <p className="text-bartr-muted mb-6" style={{fontFamily:"'DM Sans',sans-serif"}}>Browse skills and propose an exchange to get started.</p>
+            <button onClick={() => navigate('/browse')} className="bg-bartr-dark text-white px-6 py-3 rounded-2xl text-sm font-bold hover:opacity-80 transition-all shadow-lg" style={{fontFamily:"'Sora',sans-serif"}}>
               Browse Skills
             </button>
           </div>
@@ -192,8 +192,8 @@ export default function ExchangesPage() {
       ) : (
         <>
           <Reveal>
-            <p className="text-sm text-gray-400 mb-4" style={{fontFamily:"'DM Sans',sans-serif"}}>
-              <span className="text-gray-900 font-black text-lg">{exchanges.length}</span> exchange{exchanges.length !== 1 ? 's' : ''}
+            <p className="text-sm text-bartr-muted mb-4" style={{fontFamily:"'DM Sans',sans-serif"}}>
+              <span className="text-bartr-text font-black text-lg">{exchanges.length}</span> exchange{exchanges.length !== 1 ? 's' : ''}
             </p>
           </Reveal>
           <div className="space-y-3">

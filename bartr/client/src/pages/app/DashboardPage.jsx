@@ -6,6 +6,8 @@ import { usersApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { Avatar, SkillCard, Spinner } from '../../components/shared.jsx'
+import { aiApi } from '../../api/ai.js'
+import { AiAssistButton, AiResultCard } from '../../components/ai/AiAssistButton.jsx'
 
 
 /* ─── Reveal ─────────────────────────────────────────────────────────────────── */
@@ -31,7 +33,7 @@ function WelcomeBanner({ user, scrollY }) {
 
   return (
     <div style={{ transform:`scale(${scale})`, opacity, transformOrigin:'top center' }}
-      className="relative overflow-hidden rounded-[2rem] mb-8">
+      className="relative overflow-hidden rounded-[2rem] mb-6 md:mb-8">
       {/* BG */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-amber-500/10 dark:from-indigo-900/40 dark:via-purple-900/40 dark:to-amber-900/40" />
@@ -43,17 +45,17 @@ function WelcomeBanner({ user, scrollY }) {
       </div>
 
       {/* Glow orb */}
-      <div className="absolute top-0 right-0 w-80 h-80 rounded-full opacity-20" style={{ background:'radial-gradient(circle, #f59e0b 0%, transparent 70%)', transform:'translate(30%,-30%)' }} />
+      <div className="absolute top-0 right-0 w-64 h-64 md:w-80 md:h-80 rounded-full opacity-20" style={{ background:'radial-gradient(circle, #f59e0b 0%, transparent 70%)', transform:'translate(30%,-30%)' }} />
 
-      <div className="relative px-8 py-10 flex items-center justify-between gap-6">
-        <div>
-          <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 text-xs font-bold px-3 py-1.5 rounded-full border border-amber-400/20 mb-4">
+      <div className="relative p-6 sm:px-8 sm:py-10 flex items-center justify-between gap-6">
+        <div className="relative z-10 max-w-full">
+          <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 text-[10px] sm:text-xs font-bold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-amber-400/20 mb-3 sm:mb-4">
             <Sparkles className="w-3 h-3" /> Welcome back
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-bartr-text mb-2" style={{ fontFamily:"'Sora',sans-serif" }}>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-bartr-text mb-2 break-words" style={{ fontFamily:"'Sora',sans-serif" }}>
             Hey, {user?.full_name?.split(' ')[0] || 'there'}!
           </h1>
-          <p className="text-bartr-muted text-sm max-w-sm" style={{ fontFamily:"'DM Sans',sans-serif" }}>
+          <p className="text-bartr-muted text-xs sm:text-sm max-w-sm" style={{ fontFamily:"'DM Sans',sans-serif" }}>
             Ready to exchange some skills today? You have new opportunities waiting.
           </p>
         </div>
@@ -71,15 +73,15 @@ function WelcomeBanner({ user, scrollY }) {
 function StatCard({ icon: Icon, label, value, color, delay }) {
   return (
     <Reveal delay={delay}>
-      <div className={`relative overflow-hidden rounded-2xl p-5 border ${color} group hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}>
-        <div className="flex items-center justify-between mb-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-bartr-surface shadow-sm">
-            <Icon className="w-5 h-5 text-bartr-text" />
+      <div className={`relative overflow-hidden rounded-2xl p-4 sm:p-5 border ${color} group hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}>
+        <div className="flex items-center justify-between mb-2 lg:mb-3">
+          <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-[10px] lg:rounded-xl flex items-center justify-center bg-bartr-surface shadow-sm">
+            <Icon className="w-4 h-4 lg:w-5 lg:h-5 text-bartr-text" />
           </div>
-          <TrendingUp className="w-4 h-4 text-bartr-muted group-hover:text-emerald-500 transition-colors" />
+          <TrendingUp className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-bartr-muted group-hover:text-amber-500 transition-colors" />
         </div>
-        <p className="text-3xl font-black text-bartr-text mb-0.5" style={{ fontFamily:"'Sora',sans-serif" }}>{value}</p>
-        <p className="text-xs text-bartr-muted font-medium" style={{ fontFamily:"'DM Sans',sans-serif" }}>{label}</p>
+        <p className="text-2xl lg:text-3xl font-black text-bartr-text mb-0.5 truncate" style={{ fontFamily:"'Sora',sans-serif" }}>{value}</p>
+        <p className="text-[10px] sm:text-xs text-bartr-muted font-medium truncate" style={{ fontFamily:"'DM Sans',sans-serif" }}>{label}</p>
       </div>
     </Reveal>
   )
@@ -104,6 +106,8 @@ export default function DashboardPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [scrollY, setScrollY] = useState(0)
+  const [explanations, setExplanations] = useState({})
+  const [loadingExpl, setLoadingExpl] = useState({})
 
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY)
@@ -115,6 +119,29 @@ export default function DashboardPage() {
     queryKey: QUERY_KEYS.DASHBOARD,
     queryFn: () => usersApi.getDashboard().then(r => r.data.data),
   })
+
+  const handleExplainMatch = async (e, matchSkill) => {
+    e.stopPropagation()
+    const matchUserId = matchSkill.user_id
+    const myOffering = data?.mySkills?.find(s => s.is_offering)?.title
+    const myRequest = data?.mySkills?.find(s => !s.is_offering)?.title
+    
+    try {
+      setLoadingExpl(p => ({ ...p, [matchSkill.id]: true }))
+      const res = await aiApi.explainMatch({
+        matchUserId,
+        myOfferingTitle: myOffering,
+        myRequestTitle: myRequest,
+        theirOfferingTitle: matchSkill.is_offering ? matchSkill.title : null,
+        theirRequestTitle: !matchSkill.is_offering ? matchSkill.title : null,
+      })
+      setExplanations(p => ({ ...p, [matchSkill.id]: res.data.data.explanation }))
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoadingExpl(p => ({ ...p, [matchSkill.id]: false }))
+    }
+  }
 
   return (
     <div style={{ fontFamily:"'DM Sans',sans-serif" }}>
@@ -206,8 +233,27 @@ export default function DashboardPage() {
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {data.recommended.map((skill, i) => (
                   <Reveal key={skill.id} delay={i * 60}>
-                    <div onClick={() => navigate(`/skills/${skill.id}`)} className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-2xl cursor-pointer">
-                      <SkillCard skill={skill} />
+                    <div className="relative flex flex-col gap-2">
+                      <div onClick={() => navigate(`/skills/${skill.id}`)} className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 rounded-2xl cursor-pointer">
+                        <SkillCard skill={skill} />
+                      </div>
+                      
+                      <div className="flex justify-end -mt-3 relative z-10 px-2 lg:px-4">
+                        <AiAssistButton 
+                          label="Why this match?" 
+                          variant="glow"
+                          className="py-1 px-2.5 text-[10px] rounded-lg shadow-sm"
+                          isLoading={loadingExpl[skill.id]}
+                          onClick={(e) => handleExplainMatch(e, skill)}
+                        />
+                      </div>
+                      
+                      {explanations[skill.id] && (
+                        <AiResultCard 
+                          content={explanations[skill.id]} 
+                          onClose={() => setExplanations(p => ({...p, [skill.id]: null}))}
+                        />
+                      )}
                     </div>
                   </Reveal>
                 ))}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import ThemeContext from '../context/themeContext.jsx'
 import ThemeToggle from './ThemeToggle.jsx'
 
@@ -16,7 +16,12 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
-  const links = ['Features', 'Benefits', 'FAQ', 'Contact us']
+  const links = [
+    { label: 'Features', href: '#features' },
+    { label: 'Benefits', href: '#benefits' },
+    { label: 'FAQ', href: '#faq' },
+    { label: 'Contact us', href: '/contact', isPage: true },
+  ]
 
   return (
     <motion.nav
@@ -42,13 +47,23 @@ export default function Navbar() {
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           {links.map(link => (
-            <a
-              key={link}
-              href={`#${link.toLowerCase().replace(' ', '-')}`}
-              className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
-            >
-              {link}
-            </a>
+            link.isPage ? (
+              <button
+                key={link.label}
+                onClick={() => navigate(link.href)}
+                className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+              >
+                {link.label}
+              </button>
+            ) : (
+              <a
+                key={link.label}
+                href={link.href}
+                className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+              >
+                {link.label}
+              </a>
+            )
           ))}
         </div>
 
@@ -100,14 +115,24 @@ export default function Navbar() {
             <div className="px-6 py-4 space-y-4">
               
               {links.map(link => (
-                <a
-                  key={link}
-                  href={`#${link.toLowerCase().replace(' ', '-')}`}
-                  onClick={() => setMenuOpen(false)}
-                  className="block text-sm text-gray-700 dark:text-gray-300 font-medium"
-                >
-                  {link}
-                </a>
+                link.isPage ? (
+                  <button
+                    key={link.label}
+                    onClick={() => { navigate(link.href); setMenuOpen(false) }}
+                    className="block text-sm text-gray-700 dark:text-gray-300 font-medium w-full text-left"
+                  >
+                    {link.label}
+                  </button>
+                ) : (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="block text-sm text-gray-700 dark:text-gray-300 font-medium"
+                  >
+                    {link.label}
+                  </a>
+                )
               ))}
 
               {/* 🌙 Theme Toggle (Mobile) */}

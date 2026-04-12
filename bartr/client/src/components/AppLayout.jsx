@@ -121,8 +121,8 @@ export const AppLayout = ({ children }) => {
 
       {/* Mobile menu */}
       <div className={`md:hidden fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0'}`}>
-        <div className={`absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0'}`} onClick={() => setMobileOpen(false)} />
-        <div className={`absolute top-0 left-0 bottom-0 w-64 bg-bartr-sidebar border-r border-bartr-border pointer-events-auto flex flex-col transition-transform duration-300 ease-out ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setMobileOpen(false)} />
+        <div className={`absolute top-0 left-0 bottom-0 w-64 bg-bartr-sidebar border-r border-bartr-border flex flex-col transition-transform duration-300 ease-out ${mobileOpen ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'}`}>
           <div className="h-14 flex items-center justify-between px-4 border-b border-bartr-border">
             <button onClick={() => { navigate('/dashboard'); setMobileOpen(false) }} className="flex items-center gap-2 font-sora font-bold text-base text-bartr-text">
               <span className="w-6 h-6 bg-yellow-300 rounded-lg flex items-center justify-center text-bartr-dark font-black text-xs">B</span>
@@ -172,8 +172,8 @@ export const AppLayout = ({ children }) => {
       </div>
 
       {/* ── Main content ── */}
-      <main className="flex-1 md:ml-60 pt-14 md:pt-0 min-h-screen">
-        <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
+      <main className="flex-1 min-w-0 md:ml-60 pt-14 md:pt-0 min-h-screen w-full overflow-x-hidden">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 py-6 md:py-8">
           {children}
         </div>
       </main>
