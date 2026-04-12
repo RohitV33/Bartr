@@ -123,7 +123,7 @@ export default function EditProfilePage() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const { register, handleSubmit, formState: { errors }, setError } = useForm({
+  const { register, handleSubmit, formState: { errors }, setError,setValue } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
       full_name: user?.full_name || '',

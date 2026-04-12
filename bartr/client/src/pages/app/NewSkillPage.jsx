@@ -71,7 +71,7 @@ export default function NewSkillPage() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const { register, handleSubmit, watch, setValue, formState: { errors }, setError } = useForm({
+  const { register, handleSubmit, watch, setValue, formState: { errors }, setError} = useForm({
     resolver: zodResolver(schema),
     defaultValues: { is_offering: true, proficiency_level: 'INTERMEDIATE' },
   })
