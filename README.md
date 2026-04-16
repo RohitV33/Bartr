@@ -45,7 +45,7 @@ Students possess a wide range of skills — from coding and design to music, wri
 
 At the same time, platforms like Fiverr or Upwork are **money-driven**, making them inaccessible to students who want to learn or get help without spending cash.
 
-> **The gap:** Students have skills others need, but no efficient, trust-based system to exchange them.
+> **The gap:** Students have skills others need, but no efficient, trust-based system to exchange
 
 ---
 
