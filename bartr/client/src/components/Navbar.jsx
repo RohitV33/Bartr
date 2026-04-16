@@ -146,7 +146,7 @@ export default function Navbar() {
                   onClick={() => { navigate('/login'); setMenuOpen(false) }}
                   className="w-full border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
-                  Log 
+                  Log in
                 </button>
 
                 <button
