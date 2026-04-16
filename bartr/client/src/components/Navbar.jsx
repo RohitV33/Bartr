@@ -41,7 +41,7 @@ export default function Navbar() {
           <span className="w-7 h-7 bg-yellow-300 rounded-lg flex items-center justify-center text-bartr-dark font-black text-sm">
             B
           </span>
-          <span>Bartr</span>
+          <span>Bart</span>
         </a>
 
         {/* Desktop links */}
