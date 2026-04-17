@@ -56,7 +56,7 @@ function WelcomeBanner({ user, scrollY }) {
             Hey, {user?.full_name?.split(' ')[0] || 'there'}!
           </h1>
           <p className="text-bartr-muted text-xs sm:text-sm max-w-sm" style={{ fontFamily:"'DM Sans',sans-serif" }}>
-            Ready to exchange some skills today? You have new opportunities waiting
+            Ready to exchange some skills today? You have new opportunities waiting.
           </p>
         </div>
         <div className="hidden md:block">
