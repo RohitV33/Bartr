@@ -50,7 +50,7 @@ function WelcomeBanner({ user, scrollY }) {
       <div className="relative p-6 sm:px-8 sm:py-10 flex items-center justify-between gap-6">
         <div className="relative z-10 max-w-full">
           <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 text-[10px] sm:text-xs font-bold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-amber-400/20 mb-3 sm:mb-4">
-            <Sparkles className="w-3 h-3" /> Welcome bac
+            <Sparkles className="w-3 h-3" /> Welcome back
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-bartr-text mb-2 break-words" style={{ fontFamily:"'Sora',sans-serif" }}>
             Hey, {user?.full_name?.split(' ')[0] || 'there'}!
