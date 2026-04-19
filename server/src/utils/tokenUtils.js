@@ -21,6 +21,7 @@ export const setAuthCookie = (res, token) => {
     sameSite: 'None',   
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/',
+    domain: '.onrender.com',
   })
 }
 
