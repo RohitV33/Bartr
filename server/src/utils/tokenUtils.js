@@ -15,7 +15,7 @@ export const verifyToken = (token) => {
 export const generateSecureToken = () => uuidv4().replace(/-/g, '')
 
 export const setAuthCookie = (res, token) => {
-  const isProd = process.env.NODE_ENV === 'production'
+  const isProd = process.env.NODE_ENV === 'production' || !!process.env.RENDER
   res.cookie('bartr_token', token, {
     httpOnly: true,
     secure: isProd,        
@@ -26,7 +26,7 @@ export const setAuthCookie = (res, token) => {
 }
 
 export const clearAuthCookie = (res) => {
-  const isProd = process.env.NODE_ENV === 'production'
+  const isProd = process.env.NODE_ENV === 'production' || !!process.env.RENDER
   res.clearCookie('bartr_token', {
     httpOnly: true,
     secure: isProd,

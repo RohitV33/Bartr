@@ -23,9 +23,13 @@ export const AuthProvider = ({ children }) => {
   const user = error ? null : data
 
   const logout = useCallback(async () => {
-    await authApi.logout()
-    qc.clear()
-    window.location.href = '/'
+    try {
+      await authApi.logout()
+    } finally {
+      localStorage.removeItem('bartr_token')
+      qc.clear()
+      window.location.href = '/'
+    }
   }, [qc])
 
   const refreshUser = useCallback(() => {

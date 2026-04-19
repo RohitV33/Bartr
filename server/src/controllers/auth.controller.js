@@ -51,9 +51,9 @@ export const register = async (req, res, next) => {
     }
 
     const jwtToken = signToken(user.id)
-    setAuthCookie(res, jwtToken)
+    setAuthCookie(res, jwtToken) // Keep cookie as backup
 
-    return created(res, { user }, 'Account created. Please verify your email.')
+    return created(res, { user, token: jwtToken }, 'Account created. Please verify your email.')
   } catch (err) {
     next(err)
   }
@@ -76,10 +76,10 @@ export const login = async (req, res, next) => {
     if (!valid) return badRequest(res, 'Invalid email or password.')
 
     const token = signToken(user.id)
-    setAuthCookie(res, token)
+    setAuthCookie(res, token) // Keep cookie as backup
 
     const { password_hash, ...safeUser } = user
-    return ok(res, { user: safeUser }, 'Logged in successfully.')
+    return ok(res, { user: safeUser, token }, 'Logged in successfully.')
   } catch (err) {
     next(err)
   }
@@ -219,8 +219,11 @@ export const resetPassword = async (req, res, next) => {
 export const googleCallback = (req, res) => {
   const token = signToken(req.user.id)
   setAuthCookie(res, token)
-  const redirect = req.user.onboarding_done
-    ? `${process.env.CLIENT_URL}/dashboard`
-    : `${process.env.CLIENT_URL}/onboarding`
-  res.redirect(redirect)
+  
+  const redirectParams = new URLSearchParams({
+    token,
+    onboarding: (!req.user.onboarding_done).toString()
+  }).toString()
+
+  res.redirect(`${process.env.CLIENT_URL}/auth/callback?${redirectParams}`)
 }

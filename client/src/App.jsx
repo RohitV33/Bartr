@@ -13,6 +13,7 @@ import RegisterPage from './pages/auth/RegisterPage.jsx'
 import VerifyEmailPage from './pages/auth/VerifyEmailPage.jsx'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage.jsx'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage.jsx'
+import AuthCallback from './pages/auth/AuthCallback.jsx'
 import OnboardingPage from './pages/onboarding/OnboardingPage.jsx'
 import DashboardPage from './pages/app/DashboardPage.jsx'
 import BrowsePage from './pages/app/BrowsePage.jsx'
@@ -60,6 +61,7 @@ export default function App() {
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />
           <Route path="/reset-password" element={<GuestRoute><ResetPasswordPage /></GuestRoute>} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/onboarding" element={<OnboardingRoute><OnboardingPage /></OnboardingRoute>} />
           <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
           <Route path="/browse" element={<ProtectedLayout><BrowsePage /></ProtectedLayout>} />
