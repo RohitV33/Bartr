@@ -53,12 +53,16 @@ export const AppLayout = ({ children }) => {
                 `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium font-dm transition-all ${isActive ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-gray-900 shadow-md shadow-amber-400/20 dark:shadow-amber-900/20' : 'text-bartr-muted hover:bg-bartr-bg hover:text-bartr-text'}`
               }
             >
-              <Icon className="w-4 h-4" />
-              {label}
-              {label === 'Notifications' && unread > 0 && (
-                <span className={`ml-auto text-xs font-bold px-1.5 py-0.5 rounded-full font-sora ${isActive ? 'bg-gray-900 text-white' : 'bg-amber-400 text-gray-900'}`}>
-                  {unread > 99 ? '99+' : unread}
-                </span>
+              {({ isActive }) => (
+                <>
+                  <Icon className="w-4 h-4" />
+                  {label}
+                  {label === 'Notifications' && unread > 0 && (
+                    <span className={`ml-auto text-xs font-bold px-1.5 py-0.5 rounded-full font-sora ${isActive ? 'bg-gray-900 text-white' : 'bg-amber-400 text-gray-900'}`}>
+                      {unread > 99 ? '99+' : unread}
+                    </span>
+                  )}
+                </>
               )}
             </NavLink>
           ))}
@@ -142,12 +146,16 @@ export const AppLayout = ({ children }) => {
                   `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium font-dm transition-all ${isActive ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-gray-900 shadow-md shadow-amber-400/20 dark:shadow-amber-900/20' : 'text-bartr-muted hover:bg-bartr-bg hover:text-bartr-text'}`
                 }
               >
-                <Icon className="w-4 h-4" />
-                {label}
-                {label === 'Notifications' && unread > 0 && (
-                  <span className="ml-auto bg-amber-400 text-gray-900 text-xs font-bold px-1.5 py-0.5 rounded-full font-sora">
-                    {unread > 99 ? '99+' : unread}
-                  </span>
+                {({ isActive }) => (
+                  <>
+                    <Icon className="w-4 h-4" />
+                    {label}
+                    {label === 'Notifications' && unread > 0 && (
+                      <span className={`ml-auto text-xs font-bold px-1.5 py-0.5 rounded-full font-sora ${isActive ? 'bg-gray-900 text-white' : 'bg-amber-400 text-gray-900'}`}>
+                        {unread > 99 ? '99+' : unread}
+                      </span>
+                    )}
+                  </>
                 )}
               </NavLink>
             ))}

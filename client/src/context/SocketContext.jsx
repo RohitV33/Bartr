@@ -20,7 +20,8 @@ export const SocketProvider = ({ children }) => {
       return
     }
 
-    const socket = io(import.meta.env.VITE_SOCKET_URL || '', {
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://bartr-backend.onrender.com'
+    const socket = io(socketUrl, {
       withCredentials: true,
       transports: ['websocket', 'polling'],
     })
