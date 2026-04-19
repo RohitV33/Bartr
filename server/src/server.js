@@ -7,9 +7,6 @@ const PORT = process.env.PORT || 4000
 
 const httpServer = createServer(app)
 
-console.log('GOOGLE_CLIENT_ID loaded:', !!process.env.GOOGLE_CLIENT_ID)
-console.log('GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL)
-
 // Initialise Socket.io
 initSocket(httpServer)
 
