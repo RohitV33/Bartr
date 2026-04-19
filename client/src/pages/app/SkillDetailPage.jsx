@@ -209,6 +209,16 @@ export default function SkillDetailPage() {
                   View Profile
                 </button>
 
+                {isOwner && (
+                  <button
+                    onClick={() => navigate(`/skills/${id}/edit`)}
+                    className="w-full py-2.5 rounded-2xl bg-bartr-dark text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-gray-700 dark:bg-yellow-300 dark:text-bartr-dark dark:hover:bg-yellow-400 transition-all shadow-lg mb-3"
+                    style={{ fontFamily: "'Sora',sans-serif" }}
+                  >
+                    Edit Skill
+                  </button>
+                )}
+
                 {!isOwner && skill.is_offering && (
                   <div>
                     {!showPropose ? (

@@ -1,8 +1,8 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useNavigate } from 'react-router-dom'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { skillsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { Input, Textarea, Select, Spinner } from '../../components/shared.jsx'
@@ -61,9 +61,13 @@ function PostHero({ isOffering, scrollY }) {
 }
 
 export default function NewSkillPage() {
+  const { id } = useParams()
   const navigate = useNavigate()
+  const qc = useQueryClient()
   const [scrollY, setScrollY] = useState(0)
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false)
+
+  const isEdit = !!id
 
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY)
@@ -71,10 +75,28 @@ export default function NewSkillPage() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const { register, handleSubmit, watch, setValue, formState: { errors }, setError} = useForm({
+  const { register, handleSubmit, watch, setValue, reset, formState: { errors }, setError} = useForm({
     resolver: zodResolver(schema),
     defaultValues: { is_offering: true, proficiency_level: 'INTERMEDIATE' },
   })
+
+  const { data: skillData, isLoading: skillLoading } = useQuery({
+    queryKey: QUERY_KEYS.SKILL(id),
+    queryFn: () => skillsApi.getSkill(id).then(r => r.data.data.skill),
+    enabled: isEdit,
+  })
+
+  useEffect(() => {
+    if (skillData) {
+      reset({
+        title: skillData.title,
+        description: skillData.description,
+        category_id: skillData.category_id,
+        proficiency_level: skillData.proficiency_level,
+        is_offering: skillData.is_offering,
+      })
+    }
+  }, [skillData, reset])
 
   const isOffering = watch('is_offering')
   const selectedCategory = watch('category_id')
@@ -86,8 +108,11 @@ export default function NewSkillPage() {
   const categories = catData || []
 
   const mutation = useMutation({
-    mutationFn: (data) => skillsApi.create(data),
-    onSuccess: (res) => navigate(`/skills/${res.data.data.skill.id}`),
+    mutationFn: (data) => isEdit ? skillsApi.update(id, data) : skillsApi.create(data),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.SKILL(id) })
+      navigate(`/skills/${isEdit ? id : res.data.data.skill.id}`)
+    },
     onError: (err) => setError('root', { message: extractError(err) }),
   })
 
@@ -120,7 +145,7 @@ export default function NewSkillPage() {
     }
   }
 
-  if (catsLoading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
+  if (catsLoading || (isEdit && skillLoading)) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
   return (
     <div className="max-w-xl mx-auto px-4 py-6">
@@ -149,8 +174,9 @@ export default function NewSkillPage() {
                 key={String(val)}
                 type="button"
                 onClick={() => setValue('is_offering', val)}
-                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${isOffering === val ? 'bg-bartr-surface text-bartr-text shadow-md border border-bartr-border' : 'text-bartr-muted hover:text-bartr-text'}`}
+                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${isOffering === val ? 'bg-bartr-surface text-bartr-text shadow-md border border-bartr-border' : 'text-bartr-muted hover:text-bartr-text disabled:opacity-50'}`}
                 style={{fontFamily:"'Sora',sans-serif"}}
+                disabled={isEdit}
               >
                 {val ? '✨ I can teach this' : '🎯 I want to learn this'}
               </button>
@@ -264,8 +290,8 @@ export default function NewSkillPage() {
                 style={{fontFamily:"'Sora',sans-serif"}}
               >
                 {mutation.isPending
-                  ? <><div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> Posting…</>
-                  : isOffering ? '✨ Post Offering' : '🎯 Post Request'
+                  ? <><div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> {isEdit ? 'Updating…' : 'Posting…'}</>
+                  : isEdit ? 'Update Skill' : (isOffering ? '✨ Post Offering' : '🎯 Post Request')
                 }
               </button>
             </div>

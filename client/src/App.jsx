@@ -67,6 +67,7 @@ export default function App() {
           <Route path="/browse" element={<ProtectedLayout><BrowsePage /></ProtectedLayout>} />
           <Route path="/skills/new" element={<ProtectedLayout><NewSkillPage /></ProtectedLayout>} />
           <Route path="/skills/:id" element={<ProtectedLayout><SkillDetailPage /></ProtectedLayout>} />
+          <Route path="/skills/:id/edit" element={<ProtectedLayout><NewSkillPage /></ProtectedLayout>} />
           <Route path="/profile/edit" element={<ProtectedLayout><EditProfilePage /></ProtectedLayout>} />
           <Route path="/profile/:username" element={<ProtectedLayout><ProfilePage /></ProtectedLayout>} />
           <Route path="/exchanges" element={<ProtectedLayout><ExchangesPage /></ProtectedLayout>} />
