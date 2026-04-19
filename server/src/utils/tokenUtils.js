@@ -15,20 +15,22 @@ export const verifyToken = (token) => {
 export const generateSecureToken = () => uuidv4().replace(/-/g, '')
 
 export const setAuthCookie = (res, token) => {
+  const isProd = process.env.NODE_ENV === 'production'
   res.cookie('bartr_token', token, {
     httpOnly: true,
-    secure: true,        
-    sameSite: 'None',   
+    secure: isProd,        
+    sameSite: isProd ? 'None' : 'Lax',   
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/',
   })
 }
 
 export const clearAuthCookie = (res) => {
+  const isProd = process.env.NODE_ENV === 'production'
   res.clearCookie('bartr_token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    secure: isProd,
+    sameSite: isProd ? 'None' : 'Lax',
     path: '/',
   })
 }

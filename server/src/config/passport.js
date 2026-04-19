@@ -19,7 +19,7 @@ passport.use(
         cookieExtractor,
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
-      secretOrKey: process.env.JWT_SECRET || 'changeme',
+      secretOrKey: process.env.JWT_SECRET || 'changeme_in_production',
     },
     async (payload, done) => {
       try {
