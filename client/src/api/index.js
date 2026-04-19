@@ -1,9 +1,13 @@
 import axios from 'axios'
 
+export const getBaseURL = () => {
+  const url = import.meta.env.VITE_API_URL || 'https://bartr-backend.onrender.com'
+  const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url
+  return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL 
-    ? (import.meta.env.VITE_API_URL.endsWith('/api') ? import.meta.env.VITE_API_URL : `${import.meta.env.VITE_API_URL}/api`)
-    : 'https://bartr-backend.onrender.com/api',
+  baseURL: getBaseURL(),
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 })
