@@ -63,9 +63,9 @@ export const initSocket = (httpServer) => {
     })
 
     // ── Send message ────────────────────────────────────────────────────────
-    socket.on('send_message', async ({ exchangeId, content }) => {
+    socket.on('send_message', async ({ exchangeId, content, file_url, message_type = 'TEXT' }) => {
       try {
-        if (!content?.trim()) return
+        if (!content?.trim() && !file_url) return
 
         const exchange = await prisma.exchange.findUnique({ where: { id: exchangeId } })
         if (!exchange) return socket.emit('error', { message: 'Exchange not found' })
@@ -76,7 +76,13 @@ export const initSocket = (httpServer) => {
         }
 
         const message = await prisma.message.create({
-          data: { exchange_id: exchangeId, sender_id: userId, content: content.trim() },
+          data: {
+            exchange_id: exchangeId,
+            sender_id: userId,
+            content: content?.trim() || (message_type === 'FILE' ? 'Sent a file' : ''),
+            message_type,
+            file_url
+          },
           include: { sender: { select: { id: true, full_name: true, username: true, avatar_url: true } } },
         })
 
@@ -90,14 +96,16 @@ export const initSocket = (httpServer) => {
 
         // Notify the other party
         const otherId = exchange.offerer_id === userId ? exchange.requester_id : exchange.offerer_id
+        const notificationBody = message_type === 'FILE' ? 'Sent a file' : (content.length > 60 ? content.slice(0, 60) + '…' : content)
+
         if (!onlineUsers.has(otherId)) {
-          // They're offline — create a DB notification (real-time handled when they connect)
+          // They're offline — create a DB notification
           await prisma.notification.create({
             data: {
               user_id: otherId,
               type: 'MESSAGE',
               title: `New message from ${socket.user.full_name}`,
-              body: content.length > 60 ? content.slice(0, 60) + '…' : content,
+              body: notificationBody,
               link: `/exchanges/${exchangeId}`,
             },
           })
@@ -107,7 +115,7 @@ export const initSocket = (httpServer) => {
             io.to(sid).emit('notification:new', {
               type: 'MESSAGE',
               title: `New message from ${socket.user.full_name}`,
-              body: content.length > 60 ? content.slice(0, 60) + '…' : content,
+              body: notificationBody,
               link: `/exchanges/${exchangeId}`,
             })
           }

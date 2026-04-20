@@ -1,9 +1,6 @@
-import { useParams, useNavigate } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useRef, useState, useCallback } from 'react'
-import {
-  Send, ArrowLeft, CheckCircle2, XCircle,
+ import { Send, ArrowLeft, CheckCircle2, XCircle,
   Clock, Zap, Star, ShieldAlert, MessageCircle, Check,
+  Paperclip, FileText, ExternalLink, Download,
 } from 'lucide-react'
 import { exchangesApi, reviewsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
@@ -145,17 +142,39 @@ function ReviewModal({ exchange, userId, onClose }) {
 
 /* ─── Message Bubble ─────────────────────────────────────────────────────────── */
 function MessageBubble({ msg, isMine }) {
+  const isFile = msg.message_type === 'FILE' && msg.file_url
+  const isImage = isFile && /\.(jpg|jpeg|png|webp|gif)$/i.test(msg.file_url)
+
   return (
     <div className={`flex gap-2 group ${isMine ? 'flex-row-reverse' : ''}`}
       style={{animation:'msgIn .3s cubic-bezier(.34,1.56,.64,1)'}}>
       {!isMine && <Avatar src={msg.sender?.avatar_url} name={msg.sender?.full_name} size="xs" className="mt-auto mb-0.5 shrink-0" />}
       <div className={`max-w-[72%] flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
-        <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed transition-all ${
+        <div className={`rounded-2xl text-sm leading-relaxed transition-all shadow-sm ${
           isMine
-            ? 'bg-gray-900 text-white rounded-tr-sm shadow-lg shadow-gray-900/20'
+            ? 'bg-gray-900 text-white rounded-tr-sm'
             : 'bg-gray-100 text-gray-900 rounded-tl-sm'
-        }`} style={{fontFamily:"'DM Sans',sans-serif"}}>
-          {msg.content}
+        } ${isFile ? 'p-1' : 'px-4 py-2.5'}`} style={{fontFamily:"'DM Sans',sans-serif"}}>
+          
+          {isImage ? (
+            <a href={msg.file_url} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-xl border border-white/10">
+              <img src={msg.file_url} alt="Attached" className="max-w-full h-auto max-h-60 object-cover hover:scale-105 transition-transform duration-500" />
+            </a>
+          ) : isFile ? (
+            <a href={msg.file_url} target="_blank" rel="noreferrer" 
+               className={`flex items-center gap-3 px-4 py-3 rounded-xl border group/file transition-all ${isMine ? 'bg-white/10 border-white/20 hover:bg-white/20' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isMine ? 'bg-white/20 text-white' : 'bg-gray-50 text-gray-500'}`}>
+                <FileText className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0 pr-2">
+                <p className={`text-xs font-bold truncate ${isMine ? 'text-white' : 'text-gray-900'}`}>{msg.file_url.split('/').pop().split('?')[0] || 'Attachment'}</p>
+                <p className={`text-[10px] ${isMine ? 'text-white/60' : 'text-gray-400'}`}>Click to view file</p>
+              </div>
+              <Download className={`w-4 h-4 shrink-0 opacity-40 group-hover/file:opacity-100 transition-opacity ${isMine ? 'text-white' : 'text-gray-900'}`} />
+            </a>
+          ) : (
+            msg.content
+          )}
         </div>
         <p className="text-[10px] text-gray-400 mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{fontFamily:"'DM Sans',sans-serif"}}>
           {timeAgo(msg.created_at)}
@@ -232,7 +251,9 @@ export default function ExchangeDetailPage() {
   const qc = useQueryClient()
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
+  const fileInputRef = useRef(null)
   const [input, setInput] = useState('')
+  const [fileUploading, setFileUploading] = useState(false)
   const [liveMessages, setLiveMessages] = useState([])
   const [typingUsers, setTypingUsers] = useState([])
   const [showReview, setShowReview] = useState(false)
@@ -303,16 +324,56 @@ export default function ExchangeDetailPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.EXCHANGE(id) }),
   })
 
-  const handleSend = useCallback(() => {
-    const content = input.trim()
-    if (!content) return
-    setInput('')
+  const handleSend = useCallback(({ content, file_url, message_type = 'TEXT' }) => {
+    const text = content?.trim()
+    if (!text && !file_url) return
+    
     emitTypingStop(id)
     clearTimeout(typingTimer.current)
-    setLiveMessages(prev => [...prev, { id:`opt-${Date.now()}`, sender_id:user?.id, sender:user, content, created_at:new Date().toISOString() }])
-    sendMutation.mutate(content)
+    
+    // Add optimistic message
+    const tempId = `opt-${Date.now()}`
+    setLiveMessages(prev => [...prev, { 
+      id: tempId, 
+      sender_id: user?.id, 
+      sender: user, 
+      content: text || (message_type === 'FILE' ? 'Sent a file' : ''), 
+      file_url,
+      message_type,
+      created_at: new Date().toISOString() 
+    }])
+    
+    socket.emit('send_message', { exchangeId: id, content: text, file_url, message_type })
     setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior:'smooth' }), 50)
-  }, [input, id, user, emitTypingStop, sendMutation])
+  }, [id, user, emitTypingStop, socket])
+
+  const handleTextSend = () => {
+    if (!input.trim()) return
+    handleSend({ content: input })
+    setInput('')
+  }
+
+  const handleFileClick = () => fileInputRef.current?.click()
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    
+    try {
+      setFileUploading(true)
+      const fd = new FormData(); fd.append('file', file)
+      const res = await exchangesApi.uploadFile(id, fd)
+      const { file_url } = res.data.data
+      
+      handleSend({ file_url, message_type: 'FILE' })
+    } catch (err) {
+      console.error('File upload error:', err)
+      alert(extractError(err))
+    } finally {
+      setFileUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
 
   const handleInputChange = (e) => {
     setInput(e.target.value)
@@ -321,7 +382,7 @@ export default function ExchangeDetailPage() {
     typingTimer.current = setTimeout(() => emitTypingStop(id), 2000)
   }
 
-  const handleKeyDown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }
+  const handleKeyDown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleTextSend() } }
 
   if (isLoading) return <div className="flex justify-center py-24"><Spinner size="lg" /></div>
   if (!exchange) return <div className="text-center py-24"><p className="text-gray-400" style={{fontFamily:"'DM Sans',sans-serif"}}>Exchange not found.</p></div>
@@ -460,13 +521,30 @@ export default function ExchangeDetailPage() {
 
             <div className="flex-1 flex bg-white rounded-2xl border-2 border-gray-200 focus-within:border-amber-400 focus-within:bg-white transition-all overflow-hidden items-center group/input">
               <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <button
+                onClick={handleFileClick}
+                disabled={!canChat || fileUploading}
+                className="pl-3.5 pr-2 py-2 hover:text-amber-500 text-gray-400 transition-colors disabled:opacity-30"
+              >
+                {fileUploading ? (
+                  <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Paperclip className="w-5 h-5" />
+                )}
+              </button>
+              <input
                 ref={inputRef}
                 value={input}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 disabled={!canChat}
                 placeholder={canChat ? 'Type a message… (Enter to send)' : 'Accept the exchange to start chatting'}
-                className="flex-1 px-4 py-3 text-sm focus:outline-none bg-transparent disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                className="flex-1 pr-4 py-3 text-sm focus:outline-none bg-transparent disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 style={{fontFamily:"'DM Sans',sans-serif"}}
               />
               {canChat && (
@@ -482,7 +560,7 @@ export default function ExchangeDetailPage() {
               )}
             </div>
             <button
-              onClick={handleSend}
+              onClick={handleTextSend}
               disabled={!canChat || !input.trim()}
               className="w-11 h-11 bg-gray-900 text-white rounded-2xl flex items-center justify-center hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shrink-0 shadow-lg shadow-gray-900/20"
             >

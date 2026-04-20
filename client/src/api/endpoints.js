@@ -49,6 +49,7 @@ export const exchangesApi = {
   dispute: (id) => api.put(`/exchanges/${id}/dispute`),
   getMessages: (id, params) => api.get(`/exchanges/${id}/messages`, { params }),
   sendMessage: (id, content) => api.post(`/exchanges/${id}/messages`, { content }),
+  uploadFile: (id, formData) => api.post(`/exchanges/${id}/files`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
   markMessagesRead: (id) => api.put(`/exchanges/${id}/messages/read`),
 }
 

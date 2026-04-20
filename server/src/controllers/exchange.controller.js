@@ -280,6 +280,19 @@ export const sendMessage = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
+export const uploadExchangeFile = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    if (!req.file) return badRequest(res, 'No file uploaded.')
+    
+    const exchange = await prisma.exchange.findUnique({ where: { id } })
+    if (!exchange) return notFound(res)
+    if (!isParticipant(exchange, req.user.id)) return forbidden(res)
+    
+    return ok(res, { file_url: req.file.path, file_type: req.file.mimetype }, 'File uploaded.')
+  } catch (err) { next(err) }
+}
+
 export const markMessagesRead = async (req, res, next) => {
   try {
     const { id } = req.params

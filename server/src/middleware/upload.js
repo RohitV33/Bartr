@@ -24,6 +24,16 @@ const portfolioStorage = new CloudinaryStorage({
   }),
 })
 
+const messageStorage = new CloudinaryStorage({
+  cloudinary,
+  params: (req, file) => ({
+    folder: 'bartr/messages',
+    // Support images, videos, and 'raw' for ZIPs/PDFs/etc.
+    resource_type: file.mimetype.startsWith('video/') ? 'video' : (file.mimetype.startsWith('image/') ? 'image' : 'raw'),
+    // We allow all for now but Cloudinary has some restrictions based on resource_type
+  }),
+})
+
 const fileFilter = (allowed) => (req, file, cb) => {
   if (allowed.includes(file.mimetype)) {
     cb(null, true)
@@ -42,6 +52,12 @@ export const uploadPortfolio = multer({
   storage: portfolioStorage,
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: fileFilter(ALLOWED_FILE_TYPES),
+}).single('file')
+
+export const uploadMessageFile = multer({
+  storage: messageStorage,
+  limits: { fileSize: MAX_FILE_SIZE },
+  // No strict filter here for messages yet, but resource_type handles it in storage
 }).single('file')
 
 export const handleUploadError = (err, req, res, next) => {

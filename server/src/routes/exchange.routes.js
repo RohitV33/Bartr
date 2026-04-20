@@ -7,7 +7,9 @@ import {
   acceptExchange, declineExchange, completeExchange,
   cancelExchange, disputeExchange,
   getMessages, sendMessage, markMessagesRead,
+  uploadExchangeFile,
 } from '../controllers/exchange.controller.js'
+import { uploadMessageFile, handleUploadError } from '../middleware/upload.js'
 
 const router = Router()
 
@@ -30,6 +32,12 @@ router.put('/:id/dispute', requireAuth, disputeExchange)
 // Messages nested under exchanges
 router.get('/:id/messages', requireAuth, getMessages)
 router.post('/:id/messages', requireAuth, validate(messageSchema), sendMessage)
+router.post('/:id/files', requireAuth, (req, res, next) => {
+  uploadMessageFile(req, res, (err) => {
+    if (err) return handleUploadError(err, req, res, next)
+    next()
+  })
+}, uploadExchangeFile)
 router.put('/:id/messages/read', requireAuth, markMessagesRead)
 
 export default router
