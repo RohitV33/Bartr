@@ -1,9 +1,9 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { LayoutDashboard, Search, ArrowLeftRight, Bell, User, Plus, LogOut, Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useNotifications } from '../context/NotificationContext.jsx'
+import { useSocket } from '../context/SocketContext.jsx'
 import { notificationsApi } from '../api/endpoints.js'
 import { QUERY_KEYS } from '../store/queryClient.js'
 import { Avatar, Toast } from './shared.jsx'
@@ -19,8 +19,20 @@ const NAV_LINKS = [
 export const AppLayout = ({ children }) => {
   const { user, logout } = useAuth()
   const { toasts, dismissToast } = useNotifications()
+  const { socket } = useSocket()
+  const qc = useQueryClient()
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  // Listen for real-time notifications
+  useEffect(() => {
+    if (!socket) return
+    const onNewNotif = () => {
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS({ page: 1, limit: 1 }) })
+    }
+    socket.on('notification:new', onNewNotif)
+    return () => { socket.off('notification:new', onNewNotif) }
+  }, [socket, qc])
 
   const { data: notifData } = useQuery({
     queryKey: QUERY_KEYS.NOTIFICATIONS({ page: 1, limit: 1 }),

@@ -301,8 +301,11 @@ export default function ExchangeDetailPage() {
   useEffect(() => {
     if (!socket) return
     const onMsg = ({ message }) => {
+      // Optimistically we already added our own sent messages,
+      // but for received messages or ensuring ID consistency:
       setLiveMessages(prev => prev.some(m => m.id === message.id) ? prev : [...prev, message])
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.MESSAGES(id) }) // Sync history
+      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
     }
     const onTypingStart = ({ userId: uid, full_name }) => { if (uid !== user?.id) setTypingUsers(prev => [...new Set([...prev, full_name])]) }
     const onTypingStop = ({ userId: uid }) => { setTypingUsers(prev => prev.slice(1)) }

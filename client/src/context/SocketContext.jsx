@@ -24,6 +24,7 @@ export const SocketProvider = ({ children }) => {
     const socket = io(socketUrl, {
       withCredentials: true,
       transports: ['websocket', 'polling'],
+      auth: { token: localStorage.getItem('bartr_token') }
     })
 
     socket.on('connect', () => setConnected(true))
