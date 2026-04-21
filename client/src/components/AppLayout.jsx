@@ -8,6 +8,7 @@ import { notificationsApi } from '../api/endpoints.js'
 import { QUERY_KEYS } from '../store/queryClient.js'
 import { Avatar, Toast } from './shared.jsx'
 import ThemeToggle from './ThemeToggle.jsx'
+import { useNavigate, NavLink } from 'react-router-dom'
 
 const NAV_LINKS = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },

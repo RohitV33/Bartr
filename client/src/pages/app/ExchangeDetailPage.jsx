@@ -10,6 +10,9 @@ import { Avatar, Spinner, Stars } from '../../components/shared.jsx'
 import { timeAgo, exchangeStatusLabel, extractError } from '../../utils/helpers.js'
 import { aiApi } from '../../api/ai.js'
 import { AiAssistButton, AiResultCard } from '../../components/ai/AiAssistButton.jsx'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 
 /* ─── Reveal ─────────────────────────────────────────────────────────────────── */
