@@ -1,190 +1,138 @@
-import { useRef } from 'react'
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
-import {
-  useScrollAnimation,
-  staggerContainerVariant,
-  staggerChildVariant,
-} from '../hooks/useScrollAnimation'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
 
-const BENEFITS = [
+const SKILL_SERVICES = [
   {
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-      </svg>
-    ),
-    color: 'bg-indigo-50 text-indigo-500',
-    title: 'Learn by Teaching',
-    body: 'The best way to master a skill is to teach it. Bartr turns knowledge-sharing into a two-way growth engine for every student.',
-    parallaxY: 0,
+    title: 'Design & Visuals',
+    skills: 'UI/UX Design • Figma • Illustrator • Branding',
+    image: 'https://images.unsplash.com/photo-1561070791-26c113006238?q=80&w=600&auto=format&fit=crop',
+    number: '01'
   },
   {
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-      </svg>
-    ),
-    color: 'bg-yellow-50 text-yellow-600',
-    title: 'Campus Networking',
-    body: 'Connect with students across departments and years. Build your campus network organically through meaningful skill exchanges.',
-    parallaxY: -20,
+    title: 'Software Engineering',
+    skills: 'React.js • Node.js • Python • PostgreSQL',
+    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&auto=format&fit=crop',
+    number: '02'
   },
   {
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-    color: 'bg-emerald-50 text-emerald-500',
-    title: 'Completely Free',
-    body: 'No subscription, no credits, no hidden fees — ever. Bartr runs entirely on the principle of equal skill exchange between students.',
-    parallaxY: -10,
+    title: 'Written Communication',
+    skills: 'Copywriting • Content Writing • Technical Documentation',
+    image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=600&auto=format&fit=crop',
+    number: '03'
   },
   {
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-    ),
-    color: 'bg-rose-50 text-rose-500',
-    title: 'Real Experience',
-    body: 'Every exchange builds your portfolio and your resume. Skill-based collaboration counts as real project experience for employers.',
-    parallaxY: 15,
+    title: 'Academics & Language',
+    skills: 'Calculus • Physics • Spanish • German Swap',
+    image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop',
+    number: '04'
   },
   {
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-      </svg>
-    ),
-    color: 'bg-purple-50 text-purple-500',
-    title: 'Verified Exchanges',
-    body: 'Both parties confirm completion and rate the exchange. Build a trusted reputation score that follows you throughout your degree.',
-    parallaxY: -25,
-  },
-  {
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-    ),
-    color: 'bg-orange-50 text-orange-500',
-    title: 'Instant Matching',
-    body: 'Our algorithm matches skill supply with demand in real time. No waiting weeks — find your skill partner within hours of posting.',
-    parallaxY: 5,
-  },
+    title: 'Media & Production',
+    skills: 'Video Editing • Premier Pro • Motion Graphics',
+    image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=600&auto=format&fit=crop',
+    number: '05'
+  }
 ]
 
-/* Individual card with its own parallax offset */
-function BenefitCard({ b, i }) {
-  const cardRef = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: cardRef,
-    offset: ['start end', 'end start'],
-  })
-
-  const y = useTransform(scrollYProgress, [0, 1], [b.parallaxY * 1.5, b.parallaxY * -1.5])
-  const smoothY = useSpring(y, { stiffness: 60, damping: 18 })
-
-  return (
-    <motion.div
-      ref={cardRef}
-      style={{ y: smoothY }}
-      variants={staggerChildVariant}
-      whileHover={{ y: -6, scale: 1.02, boxShadow: '0 16px 40px rgba(0,0,0,0.1)' }}
-      transition={{ type: 'spring', stiffness: 280, damping: 22 }}
-      className="bg-bartr-surface rounded-2xl border border-bartr-border p-6 shadow-sm will-change-transform"
-    >
-      <div className={`w-11 h-11 rounded-xl ${b.color} flex items-center justify-center mb-4`}>
-        {b.icon}
-      </div>
-      <h3 className="text-base font-bold font-sora text-bartr-text mb-2">{b.title}</h3>
-      <p className="text-sm text-bartr-muted font-dm leading-relaxed">{b.body}</p>
-    </motion.div>
-  )
-}
-
 export default function BenefitsSection() {
-  const [ref, controls] = useScrollAnimation(0.1)
-  const sectionRef = useRef(null)
+  const [hoveredIndex, setHoveredIndex] = useState(null)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
-  // Section-level scroll for the heading parallax
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'center center'],
-  })
-
-  const headingY = useTransform(scrollYProgress, [0, 1], [40, 0])
-  const headingScale = useTransform(scrollYProgress, [0, 1], [0.92, 1])
-  const smoothHeadingY = useSpring(headingY, { stiffness: 80, damping: 22 })
-  const smoothHeadingScale = useSpring(headingScale, { stiffness: 80, damping: 22 })
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    })
+  }
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 bg-bartr-bg" id="benefits">
-      <div className="max-w-6xl mx-auto">
-        {/* Header — scroll-zoom in as it enters viewport */}
-        <motion.div
-          style={{ y: smoothHeadingY, scale: smoothHeadingScale }}
-          className="text-center mb-16 will-change-transform"
-        >
-          <motion.span
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-xs font-semibold tracking-widest uppercase text-indigo-500 font-sora"
-          >
-            Why Bartr
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, delay: 0.1 }}
-            className="text-4xl md:text-5xl font-extrabold font-sora text-bartr-text mt-3 leading-tight max-w-lg mx-auto"
-          >
-            Built for students, by students.
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-bartr-muted mt-4 max-w-md mx-auto font-dm text-lg"
-          >
-            Every feature is designed around how students actually learn and collaborate.
-          </motion.p>
-        </motion.div>
+    <section
+      id="benefits"
+      onMouseMove={handleMouseMove}
+      className="py-32 px-6 md:px-12 bg-[#F7F7F5] border-t border-[#0B0B0A]/5 relative overflow-hidden"
+    >
+      <div className="max-w-7xl mx-auto relative">
+        
+        {/* Section Header */}
+        <div className="mb-24 text-center md:text-left">
+          <span className="text-[10px] font-jakarta font-bold uppercase tracking-widest text-[#6D28D9] block mb-3">
+            Available Skill Categories
+          </span>
+          <h2 className="font-syne text-4xl md:text-6xl font-bold tracking-tight text-[#0B0B0A] max-w-2xl">
+            A comprehensive list of student expertise.
+          </h2>
+        </div>
 
-        {/* Benefits grid — staggered + individual parallax */}
-        <motion.div
-          ref={ref}
-          initial="hidden"
-          animate={controls}
-          variants={staggerContainerVariant(0.08, 0.05)}
-          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"
-        >
-          {BENEFITS.map((b, i) => (
-            <BenefitCard key={b.title} b={b} i={i} />
+        {/* Hover image track (tracks mouse pointer) */}
+        <div className="hidden lg:block">
+          <AnimatePresence>
+            {hoveredIndex !== null && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ type: 'spring', stiffness: 250, damping: 25 }}
+                style={{
+                  left: mousePosition.x + 20,
+                  top: mousePosition.y - 100,
+                  position: 'absolute',
+                }}
+                className="w-72 h-44 rounded-2xl overflow-hidden shadow-2xl z-20 pointer-events-none border border-white/10"
+              >
+                <img
+                  src={SKILL_SERVICES[hoveredIndex].image}
+                  alt="Skill Preview"
+                  className="w-full h-full object-cover filter brightness-95"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Categories List */}
+        <div className="border-t border-[#0B0B0A]/10">
+          {SKILL_SERVICES.map((item, idx) => (
+            <div
+              key={item.title}
+              onMouseEnter={() => setHoveredIndex(idx)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              className="border-b border-[#0B0B0A]/10 py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer group transition-colors duration-300 hover:border-[#6D28D9]/20"
+            >
+              
+              {/* Number and Title */}
+              <div className="flex items-baseline gap-6 md:gap-12">
+                <span className="font-syne text-xs font-bold text-[#0B0B0A]/30 group-hover:text-[#6D28D9] transition-colors duration-300">
+                  {item.number}
+                </span>
+                
+                <div className="space-y-1">
+                  <h3 className="font-syne text-2xl sm:text-3xl md:text-4xl font-bold text-[#0B0B0A] group-hover:text-[#6D28D9] transition-colors duration-300">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm font-jakarta text-[#0B0B0A]/40 font-medium group-hover:text-[#0B0B0A]/60 transition-colors duration-300">
+                    {item.skills}
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Indicator */}
+              <div className="flex items-center gap-4">
+                {/* Mobile Preview Image */}
+                <div className="lg:hidden w-20 h-12 rounded-lg overflow-hidden border border-[#0B0B0A]/10">
+                  <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                </div>
+                
+                <span className="w-10 h-10 rounded-full border border-[#0B0B0A]/10 group-hover:border-[#6D28D9] group-hover:bg-[#6D28D9] text-[#0B0B0A] group-hover:text-[#F7F7F5] flex items-center justify-center transition-all duration-300">
+                  <ArrowUpRight className="w-4 h-4" />
+                </span>
+              </div>
+
+            </div>
           ))}
-        </motion.div>
+        </div>
 
-        {/* Bottom CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-center mt-16"
-        >
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.96 }}
-            className="bg-bartr-dark text-white text-sm font-semibold px-8 py-3.5 rounded-full font-sora hover:bg-gray-800 transition-all shadow-lg shadow-gray-900/10"
-          >
-            Start exchanging skills →
-          </motion.button>
-        </motion.div>
       </div>
     </section>
   )

@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 /* ================= BASE ================= */
 @layer base {
@@ -13,19 +16,17 @@
   }
 
   body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     background-color: var(--bg);
     color: var(--text);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
-    /* ✨ Smooth theme transition */
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Sora', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
   }
 }
 
@@ -33,36 +34,214 @@
 :root {
   color-scheme: light;
 
-  --bg: #f8fafc;
+  --bg: #F7F7F5;
   --surface: #ffffff;
-  --text: #0f172a;
-  --muted: #64748b;
+  --text: #0B0B0A;
+  --muted: #5e5e5e;
   --card: #ffffff;
-  --border: #f1f5f9;
+  --border: rgba(11,11,10,0.1);
   --sidebar: #ffffff;
+  --shadow-color: rgba(0,0,0,0.08);
+
+  /* App palette */
+  --app-bg: #F7F7F5;
+  --app-surface: #ffffff;
+  --app-text: #0B0B0A;
+  --app-muted: rgba(11,11,10,0.5);
+  --app-border: rgba(11,11,10,0.08);
+  --app-accent: #6D28D9;
+  --app-accent-hover: #5B21B6;
 }
 
 .dark {
   color-scheme: dark;
 
-  --bg: #0b0f1a;
-  --surface: #111827;
-  --text: #f8fafc;
-  --muted: #94a3b8;
-  --card: #1e293b;
-  --border: #334155;
-  --sidebar: #0f172a;
+  --bg: #0d0d0f;
+  --surface: #16161a;
+  --text: #f0f0f5;
+  --muted: #8a8a9a;
+  --card: #16161a;
+  --border: rgba(240,240,245,0.1);
+  --sidebar: #0d0d0f;
+  --shadow-color: rgba(0,0,0,0.4);
+
+  /* App palette overrides */
+  --app-bg: #0d0d0f;
+  --app-surface: #16161a;
+  --app-text: #f0f0f5;
+  --app-muted: rgba(240,240,245,0.5);
+  --app-border: rgba(240,240,245,0.08);
+  --app-accent: #7c3aed;
+  --app-accent-hover: #6d28d9;
 }
 
+/* ================= DARK MODE OVERRIDES ================= */
+/* These override the hardcoded Tailwind arbitrary colors used throughout JSX */
+
+/* Global transition for smooth theme switching */
+.dark *,
+.dark *::before,
+.dark *::after {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.15s ease, box-shadow 0.25s ease;
+}
+
+/* Background overrides */
+.dark .bg-white,
+.dark .bg-\[\#ffffff\],
+.dark .bg-\[\#FFFFFF\] {
+  background-color: #16161a !important;
+}
+
+.dark .bg-\[\#F7F7F5\],
+.dark .bg-\[var\(--portfolio-bg\)\] {
+  background-color: #0d0d0f !important;
+}
+
+/* Text overrides */
+.dark .text-\[\#0B0B0A\] {
+  color: #f0f0f5 !important;
+}
+
+/* Border overrides */
+.dark .border-\[\#0B0B0A\]\/8,
+.dark .border-\[\#0B0B0A\]\/5,
+.dark .border-\[\#0B0B0A\]\/10 {
+  border-color: rgba(240,240,245,0.08) !important;
+}
+
+/* Card & surface overrides */
+.dark .bg-white\/80 {
+  background-color: rgba(22,22,26,0.85) !important;
+}
+
+/* Shadow overrides */
+.dark .shadow-\[0_4px_20px_rgba\(11\,11\,10\,0\.01\)\],
+.dark .shadow-\[0_10px_40px_rgba\(11\,11\,10\,0\.02\)\],
+.dark .shadow-\[0_2px_15px_rgba\(11\,11\,10\,0\.01\)\] {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+}
+
+/* Portfolio theme dark adaptations */
+.dark .portfolio-theme {
+  background-color: #0d0d0f;
+  color: #f0f0f5;
+}
+
+.dark .portfolio-dots {
+  background-image: radial-gradient(rgba(240, 240, 245, 0.05) 1.5px, transparent 1.5px);
+}
+
+.dark .portfolio-glass {
+  background: rgba(22, 22, 26, 0.75);
+  border-color: rgba(240,240,245,0.06);
+}
+
+/* Input fields in dark mode */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #1e1e24 !important;
+  color: #f0f0f5 !important;
+  border-color: rgba(240,240,245,0.1) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: rgba(240,240,245,0.3) !important;
+}
 
 /* ================= UTILITIES ================= */
 @layer utilities {
-  .font-sora {
-    font-family: 'Sora', sans-serif;
+  .font-grotesk {
+    font-family: 'Space Grotesk', sans-serif;
   }
 
-  .font-dm {
-    font-family: 'DM Sans', sans-serif;
+  .font-inter {
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Stark Neo-Brutalist / Modern Swiss design classes */
+  .dotted-bg {
+    background-image: radial-gradient(var(--border) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.15;
+  }
+
+  .neo-card {
+    background-color: var(--card);
+    border: 2px solid var(--border);
+    box-shadow: 4px 4px 0px 0px var(--border);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .neo-card-hover:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px 0px var(--border);
+  }
+
+  .neo-card-active:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px 0px var(--border);
+  }
+
+  .neo-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--text);
+    color: var(--bg);
+    border: 2px solid var(--border);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    box-shadow: 3px 3px 0px 0px var(--muted);
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+
+  .neo-btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0px 0px var(--muted);
+  }
+
+  .neo-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0px 0px var(--muted);
+  }
+
+  .neo-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--surface);
+    color: var(--text);
+    border: 2px solid var(--border);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    box-shadow: 3px 3px 0px 0px var(--border);
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+
+  .neo-btn-secondary:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0px 0px var(--border);
+  }
+
+  .neo-btn-secondary:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0px 0px var(--border);
+  }
+
+  .neo-input {
+    background-color: var(--surface);
+    color: var(--text);
+    border: 2px solid var(--border);
+    transition: all 0.2s ease;
+  }
+
+  .neo-input:focus {
+    outline: none;
+    box-shadow: 3px 3px 0px 0px var(--border);
   }
 }
 
@@ -76,12 +255,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1cfc7;
-  border-radius: 3px;
+  background: var(--border);
+  border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #b0ada4;
+  background: var(--muted);
 }
 
 /* ================= ACCORDION ================= */
@@ -89,4 +268,65 @@
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
               opacity 0.3s ease,
               padding 0.3s ease;
+}
+
+/* ================= PORTFOLIO / APP THEME ================= */
+.portfolio-theme {
+  --portfolio-bg: #F7F7F5;
+  --portfolio-text: #0B0B0A;
+  --portfolio-accent: #6D28D9;
+  --portfolio-accent-muted: rgba(109, 40, 217, 0.08);
+  --portfolio-border: rgba(11, 11, 10, 0.08);
+  --portfolio-border-strong: rgba(11, 11, 10, 0.2);
+  --portfolio-card: #FFFFFF;
+
+  background-color: var(--portfolio-bg);
+  color: var(--portfolio-text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark .portfolio-theme {
+  --portfolio-bg: #0d0d0f;
+  --portfolio-text: #f0f0f5;
+  --portfolio-accent: #7c3aed;
+  --portfolio-accent-muted: rgba(124, 58, 237, 0.1);
+  --portfolio-border: rgba(240, 240, 245, 0.08);
+  --portfolio-border-strong: rgba(240, 240, 245, 0.15);
+  --portfolio-card: #16161a;
+}
+
+.portfolio-theme h1,
+.portfolio-theme h2,
+.portfolio-theme h3 {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Font aliases — keep backward compat */
+.font-syne    { font-family: 'Space Grotesk', sans-serif; }
+.font-jakarta { font-family: 'Inter', sans-serif; }
+.font-grotesk { font-family: 'Space Grotesk', sans-serif; }
+.font-inter   { font-family: 'Inter', sans-serif; }
+
+.portfolio-glass {
+  background: rgba(247, 247, 245, 0.7);
+  backdrop-filter: blur(16px) saturate(120%);
+  border: 1px solid rgba(11, 11, 10, 0.04);
+  transition: background 0.3s ease;
+}
+
+.portfolio-dots {
+  background-image: radial-gradient(rgba(11, 11, 10, 0.06) 1.5px, transparent 1.5px);
+  background-size: 32px 32px;
+}
+
+.scroll-container {
+  overflow-x: hidden;
+}
+
+.scroll-track {
+  display: flex;
+  flex-wrap: nowrap;
+  will-change: transform;
 }

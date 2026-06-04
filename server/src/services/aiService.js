@@ -6,7 +6,7 @@ import OpenAI from "openai"
 // ─────────────────────────────────────────────
 const groq = new OpenAI({
   baseURL: "https://api.groq.com/openai/v1",
-  apiKey: process.env.GROQ_API_KEY,
+  apiKey: process.env.GROQ_API_KEY || 'dummy_key',
 })
 
 // ─────────────────────────────────────────────
@@ -14,7 +14,7 @@ const groq = new OpenAI({
 // ─────────────────────────────────────────────
 const openrouter = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
+  apiKey: process.env.OPENROUTER_API_KEY || 'dummy_key',
 })
 
 // Groq primary model + fallback within Groq

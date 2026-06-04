@@ -1,206 +1,160 @@
-// Fixed: Added useState and useEffect to the React import
-import { useRef, useState, useEffect } from 'react'
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion'
+import { useRef } from 'react'
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import {
-  useScrollAnimation,
-  staggerContainerVariant,
-} from '../hooks/useScrollAnimation'
-import {
-  SkillOfferingCard,
-  SkillRequestCard,
-  SkillStatsCard,
-  BartrActionCard,
-} from '../components/UICards'
+import { Code, PenTool, Video, Languages, BookOpen, Cpu, Sparkles, Database } from 'lucide-react'
 
-const WORDS = [
-  { text: 'together.', color: 'bg-yellow-300' },
-  { text: 'faster.', color: 'bg-emerald-300' },
-  { text: 'smarter.', color: 'bg-indigo-300' },
-  { text: 'better.', color: 'bg-orange-300' },
+const FLOATING_SKILLS = [
+  { icon: Code, label: 'React / Web', x: '-25%', y: '12%', delay: 0 },
+  { icon: PenTool, label: 'UI/UX Design', x: '25%', y: '18%', delay: 0.4 },
+  { icon: Video, label: 'Video Edit', x: '-35%', y: '45%', delay: 0.2 },
+  { icon: Languages, label: 'Spanish', x: '35%', y: '50%', delay: 0.6 },
+  { icon: BookOpen, label: 'Tutoring', x: '-20%', y: '72%', delay: 0.1 },
+  { icon: Cpu, label: 'AI Prompting', x: '20%', y: '76%', delay: 0.5 },
+  { icon: Database, label: 'SQL / Backend', x: '0%', y: '85%', delay: 0.3 },
 ]
 
 export default function HeroSection() {
-  const [cardsRef, cardsControls] = useScrollAnimation(0.05)
   const navigate = useNavigate()
   const sectionRef = useRef(null)
-  const [index, setIndex] = useState(0)
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % WORDS.length)
-    }, 2500)
-    return () => clearInterval(timer)
-  }, [])
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
   })
 
-  // Parallax transforms
-  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '40%'])
-  const headingY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
-  const subtitleY = useTransform(scrollYProgress, [0, 1], ['0%', '20%'])
-  const cardsY = useTransform(scrollYProgress, [0, 1], ['0%', '-15%'])
-  const headingOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0])
-
-  // Scroll zoom on heading
-  const headingScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.88])
-
-  // Spring-smoothed values
-  const smoothHeadingY = useSpring(headingY, { stiffness: 80, damping: 20 })
-  const smoothHeadingScale = useSpring(headingScale, { stiffness: 80, damping: 20 })
-  const smoothCardsY = useSpring(cardsY, { stiffness: 60, damping: 18 })
+  // Smooth scroll parallax transforms
+  const textY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
+  const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0])
+  const smoothTextY = useSpring(textY, { stiffness: 80, damping: 20 })
 
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen flex flex-col overflow-hidden bg-bartr-bg"
+      className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden bg-[#F7F7F5] portfolio-dots pt-28 pb-16 px-6"
     >
-      {/* Parallax grid background */}
+      {/* Decorative luxury circles */}
+      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[70vw] h-[70vw] rounded-full border border-[#0B0B0A]/3 pointer-events-none" />
+      <div className="absolute top-40 left-1/2 -translate-x-1/2 w-[50vw] h-[50vw] rounded-full border border-[#0B0B0A]/3 pointer-events-none" />
+
+      {/* Floating Constellation of Skills (Swinging Arch) */}
+      <div className="absolute inset-0 max-w-7xl mx-auto pointer-events-none">
+        {FLOATING_SKILLS.map((skill, index) => {
+          const Icon = skill.icon
+          return (
+            <motion.div
+              key={skill.label}
+              className="absolute hidden md:flex items-center gap-2 px-4 py-2.5 rounded-full portfolio-glass border border-[#0B0B0A]/5 shadow-[0_4px_15px_rgba(11,11,10,0.02)] pointer-events-auto"
+              style={{
+                left: `calc(50% + ${skill.x})`,
+                top: skill.y,
+              }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ 
+                opacity: 1, 
+                scale: 1,
+                y: [0, -10, 0],
+              }}
+              transition={{
+                opacity: { duration: 0.8, delay: skill.delay },
+                scale: { duration: 0.8, delay: skill.delay },
+                y: {
+                  repeat: Infinity,
+                  duration: 4 + index,
+                  ease: 'easeInOut',
+                }
+              }}
+              whileHover={{ 
+                scale: 1.08,
+                borderColor: 'rgba(109, 40, 217, 0.3)',
+                boxShadow: '0 8px 30px rgba(109, 40, 217, 0.08)'
+              }}
+            >
+              <span className="w-5 h-5 rounded-full bg-[#6D28D9]/10 text-[#6D28D9] flex items-center justify-center">
+                <Icon className="w-3 h-3" />
+              </span>
+              <span className="text-[10px] font-jakarta font-bold text-[#0B0B0A] tracking-wider uppercase">
+                {skill.label}
+              </span>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      {/* Hero Central Content */}
       <motion.div
-        style={{ y: bgY }}
-        className="absolute inset-0 opacity-30 will-change-transform"
+        style={{ y: smoothTextY, opacity }}
+        className="relative z-10 flex flex-col items-center text-center max-w-4xl mx-auto w-full pt-12 md:pt-20"
       >
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              'linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
-          }}
-        />
-      </motion.div>
-
-      {/* Floating ambient orbs — parallax at different speeds */}
-      <motion.div
-        style={{ y: useTransform(scrollYProgress, [0, 1], ['0%', '60%']) }}
-        className="absolute top-24 left-10 w-72 h-72 bg-yellow-200/30 rounded-full blur-3xl pointer-events-none will-change-transform"
-      />
-      <motion.div
-        style={{ y: useTransform(scrollYProgress, [0, 1], ['0%', '80%']) }}
-        className="absolute top-40 right-8 w-56 h-56 bg-indigo-200/20 rounded-full blur-3xl pointer-events-none will-change-transform"
-      />
-
-      {/* Hero content */}
-      <div className="relative flex-1 flex flex-col items-center justify-center pt-28 pb-16 px-6 text-center max-w-4xl mx-auto w-full">
-        {/* Badge */}
+        {/* Luxury Badge */}
         <motion.div
-          initial={{ opacity: 0, y: -16 }}
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="inline-flex items-center gap-2 bg-bartr-surface border border-bartr-border rounded-full px-4 py-1.5 text-xs font-semibold text-bartr-muted shadow-sm mb-8 font-sora"
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="inline-flex items-center gap-2 bg-[#0B0B0A]/5 border border-[#0B0B0A]/5 rounded-full px-4 py-1.5 mb-8"
         >
-          <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-          Student skill exchange platform — now in beta
+          <Sparkles className="w-3.5 h-3.5 text-[#6D28D9] animate-pulse" />
+          <span className="text-[10px] font-jakarta font-bold text-[#0B0B0A] uppercase tracking-widest">
+            A New Paradigm for Student Learning
+          </span>
         </motion.div>
 
-        {/* Heading — zoom-out + parallax */}
-       <motion.div 
-          style={{ y: smoothHeadingY, scale: smoothHeadingScale, opacity: headingOpacity }} 
-          className="will-change-transform"
+        {/* Editorial Heading */}
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="font-syne text-5xl sm:text-7xl md:text-8xl font-bold leading-[1.05] text-[#0B0B0A] tracking-tight mb-8"
         >
-          {/* Corrected: Use motion.h1 for opening and closing tags */}
-          <motion.h1 className="font-sora text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight text-bartr-text mb-6">
-            Exchange skills, <br className="hidden md:block" />
-            grow{' '}
-            <span className="relative inline-grid overflow-hidden py-4">
-              <AnimatePresence mode="popLayout">
-                <motion.span
-                  key={WORDS[index].text}
-                  initial={{ x: '-100%', opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: '100%', opacity: 0 }}
-                  transition={{ 
-                    x: { type: "spring", stiffness: 100, damping: 20 },
-                    opacity: { duration: 0.3 } 
-                  }}
-                  className={`${WORDS[index].color} text-bartr-dark rounded-lg px-4 py-1 inline-block whitespace-nowrap`}
-                >
-                  {WORDS[index].text}
-                </motion.span>
-              </AnimatePresence>
-            </span>
-          </motion.h1>
-        </motion.div>
-        {/* Subtitle — slightly slower parallax */}
+          Exchange skills. <br />
+          <span className="font-playfair italic font-normal text-[#6D28D9]">Grow together.</span>
+        </motion.h1>
+
+        {/* Minimal Description */}
         <motion.p
-          style={{ y: subtitleY, opacity: headingOpacity }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.45 }}
-          className="text-lg md:text-xl text-bartr-muted max-w-xl leading-relaxed mb-10 font-dm will-change-transform"
+          transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="text-base sm:text-lg md:text-xl text-[#0B0B0A]/60 font-jakarta max-w-2xl leading-relaxed mb-12"
         >
-          Bartr connects students to swap skills — no money, no hassle. Trade
-          your expertise for what you need, and build real experience along the
-          way.
+          Bartr is a premium peer-to-peer playground for university students. Swap your design, code, language, or writing skills without money. Expand your knowledge and build a verifiable portfolio along the way.
         </motion.p>
 
-        {/* CTAs */}
+        {/* Actions */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-3 items-center"
+          transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col sm:flex-row gap-4 items-center"
         >
           <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
             onClick={() => navigate('/register')}
-            className="bg-bartr-dark text-white text-sm font-semibold px-8 py-3.5 rounded-full font-sora hover:bg-gray-800 transition-all shadow-lg shadow-gray-900/10"
+            className="bg-[#6D28D9] text-[#F7F7F5] text-xs font-jakarta font-bold px-8 py-4 rounded-full shadow-xl shadow-[#6D28D9]/20 hover:bg-[#5B21B6] transition-all tracking-wider uppercase"
           >
-            Get started — it's free →
+            Create Your Account
           </motion.button>
+          
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => navigate('/login')}
-            className="text-sm font-semibold text-bartr-muted hover:text-bartr-text transition-colors px-4 py-3.5 font-sora flex items-center gap-1.5 border border-bartr-border rounded-full hover:bg-bartr-surface"
+            className="bg-[#0B0B0A]/5 border border-[#0B0B0A]/10 text-[#0B0B0A] text-xs font-jakarta font-bold px-8 py-4 rounded-full hover:bg-[#0B0B0A]/10 transition-all tracking-wider uppercase"
           >
-            Log in
+            Log In
           </motion.button>
         </motion.div>
 
-        {/* Social proof */}
-        <motion.p
+        {/* Social Proof */}
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.9, duration: 0.5 }}
-          className="text-xs text-bartr-muted mt-6 font-dm"
+          transition={{ delay: 0.8, duration: 0.8 }}
+          className="mt-16 flex items-center gap-6 text-[#0B0B0A]/40 font-jakarta font-bold text-[10px] uppercase tracking-widest"
         >
-          Trusted by 1,200+ students across 40+ universities
-        </motion.p>
-      </div>
-
-      {/* Floating UI Cards — parallax upward on scroll */}
-      <motion.div
-        style={{ y: smoothCardsY }}
-        className="relative w-full max-w-6xl mx-auto px-6 pb-0 will-change-transform"
-      >
-        {/* Fade-up hint gradient */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-bartr-bg to-transparent z-10 pointer-events-none" />
-
-        <motion.div
-          ref={cardsRef}
-          initial="hidden"
-          animate={cardsControls}
-          variants={staggerContainerVariant(0.1, 0.1)}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4"
-        >
-          {[SkillOfferingCard, SkillRequestCard, SkillStatsCard, BartrActionCard].map(
-            (Card, i) => (
-              <motion.div
-                key={i}
-                custom={i}
-                whileHover={{ y: -4, scale: 1.02 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                className={i >= 2 ? 'hidden md:block' : ''}
-              >
-                <Card />
-              </motion.div>
-            )
-          )}
+          <span>Trusted at 40+ Universities</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#6D28D9]" />
+          <span>1,200+ Active Students</span>
         </motion.div>
       </motion.div>
     </section>

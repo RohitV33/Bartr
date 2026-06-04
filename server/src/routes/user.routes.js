@@ -12,10 +12,13 @@ const router = Router()
 
 const updateProfileSchema = z.object({
   full_name: z.string().min(2).max(80).optional(),
-  bio: z.string().max(500).optional(),
-  university: z.string().max(120).optional(),
-  department: z.string().max(120).optional(),
-  year_of_study: z.number().int().min(1).max(8).optional(),
+  bio: z.string().max(500).nullable().optional(),
+  university: z.string().max(120).nullable().optional(),
+  department: z.string().max(120).nullable().optional(),
+  year_of_study: z.preprocess(
+    (val) => (val === '' || val === null) ? null : val,
+    z.coerce.number().int().min(1).max(8).nullable().optional()
+  ),
 })
 
 router.get('/', searchUsers)

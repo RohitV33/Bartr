@@ -16,9 +16,13 @@ import reviewRoutes from './routes/review.routes.js'
 import portfolioRoutes from './routes/portfolio.routes.js'
 import notificationRoutes from './routes/notification.routes.js'
 import aiRoutes from './routes/ai.routes.js'
+import contactRoutes from './routes/contact.routes.js'
 
 const app = express()
 app.set('trust proxy', 1)
+
+// Serve local uploads statically
+app.use('/uploads', express.static('uploads'))
 
 // ─── Security ────────────────────────────────────────────────────────────────
 app.use(helmet({
@@ -62,6 +66,7 @@ app.use('/api/reviews', reviewRoutes)
 app.use('/api/portfolio', portfolioRoutes)
 app.use('/api/notifications', notificationRoutes)
 app.use('/api/ai', aiRoutes)
+app.use('/api/contact', contactRoutes)
 
 // ─── 404 ─────────────────────────────────────────────────────────────────────
 app.use((req, res) => {

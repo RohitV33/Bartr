@@ -10,17 +10,21 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sora: ['Sora', 'sans-serif'],
-        dm: ['DM Sans', 'sans-serif'],
+        grotesk: ['Space Grotesk', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+        // Keep aliases so existing classes still work
+        syne: ['Space Grotesk', 'sans-serif'],
+        jakarta: ['Inter', 'sans-serif'],
+        sora: ['Space Grotesk', 'sans-serif'],
+        dm: ['Inter', 'sans-serif'],
       },
 
       colors: {
         yellow: {
-          300: '#f5c842',
-          400: '#e6b800',
+          300: 'var(--text)',
+          400: 'var(--text)',
         },
 
-        // ✅ FIX: use CSS variables instead of fixed colors
         bartr: {
           bg: 'var(--bg)',
           surface: 'var(--surface)',
@@ -29,7 +33,7 @@ export default {
           card: 'var(--card)',
           border: 'var(--border)',
           sidebar: 'var(--sidebar)',
-          dark: '#0f0f0f',
+          dark: 'var(--text)',
         },
       },
     },

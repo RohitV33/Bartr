@@ -71,7 +71,13 @@ export const updateProfile = async (req, res, next) => {
     const { full_name, bio, university, department, year_of_study } = req.body
     const user = await prisma.user.update({
       where: { id: req.user.id },
-      data: { full_name, bio, university, department, year_of_study: year_of_study ? Number(year_of_study) : undefined },
+      data: {
+        full_name,
+        bio,
+        university,
+        department,
+        year_of_study: year_of_study === null ? null : (year_of_study !== undefined ? Number(year_of_study) : undefined),
+      },
       select: { ...PUBLIC_USER_SELECT, onboarding_done: true },
     })
     await invalidateMatchCache(req.user.id)
@@ -124,13 +130,28 @@ export const getDashboard = async (req, res, next) => {
     ])
 
     const stats = {
-      totalSkills: mySkills.length,
-      activeExchanges: activeExchanges.length,
+      skillsOffered: mySkills.filter(s => s.is_offering).length,
+      skillsWanted: mySkills.filter(s => !s.is_offering).length,
+      exchanges: await prisma.exchange.count({
+        where: { OR: [{ offerer_id: userId }, { requester_id: userId }] }
+      }),
       unreadNotifications: recentNotifications.length,
       reputation: req.user.reputation_score,
     }
 
-    return ok(res, { stats, activeExchanges, recentNotifications, mySkills, recentReviews })
+    const recentExchanges = activeExchanges.map(ex => {
+      const partner = ex.offerer_id === userId ? ex.requester : ex.offerer
+      return {
+        id: ex.id,
+        status: ex.status,
+        offered_skill: ex.offered_skill,
+        requested_skill: ex.requested_skill,
+        updated_at: ex.updated_at,
+        partner,
+      }
+    })
+
+    return ok(res, { stats, recentExchanges, recentNotifications, mySkills, recentReviews })
   } catch (err) { next(err) }
 }
 

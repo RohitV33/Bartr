@@ -7,7 +7,6 @@ import { Spinner } from '../../components/shared.jsx'
 import { timeAgo } from '../../utils/helpers.js'
 import { useEffect, useRef, useState } from 'react'
 
-
 /* ─── Reveal ─────────────────────────────────────────────────────────────────── */
 function Reveal({ children, delay = 0, className = '' }) {
   const [v, setV] = useState(false); const ref = useRef()
@@ -19,11 +18,11 @@ function Reveal({ children, delay = 0, className = '' }) {
 }
 
 const NOTIF_META = {
-  MATCH:    { icon:'⚡', bg:'bg-amber-500/10',   text:'text-amber-600 dark:text-amber-400',   border:'border-amber-200 dark:border-amber-500/30' },
-  MESSAGE:  { icon:'💬', bg:'bg-blue-500/10',    text:'text-blue-600 dark:text-blue-400',     border:'border-blue-200 dark:border-blue-500/30' },
-  REVIEW:   { icon:'⭐', bg:'bg-yellow-500/10',  text:'text-yellow-600 dark:text-yellow-400', border:'border-yellow-200 dark:border-yellow-500/30' },
-  EXCHANGE: { icon:'🤝', bg:'bg-emerald-500/10', text:'text-emerald-600 dark:text-emerald-400',border:'border-emerald-200 dark:border-emerald-500/30' },
-  SYSTEM:   { icon:'📢', bg:'bg-bartr-bg',        text:'text-bartr-muted',                     border:'border-bartr-border' },
+  MATCH:    { icon:'⚡', bg:'bg-bartr-text/10',   text:'text-bartr-text',   border:'border-bartr-border' },
+  MESSAGE:  { icon:'💬', bg:'bg-bartr-text/10',   text:'text-bartr-text',   border:'border-bartr-border' },
+  REVIEW:   { icon:'⭐', bg:'bg-bartr-text/10',   text:'text-bartr-text',   border:'border-bartr-border' },
+  EXCHANGE: { icon:'🤝', bg:'bg-bartr-text/10',   text:'text-bartr-text',   border:'border-bartr-border' },
+  SYSTEM:   { icon:'📢', bg:'bg-bartr-bg',        text:'text-bartr-muted',  border:'border-bartr-border' },
 }
 
 /* ─── Hero ───────────────────────────────────────────────────────────────────── */
@@ -31,26 +30,20 @@ function NotificationsHero({ scrollY, hasUnread, onMarkAll, loading }) {
   const scale = Math.max(1 - scrollY * 0.0003, 0.94)
   const opacity = Math.max(1 - scrollY * 0.004, 0)
   return (
-    <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-[2rem] mb-8 bg-bartr-surface border border-bartr-border">
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-transparent dark:from-blue-900/40 dark:via-indigo-900/40 dark:to-transparent" />
-        <div className="absolute inset-0 opacity-15 dark:opacity-30" style={{backgroundImage:'radial-gradient(var(--border) 1px,transparent 1px)',backgroundSize:'22px 22px'}} />
-      </div>
-      <div className="absolute right-0 bottom-0 w-64 h-64 opacity-20" style={{background:'radial-gradient(circle,#3b82f6,transparent 70%)',transform:'translate(30%,30%)'}} />
-
-      <div className="relative px-8 py-10 flex items-end justify-between gap-6">
+    <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-3xl mb-8 bg-bartr-surface border-2 border-bartr-border shadow-[4px_4px_0px_var(--border)] dotted-bg">
+      <div className="relative px-8 py-10 flex items-end justify-between gap-6 z-10">
         <div>
-          <div className="inline-flex items-center gap-2 bg-blue-500/20 text-blue-500 dark:text-blue-300 text-xs font-bold px-3 py-1.5 rounded-full border border-blue-400/20 mb-4">
+          <div className="inline-flex items-center gap-2 bg-bartr-text text-bartr-bg text-xs font-black px-3 py-1.5 rounded-lg border border-bartr-border mb-4">
             <Bell className="w-3 h-3" /> Activity
           </div>
           <h1 className="text-3xl font-black text-bartr-text mb-2" style={{fontFamily:"'Sora',sans-serif"}}>Notifications</h1>
-          <p className="text-bartr-muted text-sm" style={{fontFamily:"'DM Sans',sans-serif"}}>Stay up to date with your skill exchanges</p>
+          <p className="text-bartr-muted text-sm font-medium" style={{fontFamily:"'DM Sans',sans-serif"}}>Stay up to date with your skill exchanges</p>
         </div>
         {hasUnread && (
           <button
             onClick={onMarkAll}
             disabled={loading}
-            className="flex items-center gap-2 bg-bartr-bg backdrop-blur-md text-bartr-text text-sm font-bold px-4 py-2.5 rounded-2xl border border-bartr-border hover:bg-bartr-border transition-all"
+            className="flex items-center gap-2 bg-bartr-surface text-bartr-text text-xs font-bold px-4 py-2.5 rounded-xl border-2 border-bartr-border hover:bg-bartr-bg transition-all shadow-[2px_2px_0px_var(--border)] active:translate-y-[1px] active:shadow-none"
             style={{fontFamily:"'Sora',sans-serif"}}
           >
             {loading ? <div className="w-4 h-4 border-2 border-bartr-text border-t-transparent rounded-full animate-spin" /> : <CheckCheck className="w-4 h-4" />}
@@ -81,32 +74,31 @@ function NotifItem({ n, onClick, onDelete, delay }) {
         onMouseEnter={() => setHov(true)}
         onMouseLeave={() => setHov(false)}
         style={{ opacity: deleting ? 0 : 1, transform: deleting ? 'translateX(40px)' : 'none', transition: 'opacity .3s ease, transform .3s ease' }}
-        className={`relative bg-bartr-surface rounded-2xl border cursor-pointer transition-all duration-200 overflow-hidden
-          ${!n.is_read ? 'border-amber-400/40 dark:border-amber-500/30' : 'border-bartr-border'}
-          ${hov ? 'shadow-lg -translate-y-0.5' : 'shadow-sm'}`}
+        className={`relative bg-bartr-surface rounded-2xl border-2 cursor-pointer transition-all duration-150 overflow-hidden border-bartr-border
+          ${hov ? 'shadow-[4px_4px_0px_var(--border)] -translate-x-[1px] -translate-y-[1px]' : 'shadow-[2px_2px_0px_var(--border)]'}`}
       >
         {/* Unread left bar */}
-        {!n.is_read && <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-400 rounded-l-2xl" />}
+        {!n.is_read && <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-bartr-text rounded-l-2xl" />}
 
         {/* Unread bg tint */}
-        {!n.is_read && <div className="absolute inset-0 bg-amber-400/5 pointer-events-none" />}
+        {!n.is_read && <div className="absolute inset-0 bg-bartr-text/5 pointer-events-none" />}
 
-        <div className="flex items-start gap-4 p-4 pl-5 relative">
+        <div className="flex items-start gap-4 p-4 pl-6 relative">
           {/* Icon */}
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 border ${meta.bg} ${meta.border}`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 border-2 ${meta.bg} ${meta.border}`}>
             {meta.icon}
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
             <p className={`text-sm font-black mb-0.5 ${!n.is_read ? 'text-bartr-text' : 'text-bartr-muted'}`} style={{fontFamily:"'Sora',sans-serif"}}>{n.title}</p>
-            <p className="text-xs text-bartr-muted leading-relaxed" style={{fontFamily:"'DM Sans',sans-serif"}}>{n.body}</p>
-            <p className="text-xs text-bartr-muted mt-1.5 opacity-70" style={{fontFamily:"'DM Sans',sans-serif"}}>{timeAgo(n.created_at)}</p>
+            <p className="text-xs text-bartr-muted leading-relaxed font-medium" style={{fontFamily:"'DM Sans',sans-serif"}}>{n.body}</p>
+            <p className="text-xs text-bartr-muted mt-1.5 opacity-70 font-bold" style={{fontFamily:"'DM Sans',sans-serif"}}>{timeAgo(n.created_at)}</p>
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-2 shrink-0">
-            {!n.is_read && <div className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm shadow-amber-200" />}
+            {!n.is_read && <div className="w-2.5 h-2.5 rounded-full bg-bartr-text border border-bartr-border shadow-sm" />}
             <button
               onClick={handleDelete}
               className="p-1.5 text-bartr-muted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
@@ -170,8 +162,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div>
-
+    <div className="px-4 py-2">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap');`}</style>
 
       <NotificationsHero
@@ -185,12 +176,12 @@ export default function NotificationsPage() {
         <div className="flex justify-center py-24"><Spinner size="lg" /></div>
       ) : notifications.length === 0 ? (
         <Reveal>
-          <div className="text-center py-20">
-            <div className="w-20 h-20 bg-bartr-bg border border-bartr-border rounded-3xl flex items-center justify-center mx-auto mb-5">
-              <Bell className="w-10 h-10 text-bartr-muted" />
+          <div className="text-center py-20 bg-bartr-surface border-2 border-bartr-border shadow-[4px_4px_0px_var(--border)] max-w-xl mx-auto dotted-bg">
+            <div className="w-20 h-20 bg-bartr-text/10 border border-bartr-border rounded-3xl flex items-center justify-center mx-auto mb-5">
+              <Bell className="w-10 h-10 text-bartr-text" />
             </div>
             <h3 className="text-xl font-black text-bartr-text mb-2" style={{fontFamily:"'Sora',sans-serif"}}>All caught up! 🎉</h3>
-            <p className="text-bartr-muted" style={{fontFamily:"'DM Sans',sans-serif"}}>No notifications yet. Start exchanging skills to get updates.</p>
+            <p className="text-bartr-muted font-medium text-sm" style={{fontFamily:"'DM Sans',sans-serif"}}>No notifications yet. Start exchanging skills to get updates.</p>
           </div>
         </Reveal>
       ) : (
@@ -198,7 +189,7 @@ export default function NotificationsPage() {
           {unreadCount > 0 && (
             <Reveal>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                <div className="w-2.5 h-2.5 rounded-full bg-bartr-text animate-pulse" />
                 <p className="text-sm font-bold text-bartr-text" style={{fontFamily:"'Sora',sans-serif"}}>
                   {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
                 </p>
@@ -206,7 +197,7 @@ export default function NotificationsPage() {
             </Reveal>
           )}
 
-          <div className="space-y-2.5">
+          <div className="space-y-4">
             {notifications.map((n, i) => (
               <NotifItem
                 key={n.id}

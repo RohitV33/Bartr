@@ -27,7 +27,7 @@ export default function Navbar() {
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-700 shadow-sm'
+          ? 'bg-bartr-surface/95 backdrop-blur-md border-b border-bartr-border shadow-sm'
           : 'bg-transparent'
       }`}
       initial={{ y: -80, opacity: 0 }}
@@ -37,8 +37,8 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         
         {/* Logo */}
-        <a href="#" className="flex items-center gap-2 font-sora font-bold text-lg text-gray-900 dark:text-white">
-          <span className="w-7 h-7 bg-yellow-300 rounded-lg flex items-center justify-center text-bartr-dark font-black text-sm">
+        <a href="#" className="flex items-center gap-2 font-sora font-extrabold text-lg text-bartr-text">
+          <span className="w-7 h-7 bg-bartr-text border border-bartr-border rounded flex items-center justify-center text-bartr-bg font-black text-sm">
             B
           </span>
           <span>Bartr</span>
@@ -51,7 +51,7 @@ export default function Navbar() {
               <button
                 key={link.label}
                 onClick={() => navigate(link.href)}
-                className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+                className="text-sm text-bartr-muted hover:text-bartr-text transition-colors font-semibold"
               >
                 {link.label}
               </button>
@@ -59,7 +59,7 @@ export default function Navbar() {
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium"
+                className="text-sm text-bartr-muted hover:text-bartr-text transition-colors font-semibold"
               >
                 {link.label}
               </a>
@@ -75,14 +75,14 @@ export default function Navbar() {
 
           <button
             onClick={() => navigate('/login')}
-            className="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 px-4 py-2 rounded-full font-sora transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="text-sm font-semibold text-bartr-muted hover:text-bartr-text px-4 py-2 rounded-lg font-sora transition-colors hover:bg-bartr-surface"
           >
             Log in
           </button>
 
           <button
             onClick={() => navigate('/register')}
-            className="bg-bartr-dark text-white text-sm font-semibold px-5 py-2 rounded-full font-sora hover:bg-gray-800 active:scale-95 transition-all shadow-sm"
+            className="bg-bartr-text text-bartr-bg text-sm font-bold px-5 py-2 rounded-lg font-sora hover:opacity-90 active:scale-95 transition-all shadow-sm border border-bartr-border"
           >
             Sign up →
           </button>
@@ -90,14 +90,14 @@ export default function Navbar() {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="md:hidden p-2 rounded-lg hover:bg-bartr-surface transition-colors"
           onClick={() => setMenuOpen(o => !o)}
           aria-label="Toggle menu"
         >
           <div className="space-y-1.5">
-            <span className={`block w-5 h-0.5 bg-gray-800 dark:bg-white transition-all ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-            <span className={`block w-5 h-0.5 bg-gray-800 dark:bg-white transition-all ${menuOpen ? 'opacity-0' : ''}`} />
-            <span className={`block w-5 h-0.5 bg-gray-800 dark:bg-white transition-all ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+            <span className={`block w-5 h-0.5 bg-bartr-text transition-all ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+            <span className={`block w-5 h-0.5 bg-bartr-text transition-all ${menuOpen ? 'opacity-0' : ''}`} />
+            <span className={`block w-5 h-0.5 bg-bartr-text transition-all ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
           </div>
         </button>
       </div>
@@ -110,7 +110,7 @@ export default function Navbar() {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 overflow-hidden"
+            className="md:hidden bg-bartr-surface border-t border-bartr-border overflow-hidden"
           >
             <div className="px-6 py-4 space-y-4">
               
@@ -119,7 +119,7 @@ export default function Navbar() {
                   <button
                     key={link.label}
                     onClick={() => { navigate(link.href); setMenuOpen(false) }}
-                    className="block text-sm text-gray-700 dark:text-gray-300 font-medium w-full text-left"
+                    className="block text-sm text-bartr-text font-medium w-full text-left"
                   >
                     {link.label}
                   </button>
@@ -128,7 +128,7 @@ export default function Navbar() {
                     key={link.label}
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
-                    className="block text-sm text-gray-700 dark:text-gray-300 font-medium"
+                    className="block text-sm text-bartr-text font-medium"
                   >
                     {link.label}
                   </a>
@@ -136,22 +136,22 @@ export default function Navbar() {
               ))}
 
               {/* 🌙 Theme Toggle (Mobile) */}
-              <div className="flex justify-center py-2 border border-bartr-border rounded-xl bg-bartr-surface">
+              <div className="flex justify-center py-2 border border-bartr-border rounded-xl bg-bartr-bg">
                 <ThemeToggle />
               </div>
 
-              <div className="flex flex-col gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+              <div className="flex flex-col gap-2 pt-2 border-t border-bartr-border">
                 
                 <button
                   onClick={() => { navigate('/login'); setMenuOpen(false) }}
-                  className="w-full border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800"
+                  className="w-full border-2 border-bartr-border text-bartr-text text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-bartr-bg"
                 >
                   Log in
                 </button>
 
                 <button
                   onClick={() => { navigate('/register'); setMenuOpen(false) }}
-                  className="w-full bg-bartr-dark text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-gray-800"
+                  className="w-full bg-bartr-text text-bartr-bg text-sm font-semibold px-5 py-2.5 rounded-lg hover:opacity-90"
                 >
                   Sign up →
                 </button>

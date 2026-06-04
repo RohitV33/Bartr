@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react'
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Plus, Minus } from 'lucide-react'
 
 const FAQS = [
   {
@@ -28,134 +29,63 @@ const FAQS = [
   },
 ]
 
-function FaqItem({ q, a, isOpen, onClick, index }) {
-  const itemRef = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: itemRef,
-    offset: ['start end', 'center center'],
-  })
-
-  // Each item slides in from alternating sides
-  const xOffset = index % 2 === 0 ? -30 : 30
-  const x = useTransform(scrollYProgress, [0, 1], [xOffset, 0])
-  const opacity = useTransform(scrollYProgress, [0, 0.6], [0, 1])
-  const smoothX = useSpring(x, { stiffness: 80, damping: 22 })
-
+function FaqItem({ q, a, isOpen, onClick }) {
   return (
-    <motion.div
-      ref={itemRef}
-      style={{ x: smoothX, opacity }}
-      className={`border border-bartr-border rounded-2xl overflow-hidden transition-all duration-200 will-change-transform ${
-        isOpen ? 'bg-bartr-surface shadow-sm' : 'bg-bartr-surface hover:border-bartr-text/20'
-      }`}
-    >
+    <div className="border-b border-[#0B0B0A]/10 py-6">
       <button
         onClick={onClick}
-        className="w-full flex items-center justify-between px-6 py-5 text-left group"
+        className="w-full flex items-center justify-between text-left focus:outline-none group py-2"
         aria-expanded={isOpen}
       >
-        <span className={`text-sm font-semibold font-sora transition-colors ${isOpen ? 'text-bartr-text' : 'text-bartr-muted group-hover:text-bartr-text'}`}>
+        <span className={`font-syne text-lg sm:text-xl font-bold transition-colors duration-300 ${isOpen ? 'text-[#6D28D9]' : 'text-[#0B0B0A] hover:text-[#6D28D9]/85'}`}>
           {q}
         </span>
-        <motion.span
-          animate={isOpen ? { rotate: 45, backgroundColor: 'var(--bartr-dark)', color: '#fff' } : { rotate: 0, backgroundColor: 'var(--border)', color: 'var(--muted)' }}
-          transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-          className="ml-4 w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-          </svg>
-        </motion.span>
+        <span className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-[#6D28D9] border-[#6D28D9] text-[#F7F7F5]' : 'border-[#0B0B0A]/10 text-[#0B0B0A] group-hover:border-[#6D28D9]/40 group-hover:text-[#6D28D9]'}`}>
+          {isOpen ? <Minus className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+        </span>
       </button>
+      
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
-            initial={{ height: 0, opacity: 0, y: -8 }}
-            animate={{ height: 'auto', opacity: 1, y: 0 }}
-            exit={{ height: 0, opacity: 0, y: -8 }}
-            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+            initial={{ height: 0, opacity: 0, marginTop: 0 }}
+            animate={{ height: 'auto', opacity: 1, marginTop: 12 }}
+            exit={{ height: 0, opacity: 0, marginTop: 0 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden"
           >
-            <p className="px-6 pb-5 text-sm text-bartr-muted font-dm leading-relaxed">{a}</p>
+            <p className="font-jakarta text-xs sm:text-sm text-[#0B0B0A]/60 leading-relaxed font-medium pb-4">
+              {a}
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   )
 }
 
 export default function FAQSection() {
   const [openIdx, setOpenIdx] = useState(0)
 
-  const sectionRef = useRef(null)
-
-  // Scroll-zoom heading
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'center center'],
-  })
-
-  const headingScale = useTransform(scrollYProgress, [0, 1], [0.9, 1])
-  const headingY = useTransform(scrollYProgress, [0, 1], [40, 0])
-  const smoothHeadingScale = useSpring(headingScale, { stiffness: 80, damping: 20 })
-  const smoothHeadingY = useSpring(headingY, { stiffness: 80, damping: 20 })
-
-  // Decorative parallax orb
-  const { scrollYProgress: decorProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'end start'],
-  })
-  const orbY = useTransform(decorProgress, [0, 1], ['-20%', '20%'])
-  const orbX = useTransform(decorProgress, [0, 1], ['-5%', '5%'])
-  const smoothOrbY = useSpring(orbY, { stiffness: 40, damping: 18 })
-
   return (
-    <section ref={sectionRef} className="py-24 px-6 bg-bartr-bg overflow-hidden" id="faq">
-      {/* Decorative parallax blob */}
-      <motion.div
-        style={{ y: smoothOrbY, x: orbX }}
-        className="absolute right-0 top-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none will-change-transform -translate-x-1/2"
-      />
+    <section id="faq" className="py-32 px-6 md:px-12 bg-[#F7F7F5] border-t border-[#0B0B0A]/5 relative overflow-hidden">
+      <div className="max-w-4xl mx-auto">
+        
+        {/* Section Header */}
+        <div className="text-center mb-20">
+          <span className="text-[10px] font-jakarta font-bold uppercase tracking-widest text-[#6D28D9] block mb-3">
+            Inquiries & Help
+          </span>
+          <h2 className="font-syne text-4xl md:text-6xl font-bold tracking-tight text-[#0B0B0A]">
+            Commonly asked questions.
+          </h2>
+        </div>
 
-      <div className="max-w-3xl mx-auto relative">
-        {/* Header — scroll zoom in */}
-        <motion.div
-          style={{ scale: smoothHeadingScale, y: smoothHeadingY }}
-          className="text-center mb-14 will-change-transform"
-        >
-          <motion.span
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-xs font-semibold tracking-widest uppercase text-indigo-500 font-sora"
-          >
-            FAQ
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl md:text-5xl font-extrabold font-sora text-bartr-text mt-3 leading-tight"
-          >
-            Common questions
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-bartr-muted mt-4 font-dm"
-          >
-            Everything you need to know about skill exchange on Bartr.
-          </motion.p>
-        </motion.div>
-
-        {/* Accordion — each item slides in from alternating sides */}
-        <div className="space-y-3">
+        {/* FAQs List */}
+        <div className="border-t border-[#0B0B0A]/10">
           {FAQS.map((faq, i) => (
             <FaqItem
               key={i}
-              index={i}
               q={faq.q}
               a={faq.a}
               isOpen={openIdx === i}
@@ -164,24 +94,6 @@ export default function FAQSection() {
           ))}
         </div>
 
-        {/* Still have questions */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="mt-12 text-center"
-        >
-          <p className="text-sm text-bartr-muted font-dm mb-4">Still have questions?</p>
-          <motion.a
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.97 }}
-            href="#contact-us"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-bartr-text border border-bartr-border px-6 py-3 rounded-full hover:bg-bartr-surface transition-colors font-sora"
-          >
-            Contact our team →
-          </motion.a>
-        </motion.div>
       </div>
     </section>
   )

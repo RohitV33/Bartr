@@ -4,10 +4,10 @@ export const timeAgo = (date) => formatDistanceToNow(new Date(date), { addSuffix
 export const formatDate = (date, fmt = 'MMM d, yyyy') => format(new Date(date), fmt)
 
 export const proficiencyColor = (level) => ({
-  BEGINNER: 'bg-blue-100 text-blue-700',
-  INTERMEDIATE: 'bg-yellow-100 text-yellow-700',
-  EXPERT: 'bg-emerald-100 text-emerald-700',
-}[level] || 'bg-gray-100 text-gray-600')
+  BEGINNER: 'bg-bartr-bg text-bartr-muted border border-bartr-border',
+  INTERMEDIATE: 'bg-bartr-surface text-bartr-text border border-bartr-border',
+  EXPERT: 'bg-bartr-text text-bartr-bg font-bold border border-bartr-border',
+}[level] || 'bg-bartr-bg text-bartr-muted border border-bartr-border')
 
 export const proficiencyLabel = (level) => ({
   BEGINNER: 'Beginner',
@@ -16,13 +16,13 @@ export const proficiencyLabel = (level) => ({
 }[level] || level)
 
 export const exchangeStatusColor = (status) => ({
-  PENDING: 'bg-yellow-100 text-yellow-700',
-  ACCEPTED: 'bg-blue-100 text-blue-700',
-  IN_PROGRESS: 'bg-purple-100 text-purple-700',
-  COMPLETED: 'bg-emerald-100 text-emerald-700',
-  CANCELLED: 'bg-gray-100 text-gray-600',
-  DISPUTED: 'bg-red-100 text-red-700',
-}[status] || 'bg-gray-100 text-gray-600')
+  PENDING: 'bg-bartr-bg text-bartr-muted border border-bartr-border',
+  ACCEPTED: 'bg-bartr-surface text-bartr-text border border-bartr-border',
+  IN_PROGRESS: 'bg-bartr-surface text-bartr-text border-2 border-bartr-border font-bold',
+  COMPLETED: 'bg-bartr-text text-bartr-bg font-bold border border-bartr-border',
+  CANCELLED: 'bg-bartr-bg text-bartr-muted border border-bartr-border opacity-50 line-through',
+  DISPUTED: 'bg-bartr-bg text-red-500 border border-red-500 font-bold',
+}[status] || 'bg-bartr-bg text-bartr-muted border border-bartr-border')
 
 export const exchangeStatusLabel = (status) => ({
   PENDING: 'Pending',

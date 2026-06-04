@@ -43,10 +43,22 @@ router.post('/resend-verification', requireAuth, resendVerification)
 router.post('/forgot-password', authLimiter, validate(forgotSchema), forgotPassword)
 router.post('/reset-password', authLimiter, validate(resetSchema), resetPassword)
 
+// Google OAuth credentials check middleware
+const checkGoogleConfig = (req, res, next) => {
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    return res.status(400).json({
+      success: false,
+      message: 'Google OAuth is not configured in this environment. Please log in with email and password.'
+    })
+  }
+  next()
+}
+
 // Google OAuth
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }))
+router.get('/google', checkGoogleConfig, passport.authenticate('google', { scope: ['profile', 'email'], session: false }))
 router.get('/google/callback',
-  passport.authenticate('google', { session: false, failureRedirect: `${process.env.CLIENT_URL}/login?error=oauth` }),
+  checkGoogleConfig,
+  passport.authenticate('google', { session: false, failureRedirect: `${process.env.CLIENT_URL || 'http://localhost:5173'}/login?error=oauth` }),
   googleCallback
 )
 

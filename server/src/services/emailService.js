@@ -62,7 +62,7 @@ const baseTemplate = (content) => `
 </html>
 `
 
-export const sendVerificationEmail = async (user, token) => {
+export const sendVerificationEmail = async (user, token, otpCode) => {
   const link = `${BASE_URL}/verify-email?token=${token}`
   await getTransporter().sendMail({
     from: FROM,
@@ -70,9 +70,12 @@ export const sendVerificationEmail = async (user, token) => {
     subject: 'Verify your Bartr account',
     html: baseTemplate(`
       <h2>Welcome to Bartr, ${user.full_name.split(' ')[0]}! 👋</h2>
-      <p>Thanks for signing up. Click the button below to verify your email address and start exchanging skills.</p>
+      <p>Thanks for signing up. Enter the 6-digit verification code below on the verification page or click the link to verify your email address.</p>
+      <div style="background: #f4f4f5; border-radius: 12px; padding: 16px; text-align: center; margin: 20px 0; border: 1px solid #e4e4e7;">
+        <span style="font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #0f0f0f; font-family: monospace;">${otpCode || '------'}</span>
+      </div>
       <a href="${link}" class="btn">Verify my email →</a>
-      <p>This link expires in 24 hours. If you didn't create an account, you can safely ignore this email.</p>
+      <p>This link and code expire in 24 hours. If you didn't create an account, you can safely ignore this email.</p>
     `),
   })
 }
@@ -145,6 +148,25 @@ export const sendNewReviewEmail = async (recipient, reviewer, rating) => {
       <h2>New review received! ${'⭐'.repeat(rating)}</h2>
       <p><strong>${reviewer.full_name}</strong> just left you a ${rating}-star review on Bartr. Check it out on your profile!</p>
       <a href="${link}" class="btn">View my profile →</a>
+    `),
+  })
+}
+
+export const sendContactEmail = async (contactData) => {
+  const { name, email, subject, message } = contactData
+  await getTransporter().sendMail({
+    from: FROM,
+    to: 'hello@bartr.dev', // administrator
+    replyTo: email,
+    subject: `Contact Form: ${subject || 'New Submission'}`,
+    html: baseTemplate(`
+      <h2>New Contact Submission 📬</h2>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Subject:</strong> ${subject || 'N/A'}</p>
+      <hr style="border: 0; border-top: 1px solid #e4e4e7; margin: 20px 0;" />
+      <p><strong>Message:</strong></p>
+      <p style="white-space: pre-wrap; background: #f4f4f5; padding: 16px; border-radius: 8px; font-family: sans-serif; color: #1a1a1a;">${message}</p>
     `),
   })
 }

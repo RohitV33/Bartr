@@ -1,15 +1,15 @@
-import Navbar from '../components/Navbar'
+import PortfolioNavbar from '../components/PortfolioNavbar'
 import HeroSection from '../sections/HeroSection'
 import DashboardSection from '../sections/DashboardSection'
 import FeaturesSection from '../sections/FeaturesSection'
 import BenefitsSection from '../sections/BenefitsSection'
 import FAQSection from '../sections/FAQSection'
-import Footer from '../components/Footer'
+import PortfolioFooter from '../components/PortfolioFooter'
 
 export default function LandingPage() {
   return (
-    <>
-      <Navbar />
+    <div className="portfolio-theme">
+      <PortfolioNavbar />
       <main>
         <HeroSection />
         <DashboardSection />
@@ -17,7 +17,8 @@ export default function LandingPage() {
         <BenefitsSection />
         <FAQSection />
       </main>
-      <Footer />
-    </>
+      <PortfolioFooter />
+    </div>
   )
 }
+

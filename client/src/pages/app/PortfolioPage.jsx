@@ -7,8 +7,6 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import { Spinner } from '../../components/shared.jsx'
 import { extractError } from '../../utils/helpers.js'
 
-
-
 /* ─── Reveal ─────────────────────────────────────────────────────────────────── */
 function Reveal({ children, delay = 0, className = '' }) {
   const [v, setV] = useState(false); const ref = useRef()
@@ -24,18 +22,13 @@ function PortfolioHero({ scrollY }) {
   const scale = Math.max(1 - scrollY * 0.0003, 0.94)
   const opacity = Math.max(1 - scrollY * 0.004, 0)
   return (
-    <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-[2rem] mb-8">
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-transparent dark:from-purple-900/40 dark:via-pink-900/40 dark:to-transparent" />
-        <div className="absolute inset-0 opacity-15 dark:opacity-30" style={{backgroundImage:'radial-gradient(var(--border) 1px,transparent 1px)',backgroundSize:'20px 20px'}} />
-      </div>
-      <div className="absolute right-0 top-0 w-80 h-80 opacity-15" style={{background:'radial-gradient(circle,#a855f7,transparent 70%)',transform:'translate(30%,-30%)'}} />
-      <div className="relative px-8 py-10">
-        <div className="inline-flex items-center gap-2 bg-purple-400/20 text-purple-300 text-xs font-bold px-3 py-1.5 rounded-full border border-purple-400/20 mb-4">
+    <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-3xl mb-8 border-2 border-bartr-border bg-bartr-surface shadow-[4px_4px_0px_var(--border)] dotted-bg">
+      <div className="relative px-8 py-10 z-10">
+        <div className="inline-flex items-center gap-2 bg-bartr-text text-bartr-bg text-xs font-black px-3 py-1.5 rounded-lg border border-bartr-border mb-4">
           <Image className="w-3 h-3" /> Your Work
         </div>
-        <h1 className="text-3xl font-black text-white mb-2" style={{fontFamily:"'Sora',sans-serif"}}>My Portfolio</h1>
-        <p className="text-gray-300 text-sm" style={{fontFamily:"'DM Sans',sans-serif"}}>Showcase your projects, designs, and achievements</p>
+        <h1 className="text-3xl font-black text-bartr-text mb-2" style={{fontFamily:"'Sora',sans-serif"}}>My Portfolio</h1>
+        <p className="text-bartr-muted text-sm font-medium" style={{fontFamily:"'DM Sans',sans-serif"}}>Showcase your projects, designs, and achievements</p>
       </div>
     </div>
   )
@@ -56,11 +49,11 @@ function PortfolioItem({ item, onDelete, onUpdate, delay }) {
       <div
         onMouseEnter={() => setHov(true)}
         onMouseLeave={() => setHov(false)}
-        className="bg-white rounded-3xl border border-gray-100 overflow-hidden transition-all duration-300"
-        style={{ boxShadow: hov ? '0 20px 40px rgba(0,0,0,0.12)' : '0 2px 8px rgba(0,0,0,0.05)', transform: hov ? 'translateY(-4px)' : 'none' }}
+        className="bg-bartr-surface rounded-2xl border-2 border-bartr-border overflow-hidden transition-all duration-150 shadow-[3px_3px_0px_var(--border)]"
+        style={{ transform: hov ? 'translate(-2px, -2px)' : 'none', boxShadow: hov ? '6px 6px 0px var(--border)' : '3px 3px 0px var(--border)' }}
       >
         {/* Image */}
-        <div className="relative overflow-hidden" style={{height: 200}}>
+        <div className="relative overflow-hidden border-b-2 border-bartr-border" style={{height: 200}}>
           {item.file_type?.startsWith('image') ? (
             <img
               src={item.file_url} alt={item.title}
@@ -68,19 +61,17 @@ function PortfolioItem({ item, onDelete, onUpdate, delay }) {
               style={{ transform: hov ? 'scale(1.06)' : 'scale(1)' }}
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+            <div className="w-full h-full bg-bartr-bg flex items-center justify-center">
               <span className="text-5xl">{item.file_type?.includes('pdf') ? '📄' : '🎬'}</span>
             </div>
           )}
-          {/* Overlay on hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent opacity-0 transition-opacity duration-300" style={{opacity: hov ? 1 : 0}} />
           {/* Action buttons on hover */}
           {!editing && (
             <div className="absolute top-3 right-3 flex gap-2 transition-all duration-200" style={{opacity: hov ? 1 : 0, transform: hov ? 'translateY(0)' : 'translateY(-8px)'}}>
-              <button onClick={() => setEditing(true)} className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white shadow-md transition-all">
-                <Edit2 className="w-3.5 h-3.5 text-gray-700" />
+              <button onClick={() => setEditing(true)} className="w-8 h-8 bg-bartr-surface/90 border border-bartr-border backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-bartr-text hover:text-bartr-bg shadow-md transition-all">
+                <Edit2 className="w-3.5 h-3.5" />
               </button>
-              <button onClick={() => onDelete(item.id)} className="w-8 h-8 bg-red-50/90 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-red-100 shadow-md transition-all">
+              <button onClick={() => onDelete(item.id)} className="w-8 h-8 bg-red-500/10 border border-red-500 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-red-500/20 shadow-md transition-all">
                 <Trash2 className="w-3.5 h-3.5 text-red-500" />
               </button>
             </div>
@@ -92,31 +83,31 @@ function PortfolioItem({ item, onDelete, onUpdate, delay }) {
           {editing ? (
             <div className="space-y-2.5">
               <input value={title} onChange={e => setTitle(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border-2 border-gray-200 text-sm focus:outline-none focus:border-amber-400 transition-all"
+                className="w-full px-3 py-2 rounded-xl bg-bartr-bg border-2 border-bartr-border text-sm text-bartr-text focus:outline-none focus:border-bartr-text transition-all font-medium"
                 style={{fontFamily:"'DM Sans',sans-serif"}} />
               <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2}
-                className="w-full px-3 py-2 rounded-xl border-2 border-gray-200 text-sm focus:outline-none focus:border-amber-400 transition-all resize-none"
+                className="w-full px-3 py-2 rounded-xl bg-bartr-bg border-2 border-bartr-border text-sm text-bartr-text focus:outline-none focus:border-bartr-text transition-all resize-none font-medium"
                 placeholder="Description…" style={{fontFamily:"'DM Sans',sans-serif"}} />
               <input value={tags} onChange={e => setTags(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border-2 border-gray-200 text-sm focus:outline-none focus:border-amber-400 transition-all"
+                className="w-full px-3 py-2 rounded-xl bg-bartr-bg border-2 border-bartr-border text-sm text-bartr-text focus:outline-none focus:border-bartr-text transition-all font-medium"
                 placeholder="Tags (comma-separated)" style={{fontFamily:"'DM Sans',sans-serif"}} />
               <div className="flex gap-2 pt-1">
-                <button onClick={handleSave} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white text-xs font-bold rounded-xl hover:bg-emerald-400 transition-all">
+                <button onClick={handleSave} className="flex items-center gap-1.5 px-3 py-1.5 bg-bartr-text text-bartr-bg border-2 border-bartr-border text-xs font-bold rounded-xl hover:bg-bartr-text/90 transition-all shadow-[2px_2px_0px_var(--border)] active:translate-y-[1px] active:shadow-none">
                   <Check className="w-3 h-3" /> Save
                 </button>
-                <button onClick={() => setEditing(false)} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-200 transition-all">
+                <button onClick={() => setEditing(false)} className="flex items-center gap-1.5 px-3 py-1.5 bg-bartr-surface text-bartr-text border-2 border-bartr-border text-xs font-bold rounded-xl hover:bg-bartr-bg transition-all">
                   <X className="w-3 h-3" /> Cancel
                 </button>
               </div>
             </div>
           ) : (
             <>
-              <p className="font-black text-gray-900 text-sm mb-1" style={{fontFamily:"'Sora',sans-serif"}}>{item.title}</p>
-              {item.description && <p className="text-xs text-gray-500 line-clamp-2" style={{fontFamily:"'DM Sans',sans-serif"}}>{item.description}</p>}
+              <p className="font-black text-bartr-text text-sm mb-1" style={{fontFamily:"'Sora',sans-serif"}}>{item.title}</p>
+              {item.description && <p className="text-xs text-bartr-muted line-clamp-2 font-medium" style={{fontFamily:"'DM Sans',sans-serif"}}>{item.description}</p>}
               {item.tags?.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-2">
                   {item.tags.map(tag => (
-                    <span key={tag} className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg font-medium" style={{fontFamily:"'DM Sans',sans-serif"}}>{tag}</span>
+                    <span key={tag} className="text-[10px] bg-bartr-bg text-bartr-text border border-bartr-border px-2 py-0.5 rounded-lg font-black" style={{fontFamily:"'DM Sans',sans-serif"}}>{tag}</span>
                   ))}
                 </div>
               )}
@@ -181,18 +172,15 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div>
-     
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap');
-        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
-      `}</style>
+    <div className="px-4 py-2">
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap');`}</style>
 
       <PortfolioHero scrollY={scrollY} />
 
       {/* Upload area */}
       <Reveal delay={60}>
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 mb-8">
-          <h2 className="text-lg font-black text-gray-900 mb-5" style={{fontFamily:"'Sora',sans-serif"}}>Upload New Item</h2>
+        <div className="bg-bartr-surface border-2 border-bartr-border shadow-[4px_4px_0px_var(--border)] rounded-2xl p-6 mb-8">
+          <h2 className="text-lg font-black text-bartr-text mb-5" style={{fontFamily:"'Sora',sans-serif"}}>Upload New Item</h2>
 
           {/* Drop zone */}
           <div
@@ -200,26 +188,26 @@ export default function PortfolioPage() {
             onDragLeave={() => setDragOver(false)}
             onDrop={handleDrop}
             onClick={() => fileRef.current?.click()}
-            className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-200 mb-5 ${
-              dragOver ? 'border-amber-400 bg-amber-50' : selectedFile ? 'border-emerald-400 bg-emerald-50' : 'border-gray-200 hover:border-amber-300 hover:bg-amber-50/50'
+            className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-200 mb-5 ${
+              dragOver ? 'border-bartr-text bg-bartr-text/5' : selectedFile ? 'border-bartr-text bg-bartr-text/10' : 'border-bartr-border hover:border-bartr-text hover:bg-bartr-text/5'
             }`}
           >
             <input ref={fileRef} type="file" accept="image/*,video/*,application/pdf" className="hidden" onChange={e => setSelectedFile(e.target.files[0])} />
             {selectedFile ? (
               <div>
-                <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                  <Check className="w-6 h-6 text-emerald-500" />
+                <div className="w-12 h-12 bg-bartr-text/10 border border-bartr-border rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Check className="w-6 h-6 text-bartr-text" />
                 </div>
-                <p className="font-black text-gray-900 text-sm" style={{fontFamily:"'Sora',sans-serif"}}>{selectedFile.name}</p>
-                <p className="text-xs text-gray-400 mt-1" style={{fontFamily:"'DM Sans',sans-serif"}}>{(selectedFile.size/1024/1024).toFixed(2)} MB</p>
+                <p className="font-black text-bartr-text text-sm" style={{fontFamily:"'Sora',sans-serif"}}>{selectedFile.name}</p>
+                <p className="text-xs text-bartr-muted font-bold mt-1" style={{fontFamily:"'DM Sans',sans-serif"}}>{(selectedFile.size/1024/1024).toFixed(2)} MB</p>
               </div>
             ) : (
               <div>
-                <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                  <Upload className="w-6 h-6 text-gray-400" />
+                <div className="w-12 h-12 bg-bartr-text/10 border border-bartr-border rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Upload className="w-6 h-6 text-bartr-text" />
                 </div>
-                <p className="text-sm font-bold text-gray-600 mb-1" style={{fontFamily:"'Sora',sans-serif"}}>Drop your file here or click to upload</p>
-                <p className="text-xs text-gray-400" style={{fontFamily:"'DM Sans',sans-serif"}}>Images, PDF, or Video · Max 5MB</p>
+                <p className="text-sm font-bold text-bartr-text mb-1" style={{fontFamily:"'Sora',sans-serif"}}>Drop your file here or click to upload</p>
+                <p className="text-xs text-bartr-muted font-bold" style={{fontFamily:"'DM Sans',sans-serif"}}>Images, PDF, or Video · Max 5MB</p>
               </div>
             )}
           </div>
@@ -230,7 +218,7 @@ export default function PortfolioPage() {
                 value={uploadData.title}
                 onChange={e => setUploadData(d => ({ ...d, title: e.target.value }))}
                 placeholder="Project title *"
-                className="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 text-sm focus:outline-none focus:border-amber-400 transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-bartr-bg border-2 border-bartr-border text-sm text-bartr-text placeholder-bartr-muted focus:outline-none focus:border-bartr-text transition-all font-medium"
                 style={{fontFamily:"'DM Sans',sans-serif"}}
               />
               <textarea
@@ -238,29 +226,29 @@ export default function PortfolioPage() {
                 onChange={e => setUploadData(d => ({ ...d, description: e.target.value }))}
                 placeholder="Describe the project…"
                 rows={2}
-                className="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 text-sm focus:outline-none focus:border-amber-400 transition-all resize-none"
+                className="w-full px-4 py-3 rounded-xl bg-bartr-bg border-2 border-bartr-border text-sm text-bartr-text placeholder-bartr-muted focus:outline-none focus:border-bartr-text transition-all resize-none font-medium"
                 style={{fontFamily:"'DM Sans',sans-serif"}}
               />
               <input
                 value={uploadData.tags}
                 onChange={e => setUploadData(d => ({ ...d, tags: e.target.value }))}
                 placeholder="Tags: design, figma, ui…"
-                className="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 text-sm focus:outline-none focus:border-amber-400 transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-bartr-bg border-2 border-bartr-border text-sm text-bartr-text placeholder-bartr-muted focus:outline-none focus:border-bartr-text transition-all font-medium"
                 style={{fontFamily:"'DM Sans',sans-serif"}}
               />
-              {uploadError && <p className="text-sm text-red-500" style={{fontFamily:"'DM Sans',sans-serif"}}>{uploadError}</p>}
+              {uploadError && <p className="text-sm text-red-500 font-bold" style={{fontFamily:"'DM Sans',sans-serif"}}>{uploadError}</p>}
               <div className="flex gap-3 pt-1">
-                <button onClick={() => setSelectedFile(null)} className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:border-gray-400 transition-all" style={{fontFamily:"'Sora',sans-serif"}}>
+                <button onClick={() => setSelectedFile(null)} className="flex-1 py-3 rounded-xl border-2 border-bartr-border bg-bartr-surface text-sm font-bold text-bartr-text hover:bg-bartr-bg transition-all" style={{fontFamily:"'Sora',sans-serif"}}>
                   Cancel
                 </button>
                 <button
                   disabled={!uploadData.title || uploadMutation.isPending}
                   onClick={handleUpload}
-                  className="flex-1 py-3 rounded-2xl bg-gray-900 text-white text-sm font-bold disabled:opacity-50 hover:bg-gray-700 transition-all shadow-lg flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-xl bg-bartr-text text-bartr-bg border-2 border-bartr-border text-sm font-bold disabled:opacity-50 hover:bg-bartr-text/90 transition-all shadow-[3px_3px_0px_var(--border)] active:translate-y-[2px] active:shadow-none flex items-center justify-center gap-2"
                   style={{fontFamily:"'Sora',sans-serif"}}
                 >
                   {uploadMutation.isPending
-                    ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Uploading…</>
+                    ? <><div className="w-4 h-4 border-2 border-bartr-bg border-t-transparent rounded-full animate-spin" /> Uploading…</>
                     : <><Upload className="w-4 h-4" /> Upload</>
                   }
                 </button>
@@ -275,19 +263,19 @@ export default function PortfolioPage() {
         <div className="flex justify-center py-10"><Spinner size="lg" /></div>
       ) : items.length === 0 ? (
         <Reveal>
-          <div className="text-center py-20">
-            <div className="w-20 h-20 bg-purple-50 rounded-3xl flex items-center justify-center mx-auto mb-5">
-              <Image className="w-10 h-10 text-purple-200" />
+          <div className="text-center py-20 bg-bartr-surface border-2 border-bartr-border rounded-2xl shadow-[4px_4px_0px_var(--border)] max-w-xl mx-auto dotted-bg">
+            <div className="w-20 h-20 bg-bartr-text/10 border border-bartr-border rounded-3xl flex items-center justify-center mx-auto mb-5">
+              <Image className="w-10 h-10 text-bartr-text" />
             </div>
-            <h3 className="text-xl font-black text-gray-800 mb-2" style={{fontFamily:"'Sora',sans-serif"}}>No portfolio items yet</h3>
-            <p className="text-gray-500" style={{fontFamily:"'DM Sans',sans-serif"}}>Upload your first project to showcase your work.</p>
+            <h3 className="text-xl font-black text-bartr-text mb-2" style={{fontFamily:"'Sora',sans-serif"}}>No portfolio items yet</h3>
+            <p className="text-bartr-muted font-medium text-sm" style={{fontFamily:"'DM Sans',sans-serif"}}>Upload your first project to showcase your work.</p>
           </div>
         </Reveal>
       ) : (
         <>
           <Reveal>
-            <p className="text-sm text-gray-400 mb-5" style={{fontFamily:"'DM Sans',sans-serif"}}>
-              <span className="text-gray-900 font-black text-lg">{items.length}</span> project{items.length !== 1 ? 's' : ''}
+            <p className="text-sm text-bartr-muted mb-5 font-bold" style={{fontFamily:"'DM Sans',sans-serif"}}>
+              <span className="text-bartr-text font-black text-lg">{items.length}</span> project{items.length !== 1 ? 's' : ''}
             </p>
           </Reveal>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">

@@ -45,9 +45,9 @@ export default function Footer() {
   const navigate = useNavigate()
 
   return (
-    <footer className="bg-bartr-dark text-white" id="contact-us">
+    <footer className="bg-bartr-surface text-bartr-text border-t-2 border-bartr-border" id="contact-us">
       {/* CTA Banner */}
-      <div className="border-b border-white/10">
+      <div className="border-b border-bartr-border">
         <div className="max-w-6xl mx-auto px-6 py-16 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -57,11 +57,11 @@ export default function Footer() {
           >
             <h2 className="text-4xl md:text-5xl font-extrabold font-sora leading-tight mb-4">
               Ready to start<br />
-              <span className="bg-yellow-300 text-bartr-dark rounded-lg px-3 py-1 inline-block mt-1">
+              <span className="bg-bartr-text text-bartr-bg rounded border border-bartr-border px-3 py-1 inline-block mt-1">
                 exchanging?
               </span>
             </h2>
-            <p className="text-gray-400 font-dm text-lg mb-8 max-w-md mx-auto">
+            <p className="text-bartr-muted font-dm text-lg mb-8 max-w-md mx-auto">
               Join 1,200+ students already trading skills across 40+ campuses.
               It's free — always.
             </p>
@@ -71,11 +71,11 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder="your@university.edu"
-                className="w-full sm:w-72 bg-white/10 border border-white/20 text-white placeholder-gray-500 rounded-full px-5 py-3 text-sm outline-none focus:border-yellow-300 transition-colors font-dm"
+                className="w-full sm:w-72 bg-bartr-bg border-2 border-bartr-border text-bartr-text placeholder-bartr-muted/50 rounded-lg px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-bartr-text transition-colors font-dm"
               />
               <button
                 onClick={() => navigate('/register')}
-                className="w-full sm:w-auto bg-yellow-300 text-bartr-dark text-sm font-bold px-7 py-3 rounded-full font-sora hover:bg-yellow-400 active:scale-95 transition-all whitespace-nowrap"
+                className="w-full sm:w-auto neo-btn text-sm font-bold px-7 py-3 rounded-lg border-2 border-bartr-border"
               >
                 Get Started →
               </button>
@@ -88,8 +88,8 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-6 py-10">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo */}
-          <div className="flex items-center gap-2 font-sora font-bold text-lg">
-            <span className="w-7 h-7 bg-yellow-300 rounded-lg flex items-center justify-center text-bartr-dark font-black text-sm">
+          <div className="flex items-center gap-2 font-sora font-extrabold text-lg text-bartr-text">
+            <span className="w-7 h-7 bg-bartr-text border border-bartr-border rounded flex items-center justify-center text-bartr-bg font-black text-sm">
               B
             </span>
             Bartr
@@ -102,7 +102,7 @@ export default function Footer() {
                 <button
                   key={link.label}
                   onClick={() => navigate(link.href)}
-                  className="text-sm text-gray-400 hover:text-white transition-colors font-dm"
+                  className="text-sm text-bartr-muted hover:text-bartr-text transition-colors font-dm font-semibold"
                 >
                   {link.label}
                 </button>
@@ -110,7 +110,7 @@ export default function Footer() {
                 <a
                   key={link.label}
                   href={link.href}
-                  className="text-sm text-gray-400 hover:text-white transition-colors font-dm"
+                  className="text-sm text-bartr-muted hover:text-bartr-text transition-colors font-dm font-semibold"
                 >
                   {link.label}
                 </a>
@@ -125,7 +125,7 @@ export default function Footer() {
                 key={s.label}
                 href={s.href}
                 aria-label={s.label}
-                className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/40 transition-colors"
+                className="w-8 h-8 rounded-full border border-bartr-border flex items-center justify-center text-bartr-muted hover:text-bartr-text hover:border-bartr-text transition-colors"
               >
                 {s.icon}
               </a>
@@ -134,11 +134,11 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="mt-8 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-600 font-dm">
+        <div className="mt-8 pt-8 border-t border-bartr-border flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-bartr-muted font-dm">
           <p>© {new Date().getFullYear()} Bartr Technologies. All rights reserved.</p>
-          <div className="flex gap-4">
-            <a href="#" className="hover:text-gray-400 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-gray-400 transition-colors">Terms of Service</a>
+          <div className="flex gap-4 font-semibold">
+            <a href="#" className="hover:text-bartr-text transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-bartr-text transition-colors">Terms of Service</a>
           </div>
         </div>
       </div>

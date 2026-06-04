@@ -1,38 +1,69 @@
 import multer from 'multer'
 import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import cloudinary from '../config/cloudinary.js'
+import fs from 'fs'
+import path from 'path'
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 const ALLOWED_FILE_TYPES = [...ALLOWED_IMAGE_TYPES, 'application/pdf', 'video/mp4', 'video/webm']
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
 
-const avatarStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'bartr/avatars',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 400, height: 400, crop: 'fill', gravity: 'face' }],
+const isCloudinaryConfigured = !!(
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET
+)
+
+// ── Local Storage Setup (Fallback) ───────────────────────────────────────────
+if (!isCloudinaryConfigured) {
+  if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads', { recursive: true })
+  }
+}
+
+const diskStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/')
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname) || `.${file.mimetype.split('/')[1] || 'bin'}`
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+    cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`)
   },
 })
 
-const portfolioStorage = new CloudinaryStorage({
-  cloudinary,
-  params: (req, file) => ({
-    folder: 'bartr/portfolios',
-    resource_type: file.mimetype.startsWith('video/') ? 'video' : 'auto',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'mp4', 'webm'],
-  }),
-})
+// ── Cloudinary Storage Setup ─────────────────────────────────────────────────
+const avatarStorage = isCloudinaryConfigured
+  ? new CloudinaryStorage({
+      cloudinary,
+      params: {
+        folder: 'bartr/avatars',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+        transformation: [{ width: 400, height: 400, crop: 'fill', gravity: 'face' }],
+      },
+    })
+  : null
 
-const messageStorage = new CloudinaryStorage({
-  cloudinary,
-  params: (req, file) => ({
-    folder: 'bartr/messages',
-    // Support images, videos, and 'raw' for ZIPs/PDFs/etc.
-    resource_type: file.mimetype.startsWith('video/') ? 'video' : (file.mimetype.startsWith('image/') ? 'image' : 'raw'),
-    // We allow all for now but Cloudinary has some restrictions based on resource_type
-  }),
-})
+const portfolioStorage = isCloudinaryConfigured
+  ? new CloudinaryStorage({
+      cloudinary,
+      params: (req, file) => ({
+        folder: 'bartr/portfolios',
+        resource_type: file.mimetype.startsWith('video/') ? 'video' : 'auto',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'mp4', 'webm'],
+      }),
+    })
+  : null
+
+const messageStorage = isCloudinaryConfigured
+  ? new CloudinaryStorage({
+      cloudinary,
+      params: (req, file) => ({
+        folder: 'bartr/messages',
+        resource_type: file.mimetype.startsWith('video/') ? 'video' : (file.mimetype.startsWith('image/') ? 'image' : 'raw'),
+      }),
+    })
+  : null
 
 const fileFilter = (allowed) => (req, file, cb) => {
   if (allowed.includes(file.mimetype)) {
@@ -42,23 +73,39 @@ const fileFilter = (allowed) => (req, file, cb) => {
   }
 }
 
-export const uploadAvatar = multer({
-  storage: avatarStorage,
-  limits: { fileSize: MAX_FILE_SIZE },
-  fileFilter: fileFilter(ALLOWED_IMAGE_TYPES),
-}).single('avatar')
+// ── Middleware Wrappers ──────────────────────────────────────────────────────
+const wrapUpload = (multerMiddleware) => (req, res, next) => {
+  multerMiddleware(req, res, (err) => {
+    if (err) return next(err)
+    if (req.file && !isCloudinaryConfigured) {
+      req.file.path = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+    }
+    next()
+  })
+}
 
-export const uploadPortfolio = multer({
-  storage: portfolioStorage,
-  limits: { fileSize: MAX_FILE_SIZE },
-  fileFilter: fileFilter(ALLOWED_FILE_TYPES),
-}).single('file')
+export const uploadAvatar = wrapUpload(
+  multer({
+    storage: isCloudinaryConfigured ? avatarStorage : diskStorage,
+    limits: { fileSize: MAX_FILE_SIZE },
+    fileFilter: fileFilter(ALLOWED_IMAGE_TYPES),
+  }).single('avatar')
+)
 
-export const uploadMessageFile = multer({
-  storage: messageStorage,
-  limits: { fileSize: MAX_FILE_SIZE },
-  // No strict filter here for messages yet, but resource_type handles it in storage
-}).single('file')
+export const uploadPortfolio = wrapUpload(
+  multer({
+    storage: isCloudinaryConfigured ? portfolioStorage : diskStorage,
+    limits: { fileSize: MAX_FILE_SIZE },
+    fileFilter: fileFilter(ALLOWED_FILE_TYPES),
+  }).single('file')
+)
+
+export const uploadMessageFile = wrapUpload(
+  multer({
+    storage: isCloudinaryConfigured ? messageStorage : diskStorage,
+    limits: { fileSize: MAX_FILE_SIZE },
+  }).single('file')
+)
 
 export const handleUploadError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {

@@ -8,7 +8,7 @@ import { extractError } from '../../utils/helpers.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 
 const AuthCard = ({ children }) => (
-  <div className="min-h-screen bg-bartr-bg flex items-center justify-center px-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+  <div className="min-h-screen bg-bartr-bg flex items-center justify-center px-4 dotted-bg" style={{ fontFamily: "'DM Sans', sans-serif" }}>
     <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap');`}</style>
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -17,7 +17,7 @@ const AuthCard = ({ children }) => (
       className="w-full max-w-md"
     >
       <Link to="/" className="flex items-center gap-2 font-sora font-bold text-xl mb-8 justify-center text-bartr-text">
-        <span className="w-8 h-8 bg-yellow-300 rounded-lg flex items-center justify-center text-bartr-dark font-black">B</span>
+        <span className="w-8 h-8 bg-bartr-text text-bartr-bg rounded-lg flex items-center justify-center font-black border-2 border-bartr-border">B</span>
         Bartr
       </Link>
       {children}
@@ -66,7 +66,7 @@ function OtpInput({ value, onChange, disabled }) {
           onChange={e => handleChange(i, e)}
           onKeyDown={e => handleKeyDown(i, e)}
           disabled={disabled}
-          className="w-12 h-14 text-center text-xl font-black text-bartr-text bg-bartr-bg border-2 border-bartr-border rounded-xl outline-none focus:border-yellow-400 transition-all disabled:opacity-50"
+          className="w-12 h-14 text-center text-xl font-black text-bartr-text bg-bartr-bg border-2 border-bartr-border rounded-xl outline-none focus:border-bartr-text transition-all disabled:opacity-50"
           style={{ fontFamily: "'Sora', sans-serif" }}
         />
       ))}
@@ -116,7 +116,7 @@ export function VerifyEmailPage() {
   if (token) {
     return (
       <AuthCard>
-        <div className="bg-bartr-surface border border-bartr-border rounded-2xl shadow-sm p-8 text-center">
+        <div className="bg-bartr-surface border-2 border-bartr-border rounded-2xl shadow-[4px_4px_0px_var(--border)] p-8 text-center">
           {linkStatus === 'verifying' && (
             <>
               <div className="text-4xl mb-4">⏳</div>
@@ -127,7 +127,7 @@ export function VerifyEmailPage() {
             <>
               <div className="text-4xl mb-4">✅</div>
               <h2 className="font-sora font-bold text-xl text-bartr-text mb-2">Email verified!</h2>
-              <p className="text-bartr-muted font-dm text-sm mb-6">Your account is fully activated. You're ready to start exchanging skills.</p>
+              <p className="text-bartr-muted font-dm text-sm mb-6 font-medium">Your account is fully activated. You're ready to start exchanging skills.</p>
               <Link to="/dashboard"><Button variant="primary" size="md">Go to dashboard</Button></Link>
             </>
           )}
@@ -135,7 +135,7 @@ export function VerifyEmailPage() {
             <>
               <div className="text-4xl mb-4">❌</div>
               <h2 className="font-sora font-bold text-xl text-bartr-text mb-2">Verification failed</h2>
-              <p className="text-bartr-muted font-dm text-sm mb-6">{linkError}</p>
+              <p className="text-bartr-muted font-dm text-sm mb-6 font-medium">{linkError}</p>
               <Button variant="secondary" onClick={() => resendMutation.mutate()} loading={resendMutation.isPending}>
                 Resend verification email
               </Button>
@@ -154,15 +154,15 @@ export function VerifyEmailPage() {
           <motion.div
             key="success"
             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }}
-            className="bg-bartr-surface border border-bartr-border rounded-2xl shadow-sm p-8 text-center"
+            className="bg-bartr-surface border-2 border-bartr-border rounded-2xl shadow-[4px_4px_0px_var(--border)] p-8 text-center"
           >
             <div className="text-5xl mb-4">🎉</div>
             <h2 className="font-sora font-bold text-2xl text-bartr-text mb-2">Email verified!</h2>
-            <p className="text-bartr-muted font-dm text-sm mb-6">
+            <p className="text-bartr-muted font-dm text-sm mb-6 font-medium">
               Your account is activated. Start exchanging skills now!
             </p>
             <Link to="/dashboard">
-              <button className="bg-yellow-300 text-bartr-dark text-sm font-bold px-6 py-3 rounded-full hover:bg-yellow-400 transition-all font-sora">
+              <button className="bg-bartr-text text-bartr-bg border-2 border-bartr-border text-sm font-bold px-6 py-3 rounded-xl hover:bg-bartr-text/90 transition-all shadow-[3px_3px_0px_var(--border)] active:translate-y-[2px] active:shadow-none font-sora">
                 Go to Dashboard →
               </button>
             </Link>
@@ -171,14 +171,14 @@ export function VerifyEmailPage() {
           <motion.div
             key="otp-form"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}
-            className="bg-bartr-surface border border-bartr-border rounded-2xl shadow-sm p-8"
+            className="bg-bartr-surface border-2 border-bartr-border rounded-2xl shadow-[4px_4px_0px_var(--border)] p-8"
           >
             <div className="text-center mb-6">
               <div className="text-4xl mb-3">📬</div>
               <h1 className="font-sora font-bold text-2xl text-bartr-text mb-1">Check your email</h1>
-              <p className="text-bartr-muted font-dm text-sm">
+              <p className="text-bartr-muted font-dm text-sm font-medium">
                 We sent a 6-digit code to{' '}
-                <span className="font-semibold text-bartr-text">{email || 'your email'}</span>.
+                <span className="font-bold text-bartr-text">{email || 'your email'}</span>.
                 <br />Enter it below to verify your account.
               </p>
             </div>
@@ -187,14 +187,14 @@ export function VerifyEmailPage() {
             <div className="mb-5">
               <OtpInput value={otp} onChange={(v) => { setOtp(v); setOtpError('') }} disabled={otpMutation.isPending} />
               {otpError && (
-                <p className="text-center text-sm text-red-500 font-dm mt-3">{otpError}</p>
+                <p className="text-center text-sm text-red-500 font-bold font-dm mt-3">{otpError}</p>
               )}
             </div>
 
             {/* If email not pre-filled, show input */}
             {!user?.email && (
               <div className="mb-4">
-                <label className="text-xs font-semibold text-bartr-muted uppercase tracking-wider block mb-1.5">
+                <label className="text-xs font-bold text-bartr-muted uppercase tracking-wider block mb-1.5">
                   Your email
                 </label>
                 <input
@@ -202,7 +202,7 @@ export function VerifyEmailPage() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="you@university.edu"
-                  className="w-full bg-bartr-bg border border-bartr-border rounded-xl px-4 py-3 text-sm text-bartr-text placeholder-bartr-muted outline-none focus:border-yellow-400 transition-colors"
+                  className="w-full bg-bartr-bg border-2 border-bartr-border rounded-xl px-4 py-3 text-sm text-bartr-text placeholder-bartr-muted outline-none focus:border-bartr-text transition-colors"
                 />
               </div>
             )}
@@ -210,20 +210,20 @@ export function VerifyEmailPage() {
             <button
               onClick={() => { setOtpError(''); otpMutation.mutate() }}
               disabled={otp.length < 6 || otpMutation.isPending || !email}
-              className="w-full bg-bartr-dark text-white font-bold text-sm py-3.5 rounded-xl hover:opacity-80 active:scale-95 transition-all disabled:opacity-40 font-sora flex items-center justify-center gap-2 mb-4"
+              className="w-full bg-bartr-text text-bartr-bg border-2 border-bartr-border font-bold text-sm py-3.5 rounded-xl hover:bg-bartr-text/90 active:scale-95 transition-all disabled:opacity-40 font-sora flex items-center justify-center gap-2 mb-4 shadow-[3px_3px_0px_var(--border)] active:translate-y-[2px] active:shadow-none"
             >
               {otpMutation.isPending ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-bartr-bg border-t-transparent rounded-full animate-spin" />
               ) : null}
               {otpMutation.isPending ? 'Verifying…' : 'Verify Code'}
             </button>
 
-            <div className="flex items-center justify-between text-sm text-bartr-muted font-dm">
+            <div className="flex items-center justify-between text-sm text-bartr-muted font-dm font-medium">
               <span>Didn't get it?</span>
               <button
                 onClick={() => resendMutation.mutate()}
                 disabled={resendMutation.isPending || resendMutation.isSuccess}
-                className="font-semibold text-amber-600 hover:text-amber-700 disabled:opacity-50 transition-colors"
+                className="font-bold text-bartr-text hover:underline disabled:opacity-50 transition-colors"
               >
                 {resendMutation.isPending ? 'Sending…' : resendMutation.isSuccess ? '✓ Sent!' : 'Resend code'}
               </button>
@@ -255,32 +255,32 @@ export function ForgotPasswordPage() {
 
   return (
     <AuthCard>
-      <div className="bg-bartr-surface border border-bartr-border rounded-2xl shadow-sm p-8">
+      <div className="bg-bartr-surface border-2 border-bartr-border rounded-2xl shadow-[4px_4px_0px_var(--border)] p-8">
         {sent ? (
           <div className="text-center">
             <div className="text-4xl mb-4">📧</div>
             <h2 className="font-sora font-bold text-xl text-bartr-text mb-2">Reset link sent!</h2>
-            <p className="text-bartr-muted font-dm text-sm mb-6">If an account exists for that email, we've sent a password reset link. Check your inbox.</p>
+            <p className="text-bartr-muted font-dm text-sm mb-6 font-medium">If an account exists for that email, we've sent a password reset link. Check your inbox.</p>
             <Link to="/login"><Button variant="secondary" size="md">Back to login</Button></Link>
           </div>
         ) : (
           <>
             <h1 className="font-sora font-bold text-2xl text-bartr-text mb-1">Reset password</h1>
-            <p className="text-bartr-muted font-dm text-sm mb-6">Enter your email and we'll send a reset link.</p>
+            <p className="text-bartr-muted font-dm text-sm mb-6 font-medium">Enter your email and we'll send a reset link.</p>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <input
                   type="email" value={email} onChange={e => { setEmail(e.target.value); setEmailError('') }}
                   placeholder="you@university.edu"
-                  className={`w-full bg-bartr-bg border ${emailError ? 'border-red-400' : 'border-bartr-border'} rounded-xl px-4 py-3 text-sm text-bartr-text placeholder-bartr-muted outline-none focus:border-yellow-400 transition-colors`}
+                  className={`w-full bg-bartr-bg border-2 ${emailError ? 'border-red-500' : 'border-bartr-border'} rounded-xl px-4 py-3 text-sm text-bartr-text placeholder-bartr-muted outline-none focus:border-bartr-text transition-colors`}
                 />
-                {emailError && <p className="text-xs text-red-500 mt-1">{emailError}</p>}
+                {emailError && <p className="text-xs text-red-500 font-bold mt-1">{emailError}</p>}
               </div>
-              {mutation.isError && <p className="text-sm text-red-500 font-dm">{extractError(mutation.error)}</p>}
+              {mutation.isError && <p className="text-sm text-red-500 font-bold font-dm">{extractError(mutation.error)}</p>}
               <Button type="submit" variant="primary" size="lg" loading={mutation.isPending} className="w-full">Send reset link</Button>
             </form>
             <p className="text-center text-sm text-bartr-muted font-dm mt-4">
-              <Link to="/login" className="text-amber-600 font-semibold hover:underline">Back to login</Link>
+              <Link to="/login" className="text-bartr-text font-bold hover:underline">Back to login</Link>
             </p>
           </>
         )}
@@ -314,31 +314,31 @@ export function ResetPasswordPage() {
     mutation.mutate()
   }
 
-  const inputClass = (k) => `w-full bg-bartr-bg border ${errors[k] ? 'border-red-400' : 'border-bartr-border'} rounded-xl px-4 py-3 text-sm text-bartr-text placeholder-bartr-muted outline-none focus:border-yellow-400 transition-colors`
+  const inputClass = (k) => `w-full bg-bartr-bg border-2 ${errors[k] ? 'border-red-500' : 'border-bartr-border'} rounded-xl px-4 py-3 text-sm text-bartr-text placeholder-bartr-muted outline-none focus:border-bartr-text transition-colors`
 
   return (
     <AuthCard>
-      <div className="bg-bartr-surface border border-bartr-border rounded-2xl shadow-sm p-8">
+      <div className="bg-bartr-surface border-2 border-bartr-border rounded-2xl shadow-[4px_4px_0px_var(--border)] p-8">
         {done ? (
           <div className="text-center">
             <div className="text-4xl mb-4">🔒</div>
             <h2 className="font-sora font-bold text-xl text-bartr-text mb-2">Password updated!</h2>
-            <p className="text-bartr-muted font-dm text-sm mb-6">Your password has been reset. You can now sign in with your new password.</p>
+            <p className="text-bartr-muted font-dm text-sm mb-6 font-medium">Your password has been reset. You can now sign in with your new password.</p>
             <Link to="/login"><Button variant="primary" size="md">Sign in</Button></Link>
           </div>
         ) : (
           <>
             <h1 className="font-sora font-bold text-2xl text-bartr-text mb-1">Set new password</h1>
-            <p className="text-bartr-muted font-dm text-sm mb-6">Choose a strong new password for your account.</p>
-            {errors.root && <div className="bg-red-500/10 border border-red-400/30 rounded-xl px-4 py-3 mb-4"><p className="text-sm text-red-500 font-dm">{errors.root}</p></div>}
+            <p className="text-bartr-muted font-dm text-sm mb-6 font-medium">Choose a strong new password for your account.</p>
+            {errors.root && <div className="bg-red-500/10 border-2 border-red-500 rounded-xl px-4 py-3 mb-4"><p className="text-sm text-red-500 font-bold font-dm">{errors.root}</p></div>}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 8 characters" className={inputClass('password')} />
-                {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
+                {errors.password && <p className="text-xs text-red-500 font-bold mt-1">{errors.password}</p>}
               </div>
               <div>
                 <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="Repeat your password" className={inputClass('confirm')} />
-                {errors.confirm && <p className="text-xs text-red-500 mt-1">{errors.confirm}</p>}
+                {errors.confirm && <p className="text-xs text-red-500 font-bold mt-1">{errors.confirm}</p>}
               </div>
               <Button type="submit" variant="primary" size="lg" loading={mutation.isPending} className="w-full">Update password</Button>
             </form>
