@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { GraduationCap, ArrowLeftRight, Star, ChevronRight, Edit3, UserX, Briefcase, HandHeart, Image as ImageIcon, Trash2, Pencil } from 'lucide-react'
+import { GraduationCap, ArrowsLeftRight, Star, CaretRight, PencilSimple, UserMinus, Briefcase, HandHeart, Image, Trash, Pencil } from '@phosphor-icons/react'
 import { usersApi, skillsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -65,14 +65,14 @@ function ProfileHero({ user, isMe, onEdit, onExchange }) {
             onClick={onEdit} 
             className="bg-[#0B0B0A] hover:bg-[#0B0B0A]/90 text-[#F7F7F5] text-xs font-bold px-6 py-3 rounded-full border border-transparent flex items-center gap-1.5 shadow-sm transition-transform hover:scale-[1.02] active:scale-[0.98] font-jakarta tracking-wider uppercase"
           >
-            <Edit3 className="w-3.5 h-3.5" /> Edit Profile
+            <PencilSimple className="w-3.5 h-3.5" /> Edit Profile
           </button>
         ) : (
           <button 
             onClick={onExchange} 
             className="bg-[#6D28D9] hover:bg-[#5B21B6] text-white text-xs font-bold px-6 py-3 rounded-full border border-transparent flex items-center gap-1.5 shadow-md shadow-[#6D28D9]/10 transition-transform hover:scale-[1.02] active:scale-[0.98] font-jakarta tracking-wider uppercase"
           >
-            <ArrowLeftRight className="w-3.5 h-3.5" /> Propose Swap
+            <ArrowsLeftRight className="w-3.5 h-3.5" /> Propose Swap
           </button>
         )}
       </div>
@@ -123,7 +123,7 @@ function SkillItem({ skill, onClick, isMe, onEdit, onDelete }) {
               title="Delete skill"
               className="w-8 h-8 rounded-lg flex items-center justify-center text-[#0B0B0A]/40 hover:text-red-600 hover:bg-red-500/10 transition-all"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
@@ -149,7 +149,7 @@ export default function ProfilePage() {
   })
 
   if (isLoading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
-  if (!data) return <EmptyState icon={<UserX className="w-12 h-12" />} title="User not found" />
+  if (!data) return <EmptyState icon={<UserMinus className="w-12 h-12" />} title="User not found" />
 
   const user = data
   const isMe = user.id === me?.id
@@ -229,7 +229,7 @@ export default function ProfilePage() {
                             title="Remove wanted skill"
                             className="w-8 h-8 rounded-lg flex items-center justify-center text-[#0B0B0A]/40 hover:text-red-600 hover:bg-red-500/5 transition-all shrink-0"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash className="w-3.5 h-3.5" />
                           </button>
                         )}
                       </div>
@@ -281,7 +281,7 @@ export default function ProfilePage() {
             <div className="space-y-4">
               <Reveal>
                 <h2 className="text-xs font-bold text-[#0B0B0A]/40 uppercase tracking-widest flex items-center gap-2 border-b border-[#0B0B0A]/5 pb-3" style={{fontFamily:"'Syne',sans-serif"}}>
-                  <ImageIcon className="w-4 h-4 text-[#6D28D9]" /> 
+                  <Image className="w-4 h-4 text-[#6D28D9]" /> 
                   Portfolio
                 </h2>
               </Reveal>

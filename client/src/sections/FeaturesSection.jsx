@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, CheckCircle } from '@phosphor-icons/react'
 
 const PHASES = [
   {
@@ -132,7 +132,7 @@ export default function FeaturesSection() {
               >
                 {/* Phase Category Tag */}
                 <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#6D28D9]/10 text-[#6D28D9] text-[10px] font-jakarta font-bold uppercase tracking-wider">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <CheckCircle className="w-3.5 h-3.5" />
                   {PHASES[activeIndex].tag}
                 </span>
 

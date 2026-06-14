@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Minus } from 'lucide-react'
+import { Plus, Minus } from '@phosphor-icons/react'
 
 const FAQS = [
   {

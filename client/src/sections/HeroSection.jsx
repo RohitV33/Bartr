@@ -1,13 +1,13 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { Code, PenTool, Video, Languages, BookOpen, Cpu, Sparkles, Database } from 'lucide-react'
+import { Code, PenNib, Video, Translate, BookOpen, Cpu, Sparkle, Database } from '@phosphor-icons/react'
 
 const FLOATING_SKILLS = [
   { icon: Code, label: 'React / Web', x: '-25%', y: '12%', delay: 0 },
-  { icon: PenTool, label: 'UI/UX Design', x: '25%', y: '18%', delay: 0.4 },
+  { icon: PenNib, label: 'UI/UX Design', x: '25%', y: '18%', delay: 0.4 },
   { icon: Video, label: 'Video Edit', x: '-35%', y: '45%', delay: 0.2 },
-  { icon: Languages, label: 'Spanish', x: '35%', y: '50%', delay: 0.6 },
+  { icon: Translate, label: 'Spanish', x: '35%', y: '50%', delay: 0.6 },
   { icon: BookOpen, label: 'Tutoring', x: '-20%', y: '72%', delay: 0.1 },
   { icon: Cpu, label: 'AI Prompting', x: '20%', y: '76%', delay: 0.5 },
   { icon: Database, label: 'SQL / Backend', x: '0%', y: '85%', delay: 0.3 },
@@ -92,7 +92,7 @@ export default function HeroSection() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="inline-flex items-center gap-2 bg-[#0B0B0A]/5 border border-[#0B0B0A]/5 rounded-full px-4 py-1.5 mb-8"
         >
-          <Sparkles className="w-3.5 h-3.5 text-[#6D28D9] animate-pulse" />
+          <Sparkle className="w-3.5 h-3.5 text-[#6D28D9] animate-pulse" />
           <span className="text-[10px] font-jakarta font-bold text-[#0B0B0A] uppercase tracking-widest">
             A New Paradigm for Student Learning
           </span>

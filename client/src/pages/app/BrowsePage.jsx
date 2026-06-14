@@ -1,11 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { Search, Plus, ChevronLeft, ChevronRight, Sparkles, TrendingUp, Users, SearchX, SlidersHorizontal } from 'lucide-react'
+import { MagnifyingGlass, Plus, CaretLeft, CaretRight, Sparkle, TrendUp, Users, MagnifyingGlassX, Sliders, Briefcase, HandHeart } from '@phosphor-icons/react'
 import { skillsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { Spinner, SkillCard } from '../../components/shared.jsx'
-import { Briefcase, HandHeart } from 'lucide-react'
 
 /* ─── Scroll Reveal ─────────────────────────────────────────────────────────── */
 function Reveal({ children, delay = 0, className = '', direction = 'up' }) {
@@ -236,7 +235,7 @@ export default function BrowsePage() {
                       className="px-5 py-2.5 rounded-full border border-[#0B0B0A]/10 text-xs font-bold tracking-wider uppercase text-[#0B0B0A] hover:bg-[#0B0B0A]/5 disabled:opacity-30 transition-all active:scale-[0.98]"
                       style={{ fontFamily: "'Syne', sans-serif" }}
                     >
-                      <ChevronLeft className="w-4 h-4 inline mr-1" /> Prev
+                      <CaretLeft className="w-4 h-4 inline mr-1" /> Prev
                     </button>
                     <button
                       disabled={page >= pagination.totalPages}
@@ -244,7 +243,7 @@ export default function BrowsePage() {
                       className="px-5 py-2.5 rounded-full border border-[#0B0B0A]/10 text-xs font-bold tracking-wider uppercase text-[#0B0B0A] hover:bg-[#0B0B0A]/5 disabled:opacity-30 transition-all active:scale-[0.98]"
                       style={{ fontFamily: "'Syne', sans-serif" }}
                     >
-                      Next <ChevronRight className="w-4 h-4 inline ml-1" />
+                      Next <CaretRight className="w-4 h-4 inline ml-1" />
                     </button>
                   </div>
                 </Reveal>

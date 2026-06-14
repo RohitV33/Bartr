@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate, Link } from 'react-router-dom'
-import { Mail, MessageSquare, User, Send, CheckCircle, ArrowLeft, Phone, MapPin, Clock } from 'lucide-react'
+import { Envelope, ChatText, User, PaperPlaneTilt, CheckCircle, ArrowLeft, Phone, MapPin, Clock } from '@phosphor-icons/react'
 import api from '../api/index.js'
 
 /* ── Auth-style card wrapper ── */

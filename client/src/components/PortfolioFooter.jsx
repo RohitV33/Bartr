@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowSquareOut } from '@phosphor-icons/react'
 
 export default function PortfolioFooter() {
   const currentYear = new Date().getFullYear()
@@ -65,7 +65,7 @@ export default function PortfolioFooter() {
               whileHover={{ rotate: 45, x: 5, y: -5 }}
               transition={{ type: 'spring', stiffness: 200 }}
             >
-              <ArrowUpRight className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-[#0B0B0A]/30 group-hover:text-[#6D28D9] transition-colors" />
+              <ArrowSquareOut className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-[#0B0B0A]/30 group-hover:text-[#6D28D9] transition-colors" />
             </motion.span>
             <span className="absolute bottom-0 left-0 w-full h-[2px] bg-[#0B0B0A]/10 group-hover:bg-[#6D28D9]/20 transition-colors" />
           </a>

@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import ThemeContext from '../context/themeContext.jsx'
-import { Sun, Moon } from 'lucide-react'
+import { Sun, Moon } from '@phosphor-icons/react'
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useContext(ThemeContext)
@@ -31,8 +31,8 @@ export default function ThemeToggle() {
         style={{ transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }}
       >
         {isDark
-          ? <Sun  className="w-3 h-3 text-[#6D28D9]" strokeWidth={2.5} />
-          : <Moon className="w-3 h-3 text-[#0B0B0A]/60" strokeWidth={2.5} />
+          ? <Sun  className="w-3 h-3 text-[#6D28D9]" weight="fill" />
+          : <Moon className="w-3 h-3 text-[#0B0B0A]/60" weight="fill" />
         }
       </span>
 

@@ -1,10 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import {
-  ArrowRight, Clock, Zap, CheckCircle2, XCircle,
-  ShieldAlert, HandshakeIcon, ChevronRight, Sparkles,
-} from 'lucide-react'
+import { ArrowRight, Clock, Lightning, CheckCircle, XCircle, ShieldWarning, Handshake, CaretRight, Sparkle } from '@phosphor-icons/react'
 import { exchangesApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -24,11 +21,11 @@ function Reveal({ children, delay = 0, className = '' }) {
 /* ─── Status config ──────────────────────────────────────────────────────────── */
 const STATUS_META = {
   PENDING:     { icon: Clock,        stripe:'bg-[#0B0B0A]/20',  badge:'bg-[#0B0B0A]/5 text-[#0B0B0A]/55 border-transparent' },
-  ACCEPTED:    { icon: CheckCircle2, stripe:'bg-[#6D28D9]',      badge:'bg-[#6D28D9]/10 text-[#6D28D9] border-transparent' },
-  IN_PROGRESS: { icon: Zap,          stripe:'bg-[#6D28D9]',      badge:'bg-[#6D28D9]/15 text-[#6D28D9] border-transparent' },
-  COMPLETED:   { icon: CheckCircle2, stripe:'bg-[#10B981]',      badge:'bg-[#10B981]/10 text-[#10B981] border-transparent' },
+  ACCEPTED:    { icon: CheckCircle, stripe:'bg-[#6D28D9]',      badge:'bg-[#6D28D9]/10 text-[#6D28D9] border-transparent' },
+  IN_PROGRESS: { icon: Lightning,          stripe:'bg-[#6D28D9]',      badge:'bg-[#6D28D9]/15 text-[#6D28D9] border-transparent' },
+  COMPLETED:   { icon: CheckCircle, stripe:'bg-[#10B981]',      badge:'bg-[#10B981]/10 text-[#10B981] border-transparent' },
   CANCELLED:   { icon: XCircle,      stripe:'bg-[#0B0B0A]/10',  badge:'bg-[#0B0B0A]/5 text-[#0B0B0A]/40 border-transparent' },
-  DISPUTED:    { icon: ShieldAlert,  stripe:'bg-red-500',      badge:'bg-red-500/10 text-red-500 border-transparent' },
+  DISPUTED:    { icon: ShieldWarning,  stripe:'bg-red-500',      badge:'bg-red-500/10 text-red-500 border-transparent' },
 }
 
 const TABS = [
@@ -97,7 +94,7 @@ function ExchangeRow({ ex, isOfferer, onClick, delay }) {
         <div className="shrink-0 flex items-center gap-3">
           <p className="text-[10px] text-[#0B0B0A]/40 font-medium font-jakarta">{timeAgo(ex.updated_at)}</p>
           <span className="w-7 h-7 rounded-full bg-[#0B0B0A]/3 group-hover:bg-[#6D28D9] text-[#0B0B0A] group-hover:text-white flex items-center justify-center transition-all duration-300">
-            <ChevronRight className="w-4 h-4" />
+            <CaretRight className="w-4 h-4" />
           </span>
         </div>
       </div>
@@ -157,7 +154,7 @@ export default function ExchangesPage() {
         <Reveal delay={80}>
           <div className="text-center py-20 bg-white border border-[#0B0B0A]/8 rounded-3xl max-w-xl mx-auto shadow-sm">
             <div className="w-16 h-16 bg-[#6D28D9]/5 rounded-full flex items-center justify-center mx-auto mb-5">
-              <HandshakeIcon className="w-8 h-8 text-[#6D28D9]" />
+              <Handshake className="w-8 h-8 text-[#6D28D9]" />
             </div>
             <h3 className="text-lg font-bold text-[#0B0B0A] mb-2" style={{fontFamily:"'Syne',sans-serif"}}>No exchanges yet</h3>
             <p className="text-[#0B0B0A]/60 font-medium mb-6 text-xs sm:text-sm">Browse skills and propose an exchange to get started.</p>

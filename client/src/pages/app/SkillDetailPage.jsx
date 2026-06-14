@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ThumbsUp, ArrowLeftRight, ChevronLeft } from 'lucide-react'
+import { ThumbsUp, ArrowsLeftRight, CaretLeft } from '@phosphor-icons/react'
 import { skillsApi, exchangesApi, usersApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -108,7 +108,7 @@ export default function SkillDetailPage() {
       <Reveal>
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-bartr-muted hover:text-bartr-text mb-5 transition-colors group" style={{ fontFamily: "'DM Sans',sans-serif" }}>
           <div className="w-7 h-7 rounded-full bg-bartr-surface border border-bartr-border flex items-center justify-center group-hover:bg-bartr-text/10 transition-colors">
-            <ChevronLeft className="w-3.5 h-3.5 text-bartr-text" />
+            <CaretLeft className="w-3.5 h-3.5 text-bartr-text" />
           </div>
           Back
         </button>
@@ -206,7 +206,7 @@ export default function SkillDetailPage() {
                         className="w-full py-2.5 rounded-xl bg-bartr-text text-bartr-bg border-2 border-bartr-border text-sm font-bold flex items-center justify-center gap-2 hover:bg-bartr-text/90 transition-all shadow-[3px_3px_0px_var(--border)] active:translate-y-[2px] active:shadow-none"
                         style={{ fontFamily: "'Sora',sans-serif" }}
                       >
-                        <ArrowLeftRight className="w-4 h-4" /> Propose Exchange
+                        <ArrowsLeftRight className="w-4 h-4" /> Propose Exchange
                       </button>
                     ) : (
                       <div className="space-y-3">

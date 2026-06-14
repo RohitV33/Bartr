@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, Plus, Sparkles, TrendingUp, Star, Zap, BookOpen, Users, ChevronRight, Briefcase, Handshake, Target, ShieldCheck } from 'lucide-react'
+import { ArrowRight, Plus, Sparkle, TrendUp, Star, Lightning, BookOpen, Users, CaretRight, Briefcase, Handshake, Target, ShieldCheck } from '@phosphor-icons/react'
 import { usersApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -233,9 +233,9 @@ export default function DashboardPage() {
               </h2>
               
               <div className="space-y-3">
-                <StatRow icon={Sparkles} label="Skills Offered" value={data?.stats?.skillsOffered ?? '0'} />
+                <StatRow icon={Sparkle} label="Skills Offered" value={data?.stats?.skillsOffered ?? '0'} />
                 <StatRow icon={BookOpen} label="Skills Requested" value={data?.stats?.skillsWanted ?? '0'} />
-                <StatRow icon={Zap} label="Active Swaps" value={data?.stats?.exchanges ?? '0'} />
+                <StatRow icon={Lightning} label="Active Swaps" value={data?.stats?.exchanges ?? '0'} />
                 <StatRow icon={Star} label="Reputation Score" value={user?.reputation_score?.toFixed(1) ?? '5.0'} />
               </div>
             </Reveal>

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Camera, User, BookOpen, GraduationCap, AlignLeft, ArrowLeft, Check, Sparkles } from 'lucide-react'
+import { Camera, User, BookOpen, GraduationCap, AlignLeft, ArrowLeft, Check, Sparkle } from '@phosphor-icons/react'
 import { usersApi } from '../../api/endpoints.js'
 import { aiApi } from '../../api/ai.js'
 import { AiAssistButton } from '../../components/ai/AiAssistButton.jsx'
@@ -64,7 +64,7 @@ function ProfileHero({ user, avatarRef, onAvatarClick, uploading, scrollY }) {
         </p>
 
         <div className="inline-flex items-center gap-1.5 text-xs text-bartr-text bg-bartr-text/10 px-3 py-1.5 rounded-lg border-2 border-bartr-border font-black" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-          <Sparkles className="w-3 h-3 text-bartr-text" />
+          <Sparkle className="w-3 h-3 text-bartr-text" />
           Editing your profile
         </div>
 

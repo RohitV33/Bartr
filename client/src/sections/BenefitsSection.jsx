@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowSquareOut } from '@phosphor-icons/react'
 
 const SKILL_SERVICES = [
   {
@@ -125,7 +125,7 @@ export default function BenefitsSection() {
                 </div>
                 
                 <span className="w-10 h-10 rounded-full border border-[#0B0B0A]/10 group-hover:border-[#6D28D9] group-hover:bg-[#6D28D9] text-[#0B0B0A] group-hover:text-[#F7F7F5] flex items-center justify-center transition-all duration-300">
-                  <ArrowUpRight className="w-4 h-4" />
+                  <ArrowSquareOut className="w-4 h-4" />
                 </span>
               </div>
 

@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { LayoutDashboard, Search, ArrowLeftRight, Bell, User, Plus, LogOut, Menu, X, ChevronDown } from 'lucide-react'
+import { SquaresFour, MagnifyingGlass, ArrowsLeftRight, Bell, User, Plus, SignOut, List, X, CaretDown } from '@phosphor-icons/react'
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useNotifications } from '../context/NotificationContext.jsx'
@@ -11,9 +11,9 @@ import ThemeToggle from './ThemeToggle.jsx'
 import { useNavigate, NavLink } from 'react-router-dom'
 
 const NAV_LINKS = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/browse', icon: Search, label: 'Browse' },
-  { to: '/exchanges', icon: ArrowLeftRight, label: 'Exchanges' },
+  { to: '/dashboard', icon: SquaresFour, label: 'Dashboard' },
+  { to: '/browse', icon: MagnifyingGlass, label: 'Browse' },
+  { to: '/exchanges', icon: ArrowsLeftRight, label: 'Exchanges' },
   { to: '/notifications', icon: Bell, label: 'Notifications' },
 ]
 
@@ -90,7 +90,7 @@ export const AppLayout = ({ children }) => {
                   }`
                 }
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className="w-3.5 h-3.5" weight="duotone" />
                 <span>{label}</span>
                 {label === 'Notifications' && unread > 0 && (
                   <span className="ml-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#6D28D9] text-white">
@@ -108,7 +108,7 @@ export const AppLayout = ({ children }) => {
               onClick={() => navigate('/skills/new')}
               className="bg-[#6D28D9] hover:bg-[#5B21B6] text-white text-xs font-bold px-4 py-2.5 rounded-full border border-transparent flex items-center gap-1.5 shadow-md shadow-[#6D28D9]/10 transition-transform hover:scale-[1.02] active:scale-[0.98] font-jakarta"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3.5 h-3.5" weight="bold" />
               <span className="hidden sm:inline">Post Skill</span>
             </button>
 
@@ -121,7 +121,7 @@ export const AppLayout = ({ children }) => {
                 className="flex items-center gap-1.5 p-1 rounded-full hover:bg-[#0B0B0A]/5 transition-colors focus:outline-none"
               >
                 <Avatar src={user?.avatar_url} name={user?.full_name} size="sm" />
-                <ChevronDown className="w-3.5 h-3.5 text-[#0B0B0A]/40" />
+                <CaretDown className="w-3.5 h-3.5 text-[#0B0B0A]/40" weight="bold" />
               </button>
 
               {userDropdownOpen && (
@@ -135,7 +135,7 @@ export const AppLayout = ({ children }) => {
                     onClick={() => { navigate(`/profile/${user?.username}`); setUserDropdownOpen(false) }}
                     className="w-full px-4 py-2.5 text-left text-xs font-bold text-[#0B0B0A]/70 hover:text-[#0B0B0A] hover:bg-[#0B0B0A]/5 flex items-center gap-2 transition-colors font-jakarta"
                   >
-                    <User className="w-3.5 h-3.5" />
+                    <User className="w-3.5 h-3.5" weight="duotone" />
                     My Profile
                   </button>
                   
@@ -143,7 +143,7 @@ export const AppLayout = ({ children }) => {
                     onClick={logout}
                     className="w-full px-4 py-2.5 text-left text-xs font-bold text-red-600 hover:bg-red-500/5 flex items-center gap-2 transition-colors font-jakarta border-t border-[#0B0B0A]/5"
                   >
-                    <LogOut className="w-3.5 h-3.5" />
+                    <SignOut className="w-3.5 h-3.5" weight="duotone" />
                     Sign Out
                   </button>
                 </div>
@@ -155,7 +155,7 @@ export const AppLayout = ({ children }) => {
               onClick={() => setMobileOpen(!mobileOpen)} 
               className="md:hidden p-2 rounded-full hover:bg-[#0B0B0A]/5 text-[#0B0B0A]"
             >
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileOpen ? <X className="w-5 h-5" weight="bold" /> : <List className="w-5 h-5" weight="bold" />}
             </button>
 
           </div>
@@ -173,7 +173,7 @@ export const AppLayout = ({ children }) => {
               <span>Bartr</span>
             </button>
             <button onClick={() => setMobileOpen(false)} className="p-1.5 rounded-full hover:bg-[#0B0B0A]/5 text-[#0B0B0A]">
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5" weight="bold" />
             </button>
           </div>
           
@@ -193,7 +193,7 @@ export const AppLayout = ({ children }) => {
               >
                 {({ isActive }) => (
                   <>
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-4 h-4" weight="duotone" />
                     <span>{label}</span>
                     {label === 'Notifications' && unread > 0 && (
                       <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#6D28D9] text-white">
@@ -215,14 +215,14 @@ export const AppLayout = ({ children }) => {
               onClick={() => { navigate(`/profile/${user?.username}`); setMobileOpen(false) }}
               className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold font-jakarta text-[#0B0B0A]/60 hover:text-[#0B0B0A] hover:bg-[#0B0B0A]/5 transition-all"
             >
-              <User className="w-4 h-4" />
+              <User className="w-4 h-4" weight="duotone" />
               My Profile
             </button>
             <button
               onClick={logout}
               className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold font-jakarta text-red-600 hover:bg-red-500/10 transition-all"
             >
-              <LogOut className="w-4 h-4" />
+              <SignOut className="w-4 h-4" weight="duotone" />
               Sign Out
             </button>
           </div>

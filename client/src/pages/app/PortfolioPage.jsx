@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Upload, Trash2, Edit2, X, Check, Sparkles, Image } from 'lucide-react'
+import { UploadSimple, Trash, PencilSimple, X, Check, Sparkle, Image } from '@phosphor-icons/react'
 import { portfolioApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -69,10 +69,10 @@ function PortfolioItem({ item, onDelete, onUpdate, delay }) {
           {!editing && (
             <div className="absolute top-3 right-3 flex gap-2 transition-all duration-200" style={{opacity: hov ? 1 : 0, transform: hov ? 'translateY(0)' : 'translateY(-8px)'}}>
               <button onClick={() => setEditing(true)} className="w-8 h-8 bg-bartr-surface/90 border border-bartr-border backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-bartr-text hover:text-bartr-bg shadow-md transition-all">
-                <Edit2 className="w-3.5 h-3.5" />
+                <PencilSimple className="w-3.5 h-3.5" />
               </button>
               <button onClick={() => onDelete(item.id)} className="w-8 h-8 bg-red-500/10 border border-red-500 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-red-500/20 shadow-md transition-all">
-                <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                <Trash className="w-3.5 h-3.5 text-red-500" />
               </button>
             </div>
           )}
@@ -204,7 +204,7 @@ export default function PortfolioPage() {
             ) : (
               <div>
                 <div className="w-12 h-12 bg-bartr-text/10 border border-bartr-border rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <Upload className="w-6 h-6 text-bartr-text" />
+                  <UploadSimple className="w-6 h-6 text-bartr-text" />
                 </div>
                 <p className="text-sm font-bold text-bartr-text mb-1" style={{fontFamily:"'Sora',sans-serif"}}>Drop your file here or click to upload</p>
                 <p className="text-xs text-bartr-muted font-bold" style={{fontFamily:"'DM Sans',sans-serif"}}>Images, PDF, or Video · Max 5MB</p>
@@ -249,7 +249,7 @@ export default function PortfolioPage() {
                 >
                   {uploadMutation.isPending
                     ? <><div className="w-4 h-4 border-2 border-bartr-bg border-t-transparent rounded-full animate-spin" /> Uploading…</>
-                    : <><Upload className="w-4 h-4" /> Upload</>
+                    : <><UploadSimple className="w-4 h-4" /> Upload</>
                   }
                 </button>
               </div>

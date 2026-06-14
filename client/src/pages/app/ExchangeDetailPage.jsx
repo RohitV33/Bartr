@@ -1,7 +1,4 @@
-import { Send, ArrowLeft, CheckCircle2, XCircle,
-  Clock, Zap, Star, ShieldAlert, MessageCircle, Check,
-  Paperclip, FileText, ExternalLink, Download,
-} from 'lucide-react'
+import { PaperPlaneTilt, ArrowLeft, CheckCircle, XCircle, Clock, Lightning, Star, ShieldWarning, ChatText, Check, Paperclip, FileText, ArrowSquareOut, DownloadSimple } from '@phosphor-icons/react'
 import { exchangesApi, reviewsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -29,10 +26,10 @@ const STATUS_STEPS = ['PENDING', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED']
 const STATUS_META = {
   PENDING:     { icon: Clock,        color:'text-bartr-text',   bg:'bg-bartr-surface border-2 border-bartr-border',    bar:'bg-bartr-border',   label:'Pending' },
   ACCEPTED:    { icon: Check,        color:'text-bartr-text',   bg:'bg-bartr-surface border-2 border-bartr-border',    bar:'bg-bartr-text',    label:'Accepted' },
-  IN_PROGRESS: { icon: Zap,          color:'text-bartr-bg',     bg:'bg-bartr-text border-2 border-bartr-border',      bar:'bg-bartr-text',  label:'In Progress' },
-  COMPLETED:   { icon: CheckCircle2, color:'text-bartr-text',   bg:'bg-bartr-surface border-2 border-bartr-border shadow-[2px_2px_0px_var(--border)]',  bar:'bg-bartr-text', label:'Completed' },
+  IN_PROGRESS: { icon: Lightning,          color:'text-bartr-bg',     bg:'bg-bartr-text border-2 border-bartr-border',      bar:'bg-bartr-text',  label:'In Progress' },
+  COMPLETED:   { icon: CheckCircle, color:'text-bartr-text',   bg:'bg-bartr-surface border-2 border-bartr-border shadow-[2px_2px_0px_var(--border)]',  bar:'bg-bartr-text', label:'Completed' },
   CANCELLED:   { icon: XCircle,      color:'text-bartr-muted',  bg:'bg-bartr-bg border border-bartr-border',      bar:'bg-bartr-border',     label:'Cancelled' },
-  DISPUTED:    { icon: ShieldAlert,  color:'text-red-500',      bg:'bg-red-500/10 border-2 border-red-500',    bar:'bg-red-500',  label:'Disputed' },
+  DISPUTED:    { icon: ShieldWarning,  color:'text-red-500',      bg:'bg-red-500/10 border-2 border-red-500',    bar:'bg-red-500',  label:'Disputed' },
 }
 
 /* ─── Status Timeline ────────────────────────────────────────────────────────── */
@@ -172,7 +169,7 @@ function MessageBubble({ msg, isMine }) {
                 <p className={`text-xs font-bold truncate ${isMine ? 'text-white' : 'text-bartr-text'}`}>{msg.file_url.split('/').pop().split('?')[0] || 'Attachment'}</p>
                 <p className={`text-[10px] ${isMine ? 'text-white/60' : 'text-bartr-muted'}`}>Click to view file</p>
               </div>
-              <Download className={`w-4 h-4 shrink-0 opacity-40 group-hover/file:opacity-100 transition-opacity ${isMine ? 'text-white' : 'text-bartr-text'}`} />
+              <DownloadSimple className={`w-4 h-4 shrink-0 opacity-40 group-hover/file:opacity-100 transition-opacity ${isMine ? 'text-white' : 'text-bartr-text'}`} />
             </a>
           ) : (
             msg.content
@@ -210,7 +207,7 @@ function ActionBar({ exchange, isOfferer, actionMutation, onReview }) {
         <>
           <button onClick={() => act('accept')} disabled={pending}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-bartr-text text-bartr-bg border-2 border-bartr-border text-xs font-bold hover:bg-bartr-text/90 transition-all shadow-[2px_2px_0px_var(--border)] active:translate-y-[1px] active:shadow-none" style={{fontFamily:"'Sora',sans-serif"}}>
-            <CheckCircle2 className="w-3.5 h-3.5" /> Accept
+            <CheckCircle className="w-3.5 h-3.5" /> Accept
           </button>
           <button onClick={() => act('decline')} disabled={pending}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-500/10 text-red-500 border-2 border-red-500 text-xs font-bold hover:bg-red-500/20 transition-all shadow-[2px_2px_0px_var(--border)] active:translate-y-[1px] active:shadow-none" style={{fontFamily:"'Sora',sans-serif"}}>
@@ -222,7 +219,7 @@ function ActionBar({ exchange, isOfferer, actionMutation, onReview }) {
         <>
           <button onClick={() => act('complete')} disabled={pending || myConfirmed}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold border-2 border-bartr-border transition-all ${myConfirmed ? 'bg-bartr-surface text-bartr-muted border-bartr-border cursor-default shadow-none' : 'bg-bartr-text text-bartr-bg hover:bg-bartr-text/90 shadow-[2px_2px_0px_var(--border)] active:translate-y-[1px] active:shadow-none'}`} style={{fontFamily:"'Sora',sans-serif"}}>
-            <CheckCircle2 className="w-3.5 h-3.5" /> {myConfirmed ? 'Confirmed ✓' : 'Mark Complete'}
+            <CheckCircle className="w-3.5 h-3.5" /> {myConfirmed ? 'Confirmed ✓' : 'Mark Complete'}
           </button>
           <button onClick={() => act('cancel')} disabled={pending}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-bartr-surface text-bartr-text border-2 border-bartr-border text-xs font-bold hover:bg-bartr-bg transition-all shadow-[2px_2px_0px_var(--border)] active:translate-y-[1px] active:shadow-none" style={{fontFamily:"'Sora',sans-serif"}}>
@@ -230,7 +227,7 @@ function ActionBar({ exchange, isOfferer, actionMutation, onReview }) {
           </button>
           <button onClick={() => act('dispute')} disabled={pending}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-500/10 text-red-500 border-2 border-red-500 text-xs font-bold hover:bg-red-500/20 transition-all shadow-[2px_2px_0px_var(--border)] active:translate-y-[1px] active:shadow-none" style={{fontFamily:"'Sora',sans-serif"}}>
-            <ShieldAlert className="w-3.5 h-3.5" /> Dispute
+            <ShieldWarning className="w-3.5 h-3.5" /> Dispute
           </button>
         </>
       )}
@@ -467,7 +464,7 @@ export default function ExchangeDetailPage() {
           {/* Chat header */}
           <div className="flex items-center gap-3 px-5 py-3.5 border-b-2 border-bartr-border bg-bartr-bg shrink-0">
             <div className="w-8 h-8 bg-bartr-text text-bartr-bg rounded-lg flex items-center justify-center border border-bartr-border">
-              <MessageCircle className="w-4 h-4 text-bartr-bg" />
+              <ChatText className="w-4 h-4 text-bartr-bg" />
             </div>
             <div>
               <p className="text-sm font-black text-bartr-text" style={{fontFamily:"'Sora',sans-serif"}}>Messages</p>
@@ -486,7 +483,7 @@ export default function ExchangeDetailPage() {
             {allMessages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full gap-3">
                 <div className="w-14 h-14 rounded-2xl bg-bartr-bg border-2 border-bartr-border flex items-center justify-center">
-                  <MessageCircle className="w-7 h-7 text-bartr-border" />
+                  <ChatText className="w-7 h-7 text-bartr-border" />
                 </div>
                 <p className="text-sm text-bartr-muted text-center max-w-xs font-medium" style={{fontFamily:"'DM Sans',sans-serif"}}>
                   {canChat ? 'No messages yet. Say hello! 👋' : 'The exchange must be accepted before you can chat.'}
@@ -566,7 +563,7 @@ export default function ExchangeDetailPage() {
               disabled={!canChat || !input.trim()}
               className="w-11 h-11 bg-bartr-text text-bartr-bg border-2 border-bartr-border rounded-xl flex items-center justify-center hover:bg-bartr-text/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shrink-0 shadow-[2px_2px_0px_var(--border)] active:translate-y-[1px] active:shadow-none"
             >
-              <Send className="w-4 h-4" />
+              <PaperPlaneTilt className="w-4 h-4" />
             </button>
           </div>
         </div>

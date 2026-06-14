@@ -1,4 +1,4 @@
-import { Sparkles, Loader2, X } from 'lucide-react'
+import { Sparkle, CircleNotch, X } from '@phosphor-icons/react'
 
 export function AiAssistButton({ onClick, isLoading, label = "AI Assist", className = "", variant = "primary" }) {
   const variants = {
@@ -17,9 +17,9 @@ export function AiAssistButton({ onClick, isLoading, label = "AI Assist", classN
     >
       <div className="absolute inset-0 bg-white/20 dark:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
       {isLoading ? (
-        <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+        <CircleNotch className="w-4 h-4 animate-spin shrink-0" />
       ) : (
-        <Sparkles className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
+        <Sparkle className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
       )}
       <span>{isLoading ? 'Generating…' : label}</span>
     </button>
@@ -33,7 +33,7 @@ export function AiResultCard({ content, onClose, className = "", title = "AI Ins
       <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-amber-400 to-orange-400" />
       <div className="flex items-start gap-3">
         <div className="mt-0.5 p-1.5 bg-amber-100 dark:bg-amber-500/20 rounded-lg shrink-0">
-          <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+          <Sparkle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold text-amber-800 dark:text-amber-300 mb-1" style={{fontFamily:"'Sora',sans-serif"}}>{title}</p>

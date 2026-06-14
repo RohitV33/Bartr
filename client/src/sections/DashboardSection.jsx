@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
-import { ArrowRight, BadgeCheck, MessageSquare, Star } from 'lucide-react'
+import { ArrowRight, SealCheck, ChatText, Star } from '@phosphor-icons/react'
 
 const STORIES = [
   {
@@ -116,7 +116,7 @@ export default function DashboardSection() {
                       </span>
                     </div>
                     <span className="inline-flex items-center gap-1 text-[10px] font-jakarta font-bold text-[#10B981] uppercase tracking-wider bg-[#10B981]/10 px-2 py-0.5 rounded-full">
-                      <BadgeCheck className="w-3.5 h-3.5" />
+                      <SealCheck className="w-3.5 h-3.5" />
                       Verified Swap
                     </span>
                   </div>

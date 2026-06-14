@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { Menu, X, ArrowUpRight } from 'lucide-react'
+import { List, X, ArrowSquareOut } from '@phosphor-icons/react'
 import ThemeToggle from './ThemeToggle.jsx'
 
 export default function PortfolioNavbar() {
@@ -80,7 +80,7 @@ export default function PortfolioNavbar() {
             className="flex items-center gap-1.5 bg-[#6D28D9] text-[#F7F7F5] text-xs font-jakarta font-bold px-5 py-2.5 rounded-full shadow-[0_4px_14px_rgba(109,40,217,0.2)] hover:bg-[#5B21B6] transition-all tracking-wider uppercase"
           >
             Start Swapping
-            <ArrowUpRight className="w-3.5 h-3.5" />
+            <ArrowSquareOut className="w-3.5 h-3.5" />
           </motion.button>
         </div>
 
@@ -90,7 +90,7 @@ export default function PortfolioNavbar() {
           className="md:hidden w-10 h-10 flex items-center justify-center rounded-full bg-[#0B0B0A]/5 hover:bg-[#0B0B0A]/10 text-[#0B0B0A] transition-colors"
           aria-label="Toggle Navigation"
         >
-          {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {menuOpen ? <X className="w-5 h-5" weight="bold" /> : <List className="w-5 h-5" weight="bold" />}
         </button>
       </div>
 

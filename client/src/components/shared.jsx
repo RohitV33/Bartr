@@ -1,5 +1,5 @@
 import { forwardRef } from 'react'
-import { PackageOpen, Star, ChevronRight } from 'lucide-react'
+import { Package, Star, CaretRight } from '@phosphor-icons/react'
 import { getInitials, proficiencyColor, proficiencyLabel } from '../utils/helpers.js'
 
 // ── Avatar ────────────────────────────────────────────────────────────────────
@@ -167,7 +167,7 @@ export const Spinner = ({ size = 'md' }) => {
 export const EmptyState = ({ icon, title, description, action }) => (
   <div className="flex flex-col items-center justify-center py-16 text-center bg-white border border-[#0B0B0A]/8 rounded-3xl p-8 max-w-md mx-auto shadow-[0_4px_20px_rgba(11,11,10,0.01)]">
     <div className="mb-4 text-[#6D28D9] bg-[#6D28D9]/5 w-16 h-16 rounded-full flex items-center justify-center">
-      {icon || <PackageOpen className="w-8 h-8" />}
+      {icon || <Package className="w-8 h-8" />}
     </div>
     <h3 className="font-syne font-bold text-[#0B0B0A] text-lg mb-2">{title}</h3>
     {description && <p className="text-[#0B0B0A]/60 text-xs sm:text-sm font-jakarta mb-6 max-w-xs leading-relaxed">{description}</p>}
@@ -221,7 +221,7 @@ export const SkillCard = ({ skill, onClick, layout = 'card' }) => {
             </div>
 
             <span className="hidden md:flex w-7 h-7 rounded-full bg-[#0B0B0A]/3 group-hover:bg-[#6D28D9] text-[#0B0B0A] group-hover:text-white items-center justify-center transition-all duration-300">
-              <ChevronRight className="w-4 h-4" />
+              <CaretRight className="w-4 h-4" />
             </span>
           </div>
         )}

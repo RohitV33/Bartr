@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { Bell, CheckCheck, Trash2 } from 'lucide-react'
+import { Bell, Checks, Trash } from '@phosphor-icons/react'
 import { notificationsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { Spinner } from '../../components/shared.jsx'
@@ -103,7 +103,7 @@ function NotifItem({ n, onClick, onDelete, delay }) {
               onClick={handleDelete}
               className="p-1.5 text-bartr-muted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

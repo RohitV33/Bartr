@@ -8,7 +8,7 @@ import { QUERY_KEYS } from '../../store/queryClient.js'
 import { Input, Textarea, Select, Spinner } from '../../components/shared.jsx'
 import { extractError } from '../../utils/helpers.js'
 import { useEffect, useRef, useState } from 'react'
-import { ChevronLeft, Sparkles, BookOpen } from 'lucide-react'
+import { CaretLeft, Sparkle, BookOpen } from '@phosphor-icons/react'
 import { aiApi } from '../../api/ai.js'
 import { AiAssistButton } from '../../components/ai/AiAssistButton.jsx'
 
@@ -38,7 +38,7 @@ function PostHero({ isOffering, scrollY }) {
     <div style={{transform:`scale(${scale})`,opacity,transformOrigin:'top center'}} className="relative overflow-hidden rounded-3xl mb-8 border-2 border-bartr-border bg-bartr-surface shadow-[4px_4px_0px_var(--border)] dotted-bg">
       <div className="relative px-8 py-10 z-10">
         <div className={`inline-flex items-center gap-2 text-xs font-black px-3 py-1.5 rounded-lg border border-bartr-border bg-bartr-text text-bartr-bg mb-4`}>
-          <Sparkles className="w-3 h-3" />
+          <Sparkle className="w-3 h-3" />
           {isOffering ? 'Share Your Expertise' : 'Find a Teacher'}
         </div>
         <h1 className="text-3xl font-black text-bartr-text mb-2" style={{fontFamily:"'Sora',sans-serif"}}>
@@ -147,7 +147,7 @@ export default function NewSkillPage() {
       <Reveal>
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-bartr-muted hover:text-bartr-text mb-5 transition-colors group" style={{fontFamily:"'DM Sans',sans-serif"}}>
           <div className="w-7 h-7 rounded-full bg-bartr-surface border border-bartr-border flex items-center justify-center group-hover:bg-bartr-text/10 transition-colors">
-            <ChevronLeft className="w-3.5 h-3.5 text-bartr-text" />
+            <CaretLeft className="w-3.5 h-3.5 text-bartr-text" />
           </div>
           Back
         </button>
