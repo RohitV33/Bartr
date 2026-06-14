@@ -18,7 +18,7 @@ export const usersApi = {
   search: (params) => api.get('/users', { params }),
   getProfile: (username) => api.get(`/users/${username}`),
   updateProfile: (data) => api.put('/users/me', data),
-  updateAvatar: (formData) => api.put('/users/me/avatar', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  updateAvatar: (formData) => api.put('/users/me/avatar', formData),
   getDashboard: () => api.get('/users/me/dashboard'),
   getMatches: () => api.get('/users/me/matches'),
   completeOnboarding: () => api.put('/users/me/onboarding'),
@@ -49,7 +49,7 @@ export const exchangesApi = {
   dispute: (id) => api.put(`/exchanges/${id}/dispute`),
   getMessages: (id, params) => api.get(`/exchanges/${id}/messages`, { params }),
   sendMessage: (id, content) => api.post(`/exchanges/${id}/messages`, { content }),
-  uploadFile: (id, formData) => api.post(`/exchanges/${id}/files`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  uploadFile: (id, formData) => api.post(`/exchanges/${id}/files`, formData),
   markMessagesRead: (id) => api.put(`/exchanges/${id}/messages/read`),
 }
 
@@ -63,7 +63,7 @@ export const reviewsApi = {
 // ── Portfolio ─────────────────────────────────────────────────────────────────
 export const portfolioApi = {
   forUser: (userId) => api.get(`/portfolio/user/${userId}`),
-  create: (formData) => api.post('/portfolio', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  create: (formData) => api.post('/portfolio', formData),
   update: (id, data) => api.put(`/portfolio/${id}`, data),
   delete: (id) => api.delete(`/portfolio/${id}`),
 }
