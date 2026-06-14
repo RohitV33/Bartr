@@ -8,6 +8,8 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import { Avatar, SkillCard, Spinner } from '../../components/shared.jsx'
 import { aiApi } from '../../api/ai.js'
 import { AiAssistButton, AiResultCard } from '../../components/ai/AiAssistButton.jsx'
+import { Helmet } from 'react-helmet-async'
+import { StatCardSkeleton, SkillCardSkeleton } from '../../components/Skeletons.jsx'
 
 /* ─── Scroll Reveal ─────────────────────────────────────────────────────────── */
 function Reveal({ children, delay = 0, className = '' }) {
@@ -76,6 +78,7 @@ export default function DashboardPage() {
 
   return (
     <div className="font-jakarta w-full">
+      <Helmet><title>Dashboard | Bartrr</title></Helmet>
       
       {/* Editorial Header */}
       <Reveal className="mb-10">
@@ -105,7 +108,20 @@ export default function DashboardPage() {
       </Reveal>
 
       {isLoading ? (
-        <div className="flex justify-center py-24"><Spinner size="lg" /></div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="lg:col-span-8 space-y-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <SkillCardSkeleton layout="grid" />
+              <SkillCardSkeleton layout="grid" />
+            </div>
+          </div>
+          <div className="lg:col-span-4 space-y-3">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </div>
+        </div>
       ) : (
         /* Asymmetrical 2-Column Grid Layout */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

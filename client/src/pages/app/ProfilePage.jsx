@@ -6,6 +6,7 @@ import { QUERY_KEYS } from '../../store/queryClient.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { Avatar, Stars, ProficiencyBadge, Spinner, EmptyState, Badge } from '../../components/shared.jsx'
 import { timeAgo } from '../../utils/helpers.js'
+import { Helmet } from 'react-helmet-async'
 import { useEffect, useRef, useState } from 'react'
 
 /* ─── Reveal ─────────────────────────────────────────────────────────────────── */
@@ -158,6 +159,7 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 font-jakarta">
+      <Helmet><title>{user.full_name} | Bartrr</title></Helmet>
       <ProfileHero
         user={user} isMe={isMe}
         onEdit={() => navigate('/profile/edit')}

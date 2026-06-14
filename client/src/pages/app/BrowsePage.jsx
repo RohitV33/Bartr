@@ -2,9 +2,11 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { MagnifyingGlass, Plus, CaretLeft, CaretRight, Sparkle, TrendUp, Users, MagnifyingGlassMinus, Sliders, Briefcase, HandHeart } from '@phosphor-icons/react'
+import { Helmet } from 'react-helmet-async'
 import { skillsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { Spinner, SkillCard } from '../../components/shared.jsx'
+import { SkillCardSkeleton } from '../../components/Skeletons.jsx'
 
 /* ─── Scroll Reveal ─────────────────────────────────────────────────────────── */
 function Reveal({ children, delay = 0, className = '', direction = 'up' }) {
@@ -65,6 +67,7 @@ export default function BrowsePage() {
 
   return (
     <div className="max-w-7xl mx-auto font-jakarta w-full">
+      <Helmet><title>Browse Skills | Bartrr</title></Helmet>
       
       {/* Editorial Header */}
       <Reveal className="mb-10 pb-6 border-b border-[#0B0B0A]/5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -179,7 +182,11 @@ export default function BrowsePage() {
         <div className="lg:col-span-8 space-y-6">
           
           {isLoading ? (
-            <div className="flex justify-center py-24"><Spinner size="lg" /></div>
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <SkillCardSkeleton key={i} layout="row" />
+              ))}
+            </div>
           ) : skills.length === 0 ? (
             <Reveal>
               <div className="text-center py-20 bg-white border border-[#0B0B0A]/8 rounded-3xl max-w-xl mx-auto shadow-sm">

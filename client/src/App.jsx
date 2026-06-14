@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { HelmetProvider } from 'react-helmet-async'
 import { queryClient } from './store/queryClient.js'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { SocketProvider } from './context/SocketContext.jsx'
@@ -9,6 +10,7 @@ import { NotificationProvider } from './context/NotificationContext.jsx'
 import { AppLayout, ProtectedRoute, OnboardingRoute, GuestRoute } from './components/AppLayout.jsx'
 import { ThemeProvider } from './context/themeContext.jsx'
 import { Spinner } from './components/shared.jsx'
+import { ErrorBoundary } from './components/ErrorBoundary.jsx'
 
 const LandingPage = lazy(() => import('./pages/LandingPage.jsx'))
 const LoginPage = lazy(() => import('./pages/auth/LoginPage.jsx'))
@@ -29,20 +31,23 @@ const ExchangeDetailPage = lazy(() => import('./pages/app/ExchangeDetailPage.jsx
 const NotificationsPage = lazy(() => import('./pages/app/NotificationsPage.jsx'))
 const PortfolioPage = lazy(() => import('./pages/app/PortfolioPage.jsx'))
 const ContactPage = lazy(() => import('./pages/ContactPage.jsx'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'))
 
 const AppProviders = ({ children }) => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider> 
-    <AuthProvider>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider> 
+      <AuthProvider>
       <SocketProvider>
         <NotificationProvider>
           {children}
         </NotificationProvider>
       </SocketProvider>
-    </AuthProvider>
-    </ThemeProvider>
-    {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
-  </QueryClientProvider>
+      </AuthProvider>
+      </ThemeProvider>
+      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+    </QueryClientProvider>
+  </HelmetProvider>
 )
 
 const ProtectedLayout = ({ children }) => (
@@ -55,13 +60,14 @@ export default function App() {
   return (
     <AppProviders>
       <BrowserRouter>
-        <Suspense fallback={
-          <div className="min-h-screen flex items-center justify-center bg-bartr-bg">
-            <Spinner size="lg" />
-          </div>
-        }>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
+        <ErrorBoundary>
+          <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-bartr-bg">
+              <Spinner size="lg" />
+            </div>
+          }>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
             <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
@@ -81,8 +87,10 @@ export default function App() {
             <Route path="/exchanges/:id" element={<ProtectedLayout><ExchangeDetailPage /></ProtectedLayout>} />
             <Route path="/notifications" element={<ProtectedLayout><NotificationsPage /></ProtectedLayout>} />
             <Route path="/portfolio" element={<ProtectedLayout><PortfolioPage /></ProtectedLayout>} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>
+        </ErrorBoundary>
       </BrowserRouter>
     </AppProviders>
   )
