@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { MagnifyingGlass, Plus, CaretLeft, CaretRight, Sparkle, TrendUp, Users, MagnifyingGlassX, Sliders, Briefcase, HandHeart } from '@phosphor-icons/react'
+import { MagnifyingGlass, Plus, CaretLeft, CaretRight, Sparkle, TrendUp, Users, MagnifyingGlassMinus, Sliders, Briefcase, HandHeart } from '@phosphor-icons/react'
 import { skillsApi } from '../../api/endpoints.js'
 import { QUERY_KEYS } from '../../store/queryClient.js'
 import { Spinner, SkillCard } from '../../components/shared.jsx'
@@ -185,7 +185,7 @@ export default function BrowsePage() {
               <div className="text-center py-20 bg-white border border-[#0B0B0A]/8 rounded-3xl max-w-xl mx-auto shadow-sm">
                 <div className="flex justify-center text-[#6D28D9] mb-4">
                   <div className="w-16 h-16 rounded-full bg-[#6D28D9]/5 flex items-center justify-center">
-                    <MagnifyingGlassX className="w-8 h-8 text-[#6D28D9]" />
+                    <MagnifyingGlassMinus className="w-8 h-8 text-[#6D28D9]" />
                   </div>
                 </div>
                 <h3 className="text-lg font-bold text-[#0B0B0A] mb-2" style={{ fontFamily: "'Syne', sans-serif" }}>No matches discovered</h3>
