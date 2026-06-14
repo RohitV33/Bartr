@@ -333,18 +333,6 @@ export default function ExchangeDetailPage() {
     emitTypingStop(id)
     clearTimeout(typingTimer.current)
     
-    // Add optimistic message
-    const tempId = `opt-${Date.now()}`
-    setLiveMessages(prev => [...prev, { 
-      id: tempId, 
-      sender_id: user?.id, 
-      sender: user, 
-      content: text || (message_type === 'FILE' ? 'Sent a file' : ''), 
-      file_url,
-      message_type,
-      created_at: new Date().toISOString() 
-    }])
-    
     socket.emit('send_message', { exchangeId: id, content: text, file_url, message_type })
     setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior:'smooth' }), 50)
   }, [id, user, emitTypingStop, socket])
@@ -520,23 +508,6 @@ export default function ExchangeDetailPage() {
 
             <div className="flex-1 flex bg-bartr-bg rounded-xl border-2 border-bartr-border focus-within:border-bartr-text focus-within:bg-bartr-bg transition-all overflow-hidden items-center group/input">
               <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <button
-                onClick={handleFileClick}
-                disabled={!canChat || fileUploading}
-                className="pl-3.5 pr-2 py-2 hover:text-bartr-text text-bartr-muted transition-colors disabled:opacity-30"
-              >
-                {fileUploading ? (
-                  <div className="w-5 h-5 border-2 border-bartr-text border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Paperclip className="w-5 h-5" />
-                )}
-              </button>
-              <input
                 ref={inputRef}
                 value={input}
                 onChange={handleInputChange}
@@ -558,6 +529,26 @@ export default function ExchangeDetailPage() {
                 </div>
               )}
             </div>
+            
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <button
+              onClick={handleFileClick}
+              disabled={!canChat || fileUploading}
+              className="w-11 h-11 bg-bartr-surface text-bartr-text border-2 border-bartr-border rounded-xl flex items-center justify-center hover:bg-bartr-text/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 shrink-0 shadow-[2px_2px_0px_var(--border)] active:translate-y-[1px] active:shadow-none"
+              title="Attach File or Photo"
+            >
+              {fileUploading ? (
+                <div className="w-5 h-5 border-2 border-bartr-text border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Paperclip className="w-5 h-5" weight="bold" />
+              )}
+            </button>
+            
             <button
               onClick={handleTextSend}
               disabled={!canChat || !input.trim()}
