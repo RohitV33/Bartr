@@ -96,7 +96,7 @@ export default function BrowsePage() {
             
             {/* Filter title */}
             <div className="flex items-center gap-2 border-b border-[#0B0B0A]/5 pb-3">
-              <SlidersHorizontal className="w-4 h-4 text-[#6D28D9]" />
+              <Sliders className="w-4 h-4 text-[#6D28D9]" />
               <h2 className="text-xs font-bold text-[#0B0B0A] uppercase tracking-widest" style={{ fontFamily: "'Syne', sans-serif" }}>
                 Filter Catalog
               </h2>
@@ -106,7 +106,7 @@ export default function BrowsePage() {
             <div className="space-y-2">
               <span className="text-[9px] font-bold text-[#0B0B0A]/40 uppercase tracking-widest block" style={{ fontFamily: "'Syne', sans-serif" }}>Keywords</span>
               <div className="relative">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#0B0B0A]/30" />
+                <MagnifyingGlass className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#0B0B0A]/30" />
                 <input
                   value={q}
                   onChange={handleSearch}
@@ -185,7 +185,7 @@ export default function BrowsePage() {
               <div className="text-center py-20 bg-white border border-[#0B0B0A]/8 rounded-3xl max-w-xl mx-auto shadow-sm">
                 <div className="flex justify-center text-[#6D28D9] mb-4">
                   <div className="w-16 h-16 rounded-full bg-[#6D28D9]/5 flex items-center justify-center">
-                    <SearchX className="w-8 h-8 text-[#6D28D9]" />
+                    <MagnifyingGlassX className="w-8 h-8 text-[#6D28D9]" />
                   </div>
                 </div>
                 <h3 className="text-lg font-bold text-[#0B0B0A] mb-2" style={{ fontFamily: "'Syne', sans-serif" }}>No matches discovered</h3>
