@@ -20,8 +20,11 @@ export const errorHandler = (err, req, res, next) => {
 
   // Generic
   const status = err.status || err.statusCode || 500
-  const message = process.env.NODE_ENV === 'production' && status === 500
-    ? 'Internal server error'
+  const isServerError = status >= 500
+
+  // NEVER leak raw error messages (DB details, stack traces) to the client in production
+  const message = (process.env.NODE_ENV === 'production' && isServerError)
+    ? 'Something went wrong. Please try again later.'
     : err.message || 'Internal server error'
 
   res.status(status).json({ success: false, message })
