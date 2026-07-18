@@ -56,9 +56,29 @@ const checkGoogleConfig = (req, res, next) => {
 
 // Google OAuth
 router.get('/google', checkGoogleConfig, passport.authenticate('google', { scope: ['profile', 'email'], session: false }))
+
+// Custom handler so DB failures during OAuth redirect gracefully instead of leaking raw errors
 router.get('/google/callback',
   checkGoogleConfig,
-  passport.authenticate('google', { session: false, failureRedirect: `${process.env.CLIENT_URL || 'http://localhost:5173'}/login?error=oauth` }),
+  (req, res, next) => {
+    passport.authenticate('google', { session: false }, (err, user) => {
+      if (err) {
+        console.error('[OAuth] Google callback error:', err.name, '-', err.message?.slice(0, 120))
+        // DB down or any server error → redirect to client error page
+        const isServerError =
+          err.name === 'PrismaClientInitializationError' ||
+          err.name === 'PrismaClientRustPanicError' ||
+          (err.message && err.message.includes('ENOTFOUND'))
+        const code = isServerError ? 'server_error' : 'oauth'
+        return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/error?code=${code}`)
+      }
+      if (!user) {
+        return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/error?code=oauth`)
+      }
+      req.user = user
+      next()
+    })(req, res, next)
+  },
   googleCallback
 )
 

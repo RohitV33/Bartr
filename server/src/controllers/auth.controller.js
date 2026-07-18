@@ -217,6 +217,10 @@ export const resetPassword = async (req, res, next) => {
 
 // ── Google OAuth callback ─────────────────────────────────────────────────────
 export const googleCallback = (req, res) => {
+  if (!req.user) {
+    return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/error?code=oauth`)
+  }
+
   const token = signToken(req.user.id)
   setAuthCookie(res, token)
   

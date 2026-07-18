@@ -32,6 +32,7 @@ const NotificationsPage = lazy(() => import('./pages/app/NotificationsPage.jsx')
 const PortfolioPage = lazy(() => import('./pages/app/PortfolioPage.jsx'))
 const ContactPage = lazy(() => import('./pages/ContactPage.jsx'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'))
+const ErrorPage = lazy(() => import('./pages/ErrorPage.jsx'))
 
 const AppProviders = ({ children }) => (
   <HelmetProvider>
@@ -87,6 +88,7 @@ export default function App() {
             <Route path="/exchanges/:id" element={<ProtectedLayout><ExchangeDetailPage /></ProtectedLayout>} />
             <Route path="/notifications" element={<ProtectedLayout><NotificationsPage /></ProtectedLayout>} />
             <Route path="/portfolio" element={<ProtectedLayout><PortfolioPage /></ProtectedLayout>} />
+            <Route path="/error" element={<ErrorPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>
