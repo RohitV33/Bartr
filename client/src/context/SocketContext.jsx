@@ -7,6 +7,7 @@ const SocketContext = createContext(null)
 export const SocketProvider = ({ children }) => {
   const { user } = useAuth()
   const socketRef = useRef(null)
+  const [socketInstance, setSocketInstance] = useState(null)
   const [onlineUsers, setOnlineUsers] = useState(new Set())
   const [connected, setConnected] = useState(false)
 
@@ -15,12 +16,18 @@ export const SocketProvider = ({ children }) => {
       if (socketRef.current) {
         socketRef.current.disconnect()
         socketRef.current = null
+        setSocketInstance(null)
         setConnected(false)
       }
       return
     }
 
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'https://bartr-backend.onrender.com'
+    let socketUrl = import.meta.env.VITE_SOCKET_URL
+    if (!socketUrl) {
+      const isLocalHost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      socketUrl = isLocalHost ? 'http://localhost:4000' : 'https://bartr-backend.onrender.com'
+    }
+
     const socket = io(socketUrl, {
       withCredentials: true,
       transports: ['websocket', 'polling'],
@@ -43,10 +50,12 @@ export const SocketProvider = ({ children }) => {
     })
 
     socketRef.current = socket
+    setSocketInstance(socket)
 
     return () => {
       socket.disconnect()
       socketRef.current = null
+      setSocketInstance(null)
     }
   }, [user?.id])
 
@@ -74,7 +83,7 @@ export const SocketProvider = ({ children }) => {
 
   return (
     <SocketContext.Provider value={{
-      socket: socketRef.current,
+      socket: socketInstance,
       connected,
       onlineUsers,
       isOnline,

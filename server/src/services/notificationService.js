@@ -1,9 +1,17 @@
 import prisma from '../config/db.js'
+import { emitToUser } from '../sockets/socket.js'
 
 export const createNotification = async ({ userId, type, title, body, link }) => {
   const notification = await prisma.notification.create({
     data: { user_id: userId, type, title, body, link },
   })
+
+  try {
+    emitToUser(userId, 'notification:new', notification)
+  } catch (err) {
+    console.error('Failed to emit real-time notification socket event:', err.message)
+  }
+
   return notification
 }
 

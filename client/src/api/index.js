@@ -1,9 +1,13 @@
 import axios from 'axios'
 
 export const getBaseURL = () => {
-  const url = import.meta.env.VITE_API_URL || 'https://bartr-backend.onrender.com'
-  const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url
-  return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`
+  if (import.meta.env.VITE_API_URL) {
+    const url = import.meta.env.VITE_API_URL
+    const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url
+    return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`
+  }
+  const isLocalHost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  return isLocalHost ? 'http://localhost:4000/api' : 'https://bartr-backend.onrender.com/api'
 }
 
 const api = axios.create({
@@ -12,11 +16,14 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-// Request interceptor — attach token if present
+// Request interceptor — attach token if present & handle FormData headers correctly
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('bartr_token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
+  }
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type']
   }
   return config
 })

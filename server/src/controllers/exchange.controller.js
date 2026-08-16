@@ -49,15 +49,17 @@ export const proposeExchange = async (req, res, next) => {
     if (offeredSkill.user_id !== req.user.id) return forbidden(res, 'You can only offer your own skills.')
     if (requestedSkill.user_id === req.user.id) return badRequest(res, 'Cannot request your own skill.')
 
-    // Check no duplicate pending exchange
+    // Check no duplicate pending or active exchange
     const existing = await prisma.exchange.findFirst({
       where: {
-        offerer_id: req.user.id,
-        requester_id: requestedSkill.user_id,
-        status: 'PENDING',
+        OR: [
+          { offerer_id: req.user.id, requester_id: requestedSkill.user_id },
+          { offerer_id: requestedSkill.user_id, requester_id: req.user.id },
+        ],
+        status: { in: ['PENDING', 'ACCEPTED', 'IN_PROGRESS'] },
       },
     })
-    if (existing) return badRequest(res, 'You already have a pending exchange with this user.')
+    if (existing) return badRequest(res, 'You already have an active or pending exchange with this user.')
 
     const exchange = await prisma.exchange.create({
       data: {

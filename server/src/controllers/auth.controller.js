@@ -217,8 +217,10 @@ export const resetPassword = async (req, res, next) => {
 
 // ── Google OAuth callback ─────────────────────────────────────────────────────
 export const googleCallback = (req, res) => {
+  const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173').split(',')[0].trim().replace(/\/+$/, '')
+
   if (!req.user) {
-    return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/error?code=oauth`)
+    return res.redirect(`${clientUrl}/error?code=oauth`)
   }
 
   const token = signToken(req.user.id)
@@ -229,5 +231,5 @@ export const googleCallback = (req, res) => {
     onboarding: (!req.user.onboarding_done).toString()
   }).toString()
 
-  res.redirect(`${process.env.CLIENT_URL}/auth/callback?${redirectParams}`)
+  res.redirect(`${clientUrl}/auth/callback?${redirectParams}`)
 }
