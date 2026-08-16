@@ -1,6 +1,7 @@
 import { Server } from 'socket.io'
 import { verifyToken } from '../utils/tokenUtils.js'
 import prisma from '../config/db.js'
+import { getAllowedOrigins } from '../config/cors.js'
 
 // userId → Set of socketIds
 const onlineUsers = new Map()
@@ -8,7 +9,15 @@ const onlineUsers = new Map()
 export const initSocket = (httpServer) => {
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL || 'http://localhost:5173',
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true)
+        const allowed = getAllowedOrigins()
+        const sanitizedOrigin = origin.replace(/\/+$/, '')
+        if (allowed.includes(sanitizedOrigin) || process.env.NODE_ENV !== 'production') {
+          return callback(null, true)
+        }
+        return callback(new Error('Socket CORS origin not allowed'))
+      },
       credentials: true,
     },
   })

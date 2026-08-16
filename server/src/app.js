@@ -3,6 +3,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 import passport from 'passport'
+import { corsOptions } from './config/cors.js'
 import { globalLimiter } from './middleware/rateLimiter.js'
 import { errorHandler } from './middleware/errorHandler.js'
 import './config/passport.js'
@@ -35,23 +36,13 @@ app.use(helmet({
   },
 }))
 
-app.use(cors({
-  origin: [
-    process.env.CLIENT_URL, 
-    'http://localhost:5173', 
-    'http://localhost:5174',
-    'http://localhost:5175'
-  ].filter(Boolean),
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}))
+app.use(cors(corsOptions))
 
 app.use(globalLimiter)
 
 // ─── Body Parsing ─────────────────────────────────────────────────────────────
-app.use(express.json({ limit: '10mb' }))
-app.use(express.urlencoded({ extended: true, limit: '10mb' }))
+app.use(express.json({ limit: '2mb' }))
+app.use(express.urlencoded({ extended: true, limit: '2mb' }))
 app.use(cookieParser(process.env.COOKIE_SECRET))
 
 // ─── Passport ─────────────────────────────────────────────────────────────────
