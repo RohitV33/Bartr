@@ -6,15 +6,15 @@ services:
     container_name: bartr_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: bartr
-      POSTGRES_PASSWORD: bartrpass
-      POSTGRES_DB: bartrdb
+      POSTGRES_USER: ${POSTGRES_USER:-bartr}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bartrpass}
+      POSTGRES_DB: ${POSTGRES_DB:-bartrdb}
     ports:
-      - '5432:5432'
+      - '${POSTGRES_BIND_IP:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U bartr -d bartrdb']
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-bartr} -d ${POSTGRES_DB:-bartrdb}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
     command: redis-server --appendonly yes
     ports:
-      - '6379:6379'
+      - '${REDIS_BIND_IP:-127.0.0.1}:${REDIS_PORT:-6379}:6379'
     volumes:
       - redis_data:/data
     healthcheck:
@@ -39,10 +39,10 @@ services:
     container_name: bartr_pgadmin
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@bartr.dev
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@bartr.dev}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
     ports:
-      - '5050:80'
+      - '${PGADMIN_BIND_IP:-127.0.0.1}:${PGADMIN_PORT:-5050}:80'
     depends_on:
       postgres:
         condition: service_healthy
@@ -52,3 +52,4 @@ services:
 volumes:
   postgres_data:
   redis_data:
+
