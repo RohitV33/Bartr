@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+﻿import { motion } from 'framer-motion'
 import { ArrowSquareOut } from '@phosphor-icons/react'
 
 export default function PortfolioFooter() {
@@ -90,6 +90,3 @@ export default function PortfolioFooter() {
     </footer>
   )
 }
-
-export default function PortfolioFooter() {
-  const currentYear = new Date().getFullYear()
