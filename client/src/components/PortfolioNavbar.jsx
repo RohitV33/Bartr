@@ -5,14 +5,20 @@ import { List, X, ArrowSquareOut } from '@phosphor-icons/react'
 import ThemeToggle from './ThemeToggle.jsx'
 
 export default function PortfolioNavbar() {
+  const [visible, setVisible] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
     const handler = () => {
-      setScrolled(window.scrollY > 40)
+      // Intro section is active for roughly 1.4 viewports (window.innerHeight * 1.2)
+      // Only show the navbar after the keyhole intro is unlocked
+      const introThreshold = window.innerHeight * 1.1
+      setVisible(window.scrollY > introThreshold)
+      setScrolled(window.scrollY > introThreshold + 100)
     }
+    handler()
     window.addEventListener('scroll', handler, { passive: true })
     return () => window.removeEventListener('scroll', handler)
   }, [])
@@ -26,14 +32,18 @@ export default function PortfolioNavbar() {
 
   return (
     <motion.header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ease-out ${
+        visible 
+          ? 'opacity-100 translate-y-0 pointer-events-auto' 
+          : 'opacity-0 -translate-y-10 pointer-events-none'
+      } ${
         scrolled 
           ? 'py-4 bg-[#F7F7F5]/85 dark:bg-[#0d0d0f]/85 backdrop-blur-xl border-b border-[#0B0B0A]/5 dark:border-white/10 shadow-[0_2px_20px_rgba(11,11,10,0.02)]' 
           : 'py-6 bg-gradient-to-b from-black/60 to-transparent'
       }`}
       initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      animate={{ y: visible ? 0 : -40, opacity: visible ? 1 : 0 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
         {/* Brand Logo */}

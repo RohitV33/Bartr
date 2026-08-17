@@ -14,7 +14,7 @@ export default function ScrollIntro({ children }) {
   // Animation Transforms mapped to 0% -> 100% mouse scroll
   // -------------------------------------------------------------
 
-  // 1. Keyhole Hole Zoom Scale: 1.0 (centered keyhole) -> 35.0 (zooms past screen)
+  // 1. Keyhole Hole Zoom Scale: 1.0 (centered keyhole) -> 38.0 (zooms past screen)
   const keyholeScale = useTransform(
     scrollYProgress,
     [0, 0.2, 0.45, 0.7, 0.92],
@@ -42,25 +42,21 @@ export default function ScrollIntro({ children }) {
   const textScale = useTransform(scrollYProgress, [0, 0.4], [1, 1.35])
   const textY = useTransform(scrollYProgress, [0, 0.4], [0, -35])
 
-  // 5. Scroll Hint Prompt Fade (0% -> 12% scroll)
-  const hintOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0])
-  const hintY = useTransform(scrollYProgress, [0, 0.12], [0, 15])
-
   // Dynamic pointer events to enable site interaction once unlocked
   const pointerEvents = useTransform(scrollYProgress, (v) => (v > 0.75 ? 'none' : 'auto'))
 
   return (
-    <div ref={containerRef} className="relative w-full h-[220vh] bg-[#070709] select-none">
-      {/* Film Grain Filter SVG Definition */}
+    <div ref={containerRef} className="relative w-full h-[220vh] bg-[#050507] select-none">
+      {/* Film Grain Filter SVG Definition with Rich Grain Parameters */}
       <svg className="pointer-events-none absolute w-0 h-0 overflow-hidden" aria-hidden="true">
         <filter id="cinematic-grain" x="0%" y="0%" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch" />
-          <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.15 0" />
+          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" />
+          <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.22 0" />
         </filter>
       </svg>
 
       {/* Sticky Frame: Pinned for 100vh during intro scroll */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center bg-[#070709]">
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center bg-[#050507]">
         
         {/* Layer 1: Clean Bartr Landing Page / Hero Section */}
         <motion.div
@@ -73,7 +69,7 @@ export default function ScrollIntro({ children }) {
           {children}
         </motion.div>
 
-        {/* Layer 2: Keyhole Zoom Portal Mask Overlay */}
+        {/* Layer 2: Keyhole Zoom Portal Mask Overlay & Dark Atmospheric Interior */}
         <motion.div
           className="absolute inset-0 w-full h-full z-20 pointer-events-none flex items-center justify-center"
           style={{
@@ -106,10 +102,17 @@ export default function ScrollIntro({ children }) {
 
               {/* Soft Radial Glow Gradient for Keyhole Rim */}
               <radialGradient id="rim-glow" cx="50%" cy="46%" r="50%">
-                <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.8" />
-                <stop offset="40%" stopColor="#D97706" stopOpacity="0.4" />
-                <stop offset="80%" stopColor="#7C3AED" stopOpacity="0.1" />
-                <stop offset="100%" stopColor="#070709" stopOpacity="0" />
+                <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.85" />
+                <stop offset="35%" stopColor="#D97706" stopOpacity="0.5" />
+                <stop offset="75%" stopColor="#7C3AED" stopOpacity="0.15" />
+                <stop offset="100%" stopColor="#050507" stopOpacity="0" />
+              </radialGradient>
+
+              {/* Atmospheric Dark Wall Background Gradient */}
+              <radialGradient id="wall-ambient" cx="50%" cy="46%" r="70%">
+                <stop offset="0%" stopColor="#14141A" stopOpacity="0.95" />
+                <stop offset="40%" stopColor="#0A0A0E" stopOpacity="0.98" />
+                <stop offset="85%" stopColor="#040406" stopOpacity="1" />
               </radialGradient>
             </defs>
 
@@ -117,7 +120,7 @@ export default function ScrollIntro({ children }) {
             <rect
               width="1000"
               height="1000"
-              fill="#070709"
+              fill="url(#wall-ambient)"
               mask="url(#keyhole-cutout-mask)"
             />
 
@@ -126,12 +129,12 @@ export default function ScrollIntro({ children }) {
               d="M 500, 260 A 100,100 0 0,0 420, 450 L 380, 640 A 24,24 0 0,0 404, 668 L 596, 668 A 24,24 0 0,0 620, 640 L 580, 450 A 100,100 0 0,0 500, 260 Z"
               fill="none"
               stroke="url(#rim-glow)"
-              strokeWidth="28"
+              strokeWidth="32"
               style={{
                 scale: keyholeScale,
                 transformOrigin: '500px 464px',
                 opacity: glowOpacity,
-                filter: 'blur(14px)',
+                filter: 'blur(16px)',
               }}
             />
 
@@ -150,14 +153,18 @@ export default function ScrollIntro({ children }) {
             />
           </svg>
 
-          {/* Film Grain Texture Overlay */}
+          {/* Enhanced Film Grain & Noise Overlay Layers */}
           <div
-            className="absolute inset-0 opacity-[0.09] mix-blend-overlay pointer-events-none z-30"
+            className="absolute inset-0 opacity-[0.16] mix-blend-overlay pointer-events-none z-30"
+            style={{ filter: 'url(#cinematic-grain)' }}
+          />
+          <div
+            className="absolute inset-0 opacity-[0.12] mix-blend-soft-light pointer-events-none z-30"
             style={{ filter: 'url(#cinematic-grain)' }}
           />
 
-          {/* Vignette Shadow Overlay around edges */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,#070709_85%)] pointer-events-none z-20" />
+          {/* Deep Vignette Shadow Overlay around edges */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_15%,#040406_85%)] pointer-events-none z-20" />
         </motion.div>
 
         {/* Layer 3: Editorial Typography positioned in upper section of keyhole */}
@@ -184,23 +191,6 @@ export default function ScrollIntro({ children }) {
           <p className="font-playfair italic text-base sm:text-lg text-amber-100/90 font-normal tracking-wider mt-2 drop-shadow-md">
             Your skills are the key.
           </p>
-        </motion.div>
-
-        {/* Layer 4: Scroll Hint Prompt (0% -> 12% scroll) */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-2.5 pointer-events-none"
-          style={{ opacity: hintOpacity, y: hintY }}
-        >
-          <div className="w-5 h-8 rounded-full border-2 border-white/30 p-1 flex justify-center">
-            <motion.div
-              className="w-1 h-2 rounded-full bg-amber-400"
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          </div>
-          <span className="text-[10px] font-jakarta font-bold text-white/60 tracking-[0.25em] uppercase">
-            Scroll to unlock
-          </span>
         </motion.div>
       </div>
     </div>
