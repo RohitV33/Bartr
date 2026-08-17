@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@400;500;600;700&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -304,11 +304,13 @@
 }
 
 /* Font aliases — keep backward compat */
-.font-syne    { font-family: 'Space Grotesk', sans-serif; }
-.font-jakarta { font-family: 'Inter', sans-serif; }
-.font-grotesk { font-family: 'Space Grotesk', sans-serif; }
-.font-inter   { font-family: 'Inter', sans-serif; }
-.font-playfair { font-family: 'Playfair Display', serif; }
+.font-syne      { font-family: 'Space Grotesk', sans-serif; }
+.font-jakarta   { font-family: 'Inter', sans-serif; }
+.font-grotesk   { font-family: 'Space Grotesk', sans-serif; }
+.font-inter     { font-family: 'Inter', sans-serif; }
+.font-playfair  { font-family: 'Playfair Display', serif; }
+.font-cormorant { font-family: 'Cormorant Garamond', serif; }
+
 
 .portfolio-glass {
   background: rgba(247, 247, 245, 0.7);
