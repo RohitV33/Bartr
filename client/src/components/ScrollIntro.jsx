@@ -1,4 +1,4 @@
-﻿import { useRef } from 'react'
+import { useRef } from 'react'
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
 
 export default function ScrollIntro({ children }) {
@@ -221,3 +221,6 @@ export default function ScrollIntro({ children }) {
 
       </div>
     </div>
+  )
+}
+

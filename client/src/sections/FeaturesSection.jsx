@@ -91,9 +91,9 @@ export default function FeaturesSection() {
                       position: 'absolute',
                       left: `calc(50% + ${x}px - 24px)`,
                       top: `calc(50% + ${y}px - 24px)`,
+                      fontFamily: "'Space Grotesk', sans-serif",
                     }}
                     className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-300 focus:outline-none z-10 border"
-                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                     animate={{ 
                       rotate: activeIndex * 72,
                       backgroundColor: isActive ? '#C9A84C' : 'rgba(23,19,13,0.9)',
