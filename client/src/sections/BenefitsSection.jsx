@@ -1,35 +1,35 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowSquareOut } from '@phosphor-icons/react'
 
 const SKILL_SERVICES = [
   {
     title: 'Design & Visuals',
-    skills: 'UI/UX Design • Figma • Illustrator • Branding & Design Systems',
+    skills: 'UI/UX Design â€¢ Figma â€¢ Illustrator â€¢ Branding & Design Systems',
     image: 'https://images.unsplash.com/photo-1561070791-26c113006238?q=80&w=600&auto=format&fit=crop',
     number: '01'
   },
   {
     title: 'Software Engineering',
-    skills: 'React.js • Node.js • Python • PostgreSQL • Machine Learning',
+    skills: 'React.js â€¢ Node.js â€¢ Python â€¢ PostgreSQL â€¢ Machine Learning',
     image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&auto=format&fit=crop',
     number: '02'
   },
   {
     title: 'Written Communication',
-    skills: 'Copywriting • Content Writing • Technical Documentation • Essays',
+    skills: 'Copywriting â€¢ Content Writing â€¢ Technical Documentation â€¢ Essays',
     image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=600&auto=format&fit=crop',
     number: '03'
   },
   {
     title: 'Academics & Language',
-    skills: 'Calculus • Physics • Spanish • German • Data Structures',
+    skills: 'Calculus â€¢ Physics â€¢ Spanish â€¢ German â€¢ Data Structures',
     image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop',
     number: '04'
   },
   {
     title: 'Media & Production',
-    skills: 'Video Editing • Premiere Pro • Motion Graphics • Audio Engineering',
+    skills: 'Video Editing â€¢ Premiere Pro â€¢ Motion Graphics â€¢ Audio Engineering',
     image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=600&auto=format&fit=crop',
     number: '05'
   }
@@ -137,7 +137,3 @@ export default function BenefitsSection() {
     </section>
   )
 }
-
-const SKILL_SERVICES = [
-  {
-    title: 'Design & Visuals',
