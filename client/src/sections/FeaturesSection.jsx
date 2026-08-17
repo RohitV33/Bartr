@@ -1,18 +1,18 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, CheckCircle } from '@phosphor-icons/react'
+import { ArrowRight, CheckCircle, Sparkle } from '@phosphor-icons/react'
 
 const PHASES = [
   {
     num: '01',
     title: 'Define your skillset',
-    desc: 'Set up your portfolio by listing the skills you master and the knowledge areas you wish to explore. Our structured system supports coding, design, academics, and creative crafts.',
+    desc: 'Set up your student portfolio by listing the skills you master and the knowledge areas you wish to explore. Our structured system supports coding, design, academics, and creative crafts.',
     tag: 'Profile Setup'
   },
   {
     num: '02',
     title: 'Smart reciprocal matching',
-    desc: 'Our backend matching algorithm runs real-time checks to discover students whose learning goals align with your skills, and vice versa. Say goodbye to searching through listings.',
+    desc: 'Our backend matching algorithm runs real-time checks to discover students whose learning goals align with your skills, and vice versa. Say goodbye to searching through endless message boards.',
     tag: 'Matchmaking'
   },
   {
@@ -42,17 +42,20 @@ export default function FeaturesSection() {
   return (
     <section 
       id="features" 
-      className="py-32 px-6 md:px-12 bg-[#F7F7F5] border-t border-[#0B0B0A]/5 relative overflow-hidden"
+      className="py-32 px-6 md:px-12 bg-[#0A0806] border-t border-white/[0.05] relative overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto">
+      {/* Subtle background glow */}
+      <div className="absolute top-1/2 left-0 w-[500px] h-[500px] -translate-y-1/2 bg-[radial-gradient(circle,rgba(201,168,76,0.04)_0%,rgba(10,8,6,0)_70%)] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto relative z-10">
         
         {/* Section Header */}
         <div className="text-center md:text-left mb-24 max-w-2xl">
-          <span className="text-[10px] font-jakarta font-bold uppercase tracking-widest text-[#6D28D9] block mb-3">
+          <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#C9A84C] block mb-3" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             The Exchange Method
           </span>
-          <h2 className="font-syne text-4xl md:text-6xl font-bold tracking-tight text-[#0B0B0A]">
-            A structured cycle for peer-to-peer growth.
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-[#EDE8DC]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            Simple steps, <span className="font-normal italic text-[#C9A84C]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>meaningful connections.</span>
           </h2>
         </div>
 
@@ -63,9 +66,9 @@ export default function FeaturesSection() {
           <div className="lg:col-span-6 flex justify-center items-center relative py-12">
             
             {/* The outer guide track */}
-            <div className="w-[380px] h-[380px] rounded-full border border-[#0B0B0A]/5 absolute pointer-events-none flex items-center justify-center">
+            <div className="w-[380px] h-[380px] rounded-full border border-white/[0.06] absolute pointer-events-none flex items-center justify-center">
               {/* Inner accent ring */}
-              <div className="w-[300px] h-[300px] rounded-full border border-dashed border-[#6D28D9]/10" />
+              <div className="w-[300px] h-[300px] rounded-full border border-dashed border-[#C9A84C]/20" />
             </div>
 
             {/* Rotating Wheel of Numbers */}
@@ -89,15 +92,17 @@ export default function FeaturesSection() {
                       left: `calc(50% + ${x}px - 24px)`,
                       top: `calc(50% + ${y}px - 24px)`,
                     }}
-                    className="w-12 h-12 rounded-full flex items-center justify-center font-syne font-bold text-xs transition-all duration-300 focus:outline-none z-10"
+                    className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-300 focus:outline-none z-10 border"
+                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                     animate={{ 
                       rotate: activeIndex * 72,
-                      backgroundColor: isActive ? '#6D28D9' : '#FFFFFF',
-                      color: isActive ? '#F7F7F5' : '#0B0B0A',
+                      backgroundColor: isActive ? '#C9A84C' : 'rgba(23,19,13,0.9)',
+                      color: isActive ? '#0A0806' : '#EDE8DC',
+                      borderColor: isActive ? '#C9A84C' : 'rgba(201,168,76,0.2)',
                       scale: isActive ? 1.2 : 1,
                       boxShadow: isActive 
-                        ? '0 10px 25px rgba(109, 40, 217, 0.3)' 
-                        : '0 4px 10px rgba(11, 11, 10, 0.04)'
+                        ? '0 10px 30px rgba(201,168,76,0.35)' 
+                        : '0 4px 15px rgba(0,0,0,0.5)'
                     }}
                     whileHover={{ scale: isActive ? 1.2 : 1.1 }}
                   >
@@ -108,11 +113,11 @@ export default function FeaturesSection() {
             </motion.div>
 
             {/* Center Dial Brand Indicator */}
-            <div className="absolute w-24 h-24 rounded-full bg-[#FFFFFF] border border-[#0B0B0A]/5 shadow-xl flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-[10px] font-jakarta font-bold uppercase tracking-widest text-[#0B0B0A]/40">
+            <div className="absolute w-24 h-24 rounded-full bg-[#120F0A] border border-[#C9A84C]/25 shadow-2xl flex flex-col items-center justify-center pointer-events-none">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#EDE8DC]/40" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 Step
               </span>
-              <span className="font-syne text-3xl font-bold text-[#6D28D9]">
+              <span className="text-3xl font-bold text-[#C9A84C]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 {PHASES[activeIndex].num}
               </span>
             </div>
@@ -128,21 +133,33 @@ export default function FeaturesSection() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="space-y-6 max-w-lg"
+                className="space-y-6 max-w-lg p-8 rounded-3xl border"
+                style={{
+                  background: 'rgba(23,19,13,0.6)',
+                  borderColor: 'rgba(201,168,76,0.15)',
+                  boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
+                }}
               >
                 {/* Phase Category Tag */}
-                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#6D28D9]/10 text-[#6D28D9] text-[10px] font-jakarta font-bold uppercase tracking-wider">
-                  <CheckCircle className="w-3.5 h-3.5" />
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border"
+                  style={{
+                    background: 'rgba(201,168,76,0.1)',
+                    borderColor: 'rgba(201,168,76,0.25)',
+                    color: '#C9A84C',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                  }}
+                >
+                  <CheckCircle className="w-3.5 h-3.5 text-[#C9A84C]" />
                   {PHASES[activeIndex].tag}
                 </span>
 
                 {/* Phase Title */}
-                <h3 className="font-syne text-3xl md:text-4xl font-extrabold text-[#0B0B0A] leading-tight">
+                <h3 className="text-3xl md:text-4xl font-bold text-[#EDE8DC] leading-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   {PHASES[activeIndex].title}
                 </h3>
 
                 {/* Phase Description */}
-                <p className="text-sm sm:text-base text-[#0B0B0A]/60 font-jakarta leading-relaxed">
+                <p className="text-sm sm:text-base text-[#EDE8DC]/60 leading-relaxed font-normal" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   {PHASES[activeIndex].desc}
                 </p>
 
@@ -150,7 +167,8 @@ export default function FeaturesSection() {
                 <div className="pt-4 flex items-center gap-4">
                   <button 
                     onClick={() => setActiveIndex((prev) => (prev + 1) % PHASES.length)}
-                    className="group inline-flex items-center gap-2 text-xs font-jakarta font-bold text-[#6D28D9] uppercase tracking-wider"
+                    className="group inline-flex items-center gap-2 text-xs font-bold text-[#C9A84C] uppercase tracking-wider"
+                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                   >
                     Next Phase
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -159,7 +177,7 @@ export default function FeaturesSection() {
                     {PHASES.map((_, i) => (
                       <span 
                         key={i} 
-                        className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${activeIndex === i ? 'bg-[#6D28D9] w-4' : 'bg-[#0B0B0A]/10'}`}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${activeIndex === i ? 'bg-[#C9A84C] w-4' : 'bg-white/15 w-1.5'}`}
                       />
                     ))}
                   </div>
