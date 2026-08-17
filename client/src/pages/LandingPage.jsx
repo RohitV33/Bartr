@@ -1,4 +1,5 @@
 import PortfolioNavbar from '../components/PortfolioNavbar'
+import ScrollIntro from '../components/ScrollIntro'
 import HeroSection from '../sections/HeroSection'
 import DashboardSection from '../sections/DashboardSection'
 import FeaturesSection from '../sections/FeaturesSection'
@@ -11,7 +12,9 @@ export default function LandingPage() {
     <div className="portfolio-theme">
       <PortfolioNavbar />
       <main>
-        <HeroSection />
+        <ScrollIntro>
+          <HeroSection />
+        </ScrollIntro>
         <DashboardSection />
         <FeaturesSection />
         <BenefitsSection />
@@ -21,4 +24,5 @@ export default function LandingPage() {
     </div>
   )
 }
+
 

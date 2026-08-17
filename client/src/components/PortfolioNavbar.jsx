@@ -28,8 +28,8 @@ export default function PortfolioNavbar() {
     <motion.header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled 
-          ? 'py-4 bg-[#F7F7F5]/80 backdrop-blur-xl border-b border-[#0B0B0A]/5 shadow-[0_2px_20px_rgba(11,11,10,0.02)]' 
-          : 'py-6 bg-transparent'
+          ? 'py-4 bg-[#F7F7F5]/85 dark:bg-[#0d0d0f]/85 backdrop-blur-xl border-b border-[#0B0B0A]/5 dark:border-white/10 shadow-[0_2px_20px_rgba(11,11,10,0.02)]' 
+          : 'py-6 bg-gradient-to-b from-black/60 to-transparent'
       }`}
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
@@ -41,21 +41,29 @@ export default function PortfolioNavbar() {
           href="#" 
           className="flex items-center gap-3 group focus:outline-none"
         >
-          <span className="w-8 h-8 rounded-full bg-[#0B0B0A] text-[#F7F7F5] flex items-center justify-center font-syne font-extrabold text-sm transition-transform duration-500 group-hover:rotate-[360deg]">
+          <span className={`w-8 h-8 rounded-full flex items-center justify-center font-syne font-extrabold text-sm transition-all duration-500 group-hover:rotate-[360deg] ${
+            scrolled ? 'bg-[#0B0B0A] dark:bg-white text-[#F7F7F5] dark:text-[#0d0d0f]' : 'bg-white/10 border border-white/20 text-white backdrop-blur-md'
+          }`}>
             B
           </span>
-          <span className="font-syne font-bold text-xl tracking-tight text-[#0B0B0A] transition-colors group-hover:text-[#6D28D9]">
+          <span className={`font-syne font-bold text-xl tracking-tight transition-colors group-hover:text-[#6D28D9] ${
+            scrolled ? 'text-[#0B0B0A] dark:text-white' : 'text-white'
+          }`}>
             Bartr
           </span>
         </a>
 
         {/* Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8 bg-[#0B0B0A]/5 px-6 py-2 rounded-full border border-[#0B0B0A]/5">
+        <nav className={`hidden md:flex items-center gap-8 px-6 py-2 rounded-full transition-all duration-500 ${
+          scrolled ? 'bg-[#0B0B0A]/5 dark:bg-white/5 border border-[#0B0B0A]/5 dark:border-white/10' : 'bg-white/10 backdrop-blur-md border border-white/15'
+        }`}>
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="text-xs font-jakarta font-medium text-[#0B0B0A]/60 hover:text-[#0B0B0A] transition-colors tracking-wide uppercase"
+              className={`text-xs font-jakarta font-medium transition-colors tracking-wide uppercase ${
+                scrolled ? 'text-[#0B0B0A]/60 dark:text-white/60 hover:text-[#0B0B0A] dark:hover:text-white' : 'text-white/80 hover:text-white'
+              }`}
             >
               {link.label}
             </a>
@@ -68,7 +76,9 @@ export default function PortfolioNavbar() {
 
           <button
             onClick={() => navigate('/login')}
-            className="text-xs font-jakarta font-semibold text-[#0B0B0A] hover:opacity-70 transition-opacity uppercase tracking-wider"
+            className={`text-xs font-jakarta font-semibold transition-opacity uppercase tracking-wider ${
+              scrolled ? 'text-[#0B0B0A] dark:text-white hover:opacity-70' : 'text-white/90 hover:text-white'
+            }`}
           >
             Sign In
           </button>
@@ -77,7 +87,7 @@ export default function PortfolioNavbar() {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => navigate('/register')}
-            className="flex items-center gap-1.5 bg-[#6D28D9] text-[#F7F7F5] text-xs font-jakarta font-bold px-5 py-2.5 rounded-full shadow-[0_4px_14px_rgba(109,40,217,0.2)] hover:bg-[#5B21B6] transition-all tracking-wider uppercase"
+            className="flex items-center gap-1.5 bg-[#6D28D9] text-[#F7F7F5] text-xs font-jakarta font-bold px-5 py-2.5 rounded-full shadow-[0_4px_14px_rgba(109,40,217,0.3)] hover:bg-[#5B21B6] transition-all tracking-wider uppercase"
           >
             Start Swapping
             <ArrowSquareOut className="w-3.5 h-3.5" />
@@ -87,7 +97,9 @@ export default function PortfolioNavbar() {
         {/* Mobile menu trigger */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden w-10 h-10 flex items-center justify-center rounded-full bg-[#0B0B0A]/5 hover:bg-[#0B0B0A]/10 text-[#0B0B0A] transition-colors"
+          className={`md:hidden w-10 h-10 flex items-center justify-center rounded-full transition-colors ${
+            scrolled ? 'bg-[#0B0B0A]/5 dark:bg-white/10 text-[#0B0B0A] dark:text-white' : 'bg-white/10 text-white backdrop-blur-md border border-white/20'
+          }`}
           aria-label="Toggle Navigation"
         >
           {menuOpen ? <X className="w-5 h-5" weight="bold" /> : <List className="w-5 h-5" weight="bold" />}
