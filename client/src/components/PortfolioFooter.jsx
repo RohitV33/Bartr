@@ -1,4 +1,4 @@
-﻿import { motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { ArrowSquareOut } from '@phosphor-icons/react'
 
 export default function PortfolioFooter() {
@@ -78,7 +78,7 @@ export default function PortfolioFooter() {
 
         {/* Footer bottom bar */}
         <div className="border-t border-white/[0.05] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#EDE8DC]/40 font-normal" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-          <p>Â© {currentYear} Bartr. Designed for peer-to-peer student skill exchange.</p>
+          <p>&copy; {currentYear} Bartr. Designed for peer-to-peer student skill exchange.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-[#C9A84C] transition-colors">Twitter</a>
             <a href="#" className="hover:text-[#C9A84C] transition-colors">LinkedIn</a>

@@ -1,4 +1,4 @@
-﻿import { useRef } from 'react'
+import { useRef } from 'react'
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
 import { ArrowRight, SealCheck, Star, Users } from '@phosphor-icons/react'
 
@@ -6,7 +6,7 @@ const STORIES = [
   {
     category: 'Design & Code Swap',
     title: 'Figma UI/UX Design for React Frontend Development',
-    students: 'Aisha J. â‡„ Marcus L.',
+    students: 'Aisha J. ⇄ Marcus L.',
     description: 'Aisha needed a web prototype built in React, and Marcus wanted to learn UX layout and wireframing in Figma. They did a 6-session swap and launched a campus roommate-finder app.',
     rating: '5.0',
     tags: ['Design', 'React', 'Campus Project']
@@ -14,15 +14,15 @@ const STORIES = [
   {
     category: 'Content & Media Swap',
     title: 'Copywriting for Professional Video Editing',
-    students: 'Priya S. â‡„ Sofia R.',
-    description: 'Priya wrote marketing landing copy and newsletters for Sofiaâ€™s freelance editing studio, while Sofia edited a 2-minute personal brand reel for Priyaâ€™s internship application.',
+    students: 'Priya S. ⇄ Sofia R.',
+    description: "Priya wrote marketing landing copy and newsletters for Sofia's freelance editing studio, while Sofia edited a 2-minute personal brand reel for Priya's internship application.",
     rating: '4.9',
     tags: ['Marketing', 'Premiere Pro', 'Writing']
   },
   {
     category: 'STEM & Language Swap',
     title: 'Python Scripting for Spanish Conversation',
-    students: 'Mateo K. â‡„ Sofia V.',
+    students: 'Mateo K. ⇄ Sofia V.',
     description: 'Mateo helped Sofia prepare for her Data Science midterm with coding lessons, and Sofia coached Mateo with native conversation for his exchange semester in Madrid.',
     rating: '5.0',
     tags: ['Python', 'Spanish', 'Academics']
@@ -30,8 +30,8 @@ const STORIES = [
   {
     category: 'Art & Writing Swap',
     title: 'Vector Illustration for Technical Writing',
-    students: 'Lucas G. â‡„ Maya T.',
-    description: 'Lucas illustrated custom vector icons for Mayaâ€™s engineering portfolio, and Maya helped structure and edit Lucasâ€™s technical research grant proposal.',
+    students: 'Lucas G. ⇄ Maya T.',
+    description: "Lucas illustrated custom vector icons for Maya's engineering portfolio, and Maya helped structure and edit Lucas's technical research grant proposal.",
     rating: '5.0',
     tags: ['Vector Art', 'Technical docs', 'Research']
   }

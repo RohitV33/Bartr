@@ -1,15 +1,15 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Minus } from '@phosphor-icons/react'
 
 const FAQS = [
   {
     q: 'How does Bartr work?',
-    a: 'Bartr is a peer-to-peer skill exchange platform for students. You post a skill you can offer and a skill you need. Our matching algorithm connects you with another student who has the complementary pairing. You both agree to the exchange, complete it, and rate each other â€” no money changes hands.',
+    a: 'Bartr is a peer-to-peer skill exchange platform for students. You post a skill you can offer and a skill you need. Our matching algorithm connects you with another student who has the complementary pairing. You both agree to the exchange, complete it, and rate each other — no money changes hands.',
   },
   {
     q: 'Is Bartr completely free?',
-    a: "Yes, completely and always free. Bartr operates on a barter principle â€” the value you bring is the skill you offer. There are no subscription tiers, premium features, or hidden costs. We're funded by university partnerships, not user fees.",
+    a: "Yes, completely and always free. Bartr operates on a barter principle — the value you bring is the skill you offer. There are no subscription tiers, premium features, or hidden costs. We're funded by university partnerships, not user fees.",
   },
   {
     q: 'How does the matching work?',
