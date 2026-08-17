@@ -63,9 +63,7 @@ export default function App() {
       <BrowserRouter>
         <ErrorBoundary>
           <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center bg-bartr-bg">
-              <Spinner size="lg" />
-            </div>
+            <div className="min-h-screen bg-[#070709]" />
           }>
             <Routes>
               <Route path="/" element={<LandingPage />} />
