@@ -1,15 +1,15 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Minus } from '@phosphor-icons/react'
 
 const FAQS = [
   {
     q: 'How does Bartr work?',
-    a: 'Bartr is a peer-to-peer skill exchange platform for students. You post a skill you can offer and a skill you need. Our matching algorithm connects you with another student who has the complementary pairing. You both agree to the exchange, complete it, and rate each other — no money changes hands.',
+    a: 'Bartr is a peer-to-peer skill exchange platform for students. You post a skill you can offer and a skill you need. Our matching algorithm connects you with another student who has the complementary pairing. You both agree to the exchange, complete it, and rate each other â€” no money changes hands.',
   },
   {
     q: 'Is Bartr completely free?',
-    a: "Yes, completely and always free. Bartr operates on a barter principle — the value you bring is the skill you offer. There are no subscription tiers, premium features, or hidden costs. We're funded by university partnerships, not user fees.",
+    a: "Yes, completely and always free. Bartr operates on a barter principle â€” the value you bring is the skill you offer. There are no subscription tiers, premium features, or hidden costs. We're funded by university partnerships, not user fees.",
   },
   {
     q: 'How does the matching work?',
@@ -25,22 +25,22 @@ const FAQS = [
   },
   {
     q: 'Is my university already partnered with Bartr?',
-    a: "We're currently partnered with 40+ universities and growing. Even if your university isn't officially partnered, you can still sign up with your student email and use all features. Reach out to your student union to get your university added officially.",
+    a: "We're currently partnered with 120+ universities and growing. Even if your university isn't officially partnered, you can still sign up with your student email and use all features. Reach out to your student union to get your university added officially.",
   },
 ]
 
 function FaqItem({ q, a, isOpen, onClick }) {
   return (
-    <div className="border-b border-[#0B0B0A]/10 py-6">
+    <div className="border-b border-white/[0.08] py-6">
       <button
         onClick={onClick}
         className="w-full flex items-center justify-between text-left focus:outline-none group py-2"
         aria-expanded={isOpen}
       >
-        <span className={`font-syne text-lg sm:text-xl font-bold transition-colors duration-300 ${isOpen ? 'text-[#6D28D9]' : 'text-[#0B0B0A] hover:text-[#6D28D9]/85'}`}>
+        <span className={`text-lg sm:text-xl font-bold transition-colors duration-300 ${isOpen ? 'text-[#C9A84C]' : 'text-[#EDE8DC] hover:text-[#C9A84C]'}`} style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
           {q}
         </span>
-        <span className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-[#6D28D9] border-[#6D28D9] text-[#F7F7F5]' : 'border-[#0B0B0A]/10 text-[#0B0B0A] group-hover:border-[#6D28D9]/40 group-hover:text-[#6D28D9]'}`}>
+        <span className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-[#C9A84C] border-[#C9A84C] text-[#0A0806]' : 'border-white/[0.1] text-[#EDE8DC] group-hover:border-[#C9A84C]/60 group-hover:text-[#C9A84C]'}`}>
           {isOpen ? <Minus className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
         </span>
       </button>
@@ -54,7 +54,7 @@ function FaqItem({ q, a, isOpen, onClick }) {
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <p className="font-jakarta text-xs sm:text-sm text-[#0B0B0A]/60 leading-relaxed font-medium pb-4">
+            <p className="text-xs sm:text-sm text-[#EDE8DC]/60 leading-relaxed font-normal pb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               {a}
             </p>
           </motion.div>
@@ -68,21 +68,21 @@ export default function FAQSection() {
   const [openIdx, setOpenIdx] = useState(0)
 
   return (
-    <section id="faq" className="py-32 px-6 md:px-12 bg-[#F7F7F5] border-t border-[#0B0B0A]/5 relative overflow-hidden">
-      <div className="max-w-4xl mx-auto">
+    <section id="faq" className="py-32 px-6 md:px-12 bg-[#0A0806] border-t border-white/[0.05] relative overflow-hidden">
+      <div className="max-w-4xl mx-auto relative z-10">
         
         {/* Section Header */}
         <div className="text-center mb-20">
-          <span className="text-[10px] font-jakarta font-bold uppercase tracking-widest text-[#6D28D9] block mb-3">
-            Inquiries & Help
+          <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#C9A84C] block mb-3" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            Inquiries &amp; Help
           </span>
-          <h2 className="font-syne text-4xl md:text-6xl font-bold tracking-tight text-[#0B0B0A]">
-            Commonly asked questions.
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-[#EDE8DC]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            Commonly asked <span className="font-normal italic text-[#C9A84C]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>questions.</span>
           </h2>
         </div>
 
         {/* FAQs List */}
-        <div className="border-t border-[#0B0B0A]/10">
+        <div className="border-t border-white/[0.08]">
           {FAQS.map((faq, i) => (
             <FaqItem
               key={i}
